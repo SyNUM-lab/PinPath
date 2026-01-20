@@ -1,0 +1,30 @@
+Package: PinPath
+Type: Package
+Title: PinPath - R package for pathway visualization
+Version: 1.31.1
+Date: 2026-01-20
+Authors@R: c(person("Jarno", "Koetsier", role = c("aut","cre"),
+                     email = "jarno.koetsier@maastrichtuniversity.nl",
+                     comment = c(ORCID = "0000-0002-7981-1345")),
+             person("Lars", "Eijssen", role = "aut",
+                     comment = c(ORCID = "0000-0002-6473-2839")),
+	     person("Egon", "Willighagen", role = "aut",
+                     comment = c(ORCID = "0000-0001-7542-0286"))
+           )
+Imports: httr, utils, XML, xml2, rjson, data.table, RCurl, magrittr, dplyr, tidyr, readr, stringr, purrr, lubridate, magick, shape, grid, gridBase, svglite, clusterProfiler, AnnotationDbi
+Suggests: 
+    testthat (>= 3.0.0),
+    BiocStyle,
+    knitr,
+    rmarkdown
+Encoding: UTF-8
+Description: Use this package to interface with the WikiPathways API. It provides programmatic access to WikiPathways content in multiple data and image formats, including official monthly release files and convenient GMT read/write functions.
+License: MIT + file LICENSE
+URL: https://github.com/SyNUM-lab/PinPath
+BugReports: https://github.com/SyNUM-lab/PinPath/issues
+LazyLoad: yes
+biocViews: Visualization, GraphAndNetwork
+NeedsCompilation: no
+VignetteBuilder: knitr
+RoxygenNote: 7.3.3
+Config/testthat/edition: 3

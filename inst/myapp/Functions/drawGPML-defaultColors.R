@@ -1,0 +1,96 @@
+# ------------------------------------------------------------------------------
+#' @title Make default colorList
+#'
+#' @description This function makes default list that can be used to set the node colors in the pathway diagram. 
+#' @param colorVar \code{vector} or \code{data.frame} for coloring the nodes in the pathway. 
+#' This can be for instance a \code{data.frame} with the log2FCs and significance in the columns.
+#' @param colorNames (optional) \code{character} vector with names of the color variables. 
+#' These will be used to set the names in the legend.
+#' If \code{colorNames} is NULL, the column names of the \code{colorVar} \code{data.frame} will be used. 
+#' @return A list that can be provided to \link{drawGPML} to set the node 
+#' colors in the pathway diagram.
+#' @examples
+#' 
+#' # Load example data
+#' lung_expr <- read.csv(system.file("extdata","data-lung-cancer.csv", package="rWikiPathways"), 
+#' stringsAsFactors = FALSE)
+#' 
+#' # Set significance as a binary variable
+#' lung_expr$Significant <- ifelse(lung_expr$adj.P.Value < 0.05, "Yes", "No")
+#' 
+#' # Make default color list
+#' colorList <- rWikiPathways::defaultColorList(lung_expr[,c("log2FC", "Significant")])
+#' 
+#' @export
+
+defaultColorList_app <- function(ColorVar, ColorNames = NULL){
+  colorList <- list()
+  if (!is.data.frame(ColorVar)){
+    ColorVar <- data.frame(Color = ColorVar)
+  }
+  
+  if ((!is.null(ColorNames)) & (ncol(ColorVar) == length(ColorNames))){
+    colnames(ColorVar) <- ColorNames
+  }
+  if ((!is.null(ColorNames)) & (ncol(ColorVar) != length(ColorNames))){
+    warning("The number of color names is different than the number of color variables. 
+            Default color names will be used instead.")
+  }
+  for (c in 1:ncol(ColorVar)){
+    ColorVar_temp <- ColorVar[,c]
+    ColorVar_temp <- ColorVar_temp[!is.na(ColorVar_temp)]
+    if (is.numeric(ColorVar_temp)){
+      
+      # Divergent color scale
+      if ((min(ColorVar_temp, na.rm = TRUE) < 0) & (max(ColorVar_temp, na.rm = TRUE) > 0)){
+        
+        # Since we want to color scale to be symmetric, we set the absolute min and max value 
+        # to the same max absolute value
+        max_absolute_value <- max(abs(as.numeric(quantile(ColorVar_temp, 0.9, na.rm = TRUE))),
+                                  abs(as.numeric(quantile(ColorVar_temp, 0.1, na.rm = TRUE))))
+        
+        colorList[[c]] <- list(
+          ScaleName = colnames(ColorVar)[c],
+          ScaleType = "Divergent",
+          ColorVal = c("MinVal" = -1*max_absolute_value,
+                       "MidVal" = 0,
+                       "MaxVal" = max_absolute_value),
+          Color = c( "MinCol" = "#5754FF",
+                     "MidCol" = "white",
+                     "MaxCol" = "#FF4845"))
+      } 
+      
+      # Sequential color scale
+      if ((min(ColorVar_temp, na.rm = TRUE) >= 0) | (max(ColorVar_temp, na.rm = TRUE) <= 0)){
+        
+        colorList[[c]] <- list(
+          ScaleName = colnames(ColorVar)[c],
+          ScaleType = "Sequential",
+          ColorVal = c("MinVal" = as.numeric(quantile(ColorVar_temp,0.1, na.rm = TRUE)),
+                       "MaxVal" = as.numeric(quantile(ColorVar_temp,0.9, na.rm = TRUE))),
+          Color = c("MinCol" = "#DADAEB",
+                    "MaxCol" = "#54278F"))
+      }
+    } 
+    
+    # Qualitative color scale
+    if (!is.numeric(ColorVar_temp)){
+      
+      if (length(unique(ColorVar_temp)) == 2){
+        colorList[[c]] <- list(
+          ScaleName = colnames(ColorVar)[c],
+          ScaleType = "Qualitative",
+          Color = setNames(c("green", "yellow"), unique(ColorVar_temp))
+        )
+      } else{
+        colorList[[c]] <- list(
+          ScaleName = colnames(ColorVar)[c],
+          ScaleType = "Qualitative",
+          Color = setNames(rainbow(length(unique(ColorVar_temp))), unique(ColorVar_temp))
+        )
+      }
+    }
+  }
+  names(colorList) <- colnames(ColorVar)
+  return(colorList)
+}
