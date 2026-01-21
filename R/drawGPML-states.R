@@ -160,12 +160,12 @@
     polygon_df_plot <- rbind.data.frame(polygon_df_plot, temp)
   }
   
-  polygon(x = polygon_df_plot$x,
-          y = -1 *polygon_df_plot$y,
-          col = "white",
-          border ="black")
-  text(x = states_df$X,
-       y = -1*states_df$Y,
-       labels = states_df$TextLabel,
-       col = "black")
+  graphics::polygon(x = polygon_df_plot$x,
+                    y = -1 *polygon_df_plot$y,
+                    col = "white",
+                    border ="black")
+  graphics::text(x = states_df$X,
+                 y = -1*states_df$Y,
+                 labels = states_df$TextLabel,
+                 col = "black")
 }

@@ -464,12 +464,12 @@
                    df$ArrowType == "mim-necessary-stimulation",]
     
     # Draw edges
-    arrows(x0 = plotDF$X1, x1 = plotDF$X2,
-                  y0 = -1*plotDF$Y1, y1 = -1*plotDF$Y2, 
-                  length = 0, 
-                  col = plotDF$Color, 
-                  lty = plotDF$LineStyle, 
-                  lwd = plotDF$LineThickness)
+    graphics::arrows(x0 = plotDF$X1, x1 = plotDF$X2,
+                     y0 = -1*plotDF$Y1, y1 = -1*plotDF$Y2, 
+                     length = 0, 
+                     col = plotDF$Color, 
+                     lty = plotDF$LineStyle, 
+                     lwd = plotDF$LineThickness)
     
   }
   
@@ -486,22 +486,22 @@
     
     # We will plot the main body of the edge separately from the
     # arrow head, because the arrow head looks weird when the line is dashed.
-
+    
     # Collect X and Y coordinates in separate vectors
     x1 = plotDF_temp$X1
     x2 = plotDF_temp$X2
     y1 = plotDF_temp$Y1
     y2 = plotDF_temp$Y2
-
+    
     # Offset is the distance at which the arrow head should be attached to the
     # main body of the arrow
     offset <- 5
-
+    
     plotDF <- NULL
     for (a in 1:nrow(plotDF_temp)){
-
+      
       if (plotDF_temp$ArrowEnd[a] == "first"){
-
+        
         Xstart = x1[a]-offset*((x1[a]-x2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
         Xend = x2[a]
         X1 = x1[a]
@@ -510,7 +510,7 @@
         Yend = -y2[a]
         Y1 = -y1[a]
         Y2 = Ystart
-
+        
         plotDF <- rbind.data.frame(
           plotDF,
           data.frame(
@@ -519,9 +519,9 @@
           )
         )
       }
-
+      
       if (plotDF_temp$ArrowEnd[a] == "last"){
-
+        
         Xstart = x1[a]
         Xend = x2[a]-offset*((x2[a]-x1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
         X1 = Xend
@@ -530,7 +530,7 @@
         Yend = -1*(y2[a]-offset*((y2[a]-y1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
         Y1 = Yend
         Y2 = -y2[a]
-
+        
         plotDF <- rbind.data.frame(
           plotDF,
           data.frame(
@@ -540,14 +540,14 @@
         )
       }
     }
-
+    
     # Draw edges
-    arrows(x0 = plotDF$Xstart, x1 = plotDF$Xend,
-           y0 = plotDF$Ystart, y1 = plotDF$Yend, 
-           length = 0, 
-           col = plotDF_temp$Color, 
-           lty = plotDF_temp$LineStyle, 
-           lwd = plotDF_temp$LineThickness)
+    graphics::arrows(x0 = plotDF$Xstart, x1 = plotDF$Xend,
+                     y0 = plotDF$Ystart, y1 = plotDF$Yend, 
+                     length = 0, 
+                     col = plotDF_temp$Color, 
+                     lty = plotDF_temp$LineStyle, 
+                     lwd = plotDF_temp$LineThickness)
     shape::Arrows(x0 = plotDF$X1, x1 = plotDF$X2,
                   y0 = plotDF$Y1, y1 = plotDF$Y2, 
                   code = ifelse(plotDF_temp$ArrowEnd == "first", 1, 2), 
@@ -575,22 +575,22 @@
     
     # We will plot the main body of the edge separately from the
     # arrow head, because the arrow head looks weird when the line is dashed.
-
+    
     # Collect X and Y coordinates in separate vectors
     x1 = plotDF_temp$X1
     x2 = plotDF_temp$X2
     y1 = plotDF_temp$Y1
     y2 = plotDF_temp$Y2
-
+    
     # Offset is the distance at which the arrow head should be attached to the
     # main body of the arrow
     offset <- 5
-
+    
     plotDF <- NULL
     for (a in 1:nrow(plotDF_temp)){
-
+      
       if (plotDF_temp$ArrowEnd[a] == "first"){
-
+        
         Xstart = x1[a]-offset*((x1[a]-x2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
         Xend = x2[a]
         X1 = x1[a]
@@ -599,7 +599,7 @@
         Yend = -y2[a]
         Y1 = -y1[a]
         Y2 = Ystart
-
+        
         plotDF <- rbind.data.frame(
           plotDF,
           data.frame(
@@ -608,9 +608,9 @@
           )
         )
       }
-
+      
       if (plotDF_temp$ArrowEnd[a] == "last"){
-
+        
         Xstart = x1[a]
         Xend = x2[a]-offset*((x2[a]-x1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
         X1 = Xend
@@ -619,7 +619,7 @@
         Yend = -1*(y2[a]-offset*((y2[a]-y1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
         Y1 = Yend
         Y2 = -y2[a]
-
+        
         plotDF <- rbind.data.frame(
           plotDF,
           data.frame(
@@ -627,17 +627,17 @@
             Ystart, Yend, Y1, Y2
           )
         )
-
+        
       }
     }
-  
+    
     # Draw edges
-    arrows(x0 = plotDF$Xstart, x1 = plotDF$Xend,
-           y0 = plotDF$Ystart, y1 = plotDF$Yend, 
-           length = 0, 
-           col = plotDF_temp$Color, 
-           lty = plotDF_temp$LineStyle, 
-           lwd = plotDF_temp$LineThickness)
+    graphics::arrows(x0 = plotDF$Xstart, x1 = plotDF$Xend,
+                     y0 = plotDF$Ystart, y1 = plotDF$Yend, 
+                     length = 0, 
+                     col = plotDF_temp$Color, 
+                     lty = plotDF_temp$LineStyle, 
+                     lwd = plotDF_temp$LineThickness)
     shape::Arrows(x0 = plotDF$X1, x1 = plotDF$X2,
                   y0 = plotDF$Y1, y1 = plotDF$Y2, 
                   code = ifelse(plotDF_temp$ArrowEnd == "first", 1, 2), 
@@ -662,22 +662,22 @@
     
     # We will plot the main body of the edge separately from the
     # arrow head, because the arrow head looks weird when the line is dashed.
-
+    
     # Collect X and Y coordinates in separate vectors
     x1 = plotDF_temp$X1
     x2 = plotDF_temp$X2
     y1 = plotDF_temp$Y1
     y2 = plotDF_temp$Y2
-
+    
     # Offset is the distance at which the arrow head should be attached to the
     # main body of the arrow
     offset <- 5
-
+    
     plotDF <- NULL
     for (a in 1:nrow(plotDF_temp)){
-
+      
       if (plotDF_temp$ArrowEnd[a] == "first"){
-
+        
         Xstart = x1[a]-offset*((x1[a]-x2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
         Xend = x2[a]
         X1 = x1[a]
@@ -686,7 +686,7 @@
         Yend = -y2[a]
         Y1 = -y1[a]
         Y2 = Ystart
-
+        
         plotDF <- rbind.data.frame(
           plotDF,
           data.frame(
@@ -695,9 +695,9 @@
           )
         )
       }
-
+      
       if (plotDF_temp$ArrowEnd[a] == "last"){
-
+        
         Xstart = x1[a]
         Xend = x2[a]-offset*((x2[a]-x1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
         X1 = Xend
@@ -706,7 +706,7 @@
         Yend = -1*(y2[a]-offset*((y2[a]-y1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
         Y1 = Yend
         Y2 = -y2[a]
-
+        
         plotDF <- rbind.data.frame(
           plotDF,
           data.frame(
@@ -714,17 +714,17 @@
             Ystart, Yend, Y1, Y2
           )
         )
-
+        
       }
     }
-
+    
     # Draw edges
-    arrows(x0 = plotDF$Xstart, x1 = plotDF$Xend,
-           y0 = plotDF$Ystart, y1 = plotDF$Yend, 
-           length = 0, 
-           col = plotDF_temp$Color, 
-           lty = plotDF_temp$LineStyle, 
-           lwd = plotDF_temp$LineThickness)
+    graphics::arrows(x0 = plotDF$Xstart, x1 = plotDF$Xend,
+                     y0 = plotDF$Ystart, y1 = plotDF$Yend, 
+                     length = 0, 
+                     col = plotDF_temp$Color, 
+                     lty = plotDF_temp$LineStyle, 
+                     lwd = plotDF_temp$LineThickness)
     shape::Arrows(x0 = plotDF$X1, x1 = plotDF$X2,
                   y0 = plotDF$Y1, y1 = plotDF$Y2, 
                   code = ifelse(plotDF_temp$ArrowEnd == "first", 1, 2), 
@@ -750,26 +750,26 @@
                         df$ArrowType == "TBar",]
     # We will plot the main body of the edge separately from the
     # arrow head, because the arrow head looks weird when the line is dashed.
-
+    
     # Collect X and Y coordinates in separate vectors
     x1 = plotDF_temp$X1
     x2 = plotDF_temp$X2
     y1 = plotDF_temp$Y1
     y2 = plotDF_temp$Y2
-
+    
     # Offset is the distance at which the arrow head should be attached to the
     # main body of the arrow
     offset <- 5
-
+    
     # Gap is the distance that should be present between the end of the arrow
     # and the node
     gap <- 10
-
+    
     plotDF <- NULL
     for (a in 1:nrow(plotDF_temp)){
-
+      
       if (plotDF_temp$ArrowEnd[a] == "first"){
-
+        
         Xstart = x1[a]-(offset+gap)*((x1[a]-x2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
         Xend = x2[a]
         X1 = x1[a]-(gap)*((x1[a]-x2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
@@ -778,7 +778,7 @@
         Yend = -y2[a]
         Y1 = -1*(y1[a]-(gap)*((y1[a]-y2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
         Y2 = Ystart
-
+        
         plotDF <- rbind.data.frame(
           plotDF,
           data.frame(
@@ -787,9 +787,9 @@
           )
         )
       }
-
+      
       if (plotDF_temp$ArrowEnd[a] == "last"){
-
+        
         Xstart = x1[a]
         Xend = x2[a]-(offset+gap)*((x2[a]-x1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
         X1 = Xend
@@ -798,7 +798,7 @@
         Yend = -1*(y2[a]-(offset+gap)*((y2[a]-y1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
         Y1 = Yend
         Y2 = -1*(y2[a]-(gap)*((y2[a]-y1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
-
+        
         plotDF <- rbind.data.frame(
           plotDF,
           data.frame(
@@ -806,28 +806,28 @@
             Ystart, Yend, Y1, Y2
           )
         )
-
+        
       }
     }
-
+    
     # Draw edges
-    arrows(x0 = plotDF$Xstart, x1 = plotDF$Xend,
-           y0 = plotDF$Ystart, y1 = plotDF$Yend, 
-           length = 0, 
-           col = plotDF_temp$Color, 
-           lty = plotDF_temp$LineStyle, 
-           lwd = plotDF_temp$LineThickness)
-    shape::Arrows(x0 = plotDF$X1, x1 = plotDF$X2,
-                  y0 = plotDF$Y1, y1 = plotDF$Y2, 
-                  code = ifelse(plotDF_temp$ArrowEnd == "first", 1, 2), 
-                  arr.width = 0.4,
-                  arr.length = 0.5,
-                  arr.type = "T",
-                  lcol = plotDF_temp$Color, 
-                  arr.col = plotDF_temp$Color, 
-                  col = plotDF_temp$Color,
-                  lwd = plotDF_temp$LineThickness,
-                  arr.adj = 1)
+    graphics::arrows(x0 = plotDF$Xstart, x1 = plotDF$Xend,
+                     y0 = plotDF$Ystart, y1 = plotDF$Yend, 
+                     length = 0, 
+                     col = plotDF_temp$Color, 
+                     lty = plotDF_temp$LineStyle, 
+                     lwd = plotDF_temp$LineThickness)
+    graphics::shape::Arrows(x0 = plotDF$X1, x1 = plotDF$X2,
+                            y0 = plotDF$Y1, y1 = plotDF$Y2, 
+                            code = ifelse(plotDF_temp$ArrowEnd == "first", 1, 2), 
+                            arr.width = 0.4,
+                            arr.length = 0.5,
+                            arr.type = "T",
+                            lcol = plotDF_temp$Color, 
+                            arr.col = plotDF_temp$Color, 
+                            col = plotDF_temp$Color,
+                            lwd = plotDF_temp$LineThickness,
+                            arr.adj = 1)
   }
   
   #============================================================================#
@@ -840,29 +840,29 @@
     
     # We will plot the main body of the edge separately from the
     # arrow head, because the arrow head looks weird when the line is dashed.
-
+    
     # Collect X and Y coordinates in separate vectors
     x1 = plotDF_temp$X1
     x2 = plotDF_temp$X2
     y1 = plotDF_temp$Y1
     y2 = plotDF_temp$Y2
-
+    
     # Offset is the distance at which the arrow head should be attached to the
     # main body of the arrow
     offset <- 5
-
+    
     plotDF <- NULL
     for (a in 1:nrow(plotDF_temp)){
-
+      
       if (plotDF_temp$ArrowEnd[a] == "first"){
         Xstart <- x1[a]-offset*((x1[a]-x2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
         Xend <- x2[a]
         Xpoint <- Xstart
-
+        
         Ystart <- -1*(y1[a]-offset*((y1[a]-y2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
         Yend <- -y2[a]
         Ypoint <- Ystart
-
+        
         plotDF <- rbind.data.frame(
           plotDF,
           data.frame(
@@ -870,17 +870,17 @@
             Ystart, Yend, Ypoint
           )
         )
-
+        
       }
       if (plotDF_temp$ArrowEnd[a] == "last"){
         Xstart <- x1[a]
         Xend <- x2[a]-offset*((x2[a]-x1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
         Xpoint <- Xend
-
+        
         Ystart <- -y1[a]
         Yend <- -1*(y2[a]-offset*((y2[a]-y1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
         Ypoint <- Yend
-
+        
         plotDF <- rbind.data.frame(
           plotDF,
           data.frame(
@@ -888,23 +888,23 @@
             Ystart, Yend, Ypoint
           )
         )
-
+        
       }
     }
-
+    
     # Draw edges
-    arrows(x0 = plotDF$Xstart, x1 = plotDF$Xend,
-           y0 = plotDF$Ystart, y1 = plotDF$Yend, 
-           length = 0, 
-           col = plotDF_temp$Color, 
-           lty = plotDF_temp$LineStyle, 
-           lwd = plotDF_temp$LineThickness)
-    points(x = plotDF$Xpoint,
-           y = plotDF$Ypoint,
-           pch = 21,
-           cex = 2,
-           bg = "white",
-           col = plotDF_temp$Color[1])
+    graphics::arrows(x0 = plotDF$Xstart, x1 = plotDF$Xend,
+                     y0 = plotDF$Ystart, y1 = plotDF$Yend, 
+                     length = 0, 
+                     col = plotDF_temp$Color, 
+                     lty = plotDF_temp$LineStyle, 
+                     lwd = plotDF_temp$LineThickness)
+    graphics::points(x = plotDF$Xpoint,
+                     y = plotDF$Ypoint,
+                     pch = 21,
+                     cex = 2,
+                     bg = "white",
+                     col = plotDF_temp$Color[1])
   }
   
   #============================================================================#
@@ -917,29 +917,29 @@
     
     # We will plot the main body of the edge separately from the
     # arrow head, because the arrow head looks weird when the line is dashed.
-
+    
     # Collect X and Y coordinates in separate vectors
     x1 = plotDF_temp$X1
     x2 = plotDF_temp$X2
     y1 = plotDF_temp$Y1
     y2 = plotDF_temp$Y2
-
+    
     # Offset is the distance at which the arrow head should be attached to the
     # main body of the arrow
     offset <- 5
-
+    
     plotDF <- NULL
     for (a in 1:nrow(plotDF_temp)){
-
+      
       if (plotDF_temp$ArrowEnd[a] == "first"){
         Xstart <- x1[a]-offset*((x1[a]-x2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
         Xend <- x2[a]
         Xpoint <- Xstart
-
+        
         Ystart <- -1*(y1[a]-offset*((y1[a]-y2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
         Yend <- -y2[a]
         Ypoint <- Ystart
-
+        
         plotDF <- rbind.data.frame(
           plotDF,
           data.frame(
@@ -947,17 +947,17 @@
             Ystart, Yend, Ypoint
           )
         )
-
+        
       }
       if (plotDF_temp$ArrowEnd[a] == "last"){
         Xstart <- x1[a]
         Xend <- x2[a]-offset*((x2[a]-x1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
         Xpoint <- Xend
-
+        
         Ystart <- -y1[a]
         Yend <- -1*(y2[a]-offset*((y2[a]-y1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
         Ypoint <- Yend
-
+        
         plotDF <- rbind.data.frame(
           plotDF,
           data.frame(
@@ -965,23 +965,23 @@
             Ystart, Yend, Ypoint
           )
         )
-
+        
       }
     }
     
     # Draw edges
-    arrows(x0 = plotDF$Xstart, x1 = plotDF$Xend,
-           y0 = plotDF$Ystart, y1 = plotDF$Yend, 
-           length = 0, 
-           col = plotDF_temp$Color, 
-           lty = plotDF_temp$LineStyle, 
-           lwd = plotDF_temp$LineThickness)
-    points(x = plotDF$Xpoint,
-           y = plotDF$Ypoint,
-           pch = 22,
-           cex = 2,
-           bg = "white",
-           col = plotDF_temp$Color[1])
+    graphics::arrows(x0 = plotDF$Xstart, x1 = plotDF$Xend,
+                     y0 = plotDF$Ystart, y1 = plotDF$Yend, 
+                     length = 0, 
+                     col = plotDF_temp$Color, 
+                     lty = plotDF_temp$LineStyle, 
+                     lwd = plotDF_temp$LineThickness)
+    graphics::points(x = plotDF$Xpoint,
+                     y = plotDF$Ypoint,
+                     pch = 22,
+                     cex = 2,
+                     bg = "white",
+                     col = plotDF_temp$Color[1])
     
   }
   
@@ -1044,11 +1044,11 @@
     }
     
     # Draw edges
-    arrows(x0 = plotDF$Xstart, x1 = plotDF$Xend,
-                  y0 = plotDF$Ystart, y1 = plotDF$Yend, 
-                  col = plotDF_temp$Color, code = 0,
-                  lty = plotDF_temp$LineStyle, 
-                  lwd = plotDF_temp$LineThickness
+    graphics::arrows(x0 = plotDF$Xstart, x1 = plotDF$Xend,
+                     y0 = plotDF$Ystart, y1 = plotDF$Yend, 
+                     col = plotDF_temp$Color, code = 0,
+                     lty = plotDF_temp$LineStyle, 
+                     lwd = plotDF_temp$LineThickness
     )
   }
   
@@ -1181,24 +1181,24 @@
     }
     
     # Draw edges
-    arrows(x0 = plotDF_main$X1, x1 = plotDF_main$X2,
-           y0 = plotDF_main$Y1, y1 = plotDF_main$Y2, 
-           length = 0, 
-           col = plotDF_temp$Color, 
-           lty = plotDF_temp$LineStyle, 
-           lwd = plotDF_temp$LineThickness)
-    arrows(x0 = plotDF_orth$X1, x1 = plotDF_orth$X2,
-           y0 = plotDF_orth$Y1, y1 = plotDF_orth$Y2, 
-           length = 0, 
-           col = plotDF_temp$Color, 
-           lty = plotDF_temp$LineStyle, 
-           lwd = plotDF_temp$LineThickness)
-    arrows(x0 = plotDF_diag$X1, x1 = plotDF_diag$X2,
-           y0 = plotDF_diag$Y1, y1 = plotDF_diag$Y2, 
-           length = 0, 
-           col = plotDF_temp$Color, 
-           lty = plotDF_temp$LineStyle, 
-           lwd = plotDF_temp$LineThickness)
+    graphics::arrows(x0 = plotDF_main$X1, x1 = plotDF_main$X2,
+                     y0 = plotDF_main$Y1, y1 = plotDF_main$Y2, 
+                     length = 0, 
+                     col = plotDF_temp$Color, 
+                     lty = plotDF_temp$LineStyle, 
+                     lwd = plotDF_temp$LineThickness)
+    graphics::arrows(x0 = plotDF_orth$X1, x1 = plotDF_orth$X2,
+                     y0 = plotDF_orth$Y1, y1 = plotDF_orth$Y2, 
+                     length = 0, 
+                     col = plotDF_temp$Color, 
+                     lty = plotDF_temp$LineStyle, 
+                     lwd = plotDF_temp$LineThickness)
+    graphics::arrows(x0 = plotDF_diag$X1, x1 = plotDF_diag$X2,
+                     y0 = plotDF_diag$Y1, y1 = plotDF_diag$Y2, 
+                     length = 0, 
+                     col = plotDF_temp$Color, 
+                     lty = plotDF_temp$LineStyle, 
+                     lwd = plotDF_temp$LineThickness)
   }
   
   #============================================================================#
@@ -1333,18 +1333,18 @@
     }
     
     # Draw edges
-    arrows(x0 = plotDF_main$X1, x1 = plotDF_main$X2,
-           y0 = plotDF_main$Y1, y1 = plotDF_main$Y2, 
-           length = 0, 
-           col = plotDF_temp$Color, 
-           lty = plotDF_temp$LineStyle, 
-           lwd = plotDF_temp$LineThickness)
-    arrows(x0 = plotDF_orth$X1, x1 = plotDF_orth$X2,
-           y0 = plotDF_orth$Y1, y1 = plotDF_orth$Y2, 
-           length = 0, 
-           col = plotDF_temp$Color, 
-           lty = plotDF_temp$LineStyle, 
-           lwd = plotDF_temp$LineThickness)
+    graphics::arrows(x0 = plotDF_main$X1, x1 = plotDF_main$X2,
+                     y0 = plotDF_main$Y1, y1 = plotDF_main$Y2, 
+                     length = 0, 
+                     col = plotDF_temp$Color, 
+                     lty = plotDF_temp$LineStyle, 
+                     lwd = plotDF_temp$LineThickness)
+    graphics::arrows(x0 = plotDF_orth$X1, x1 = plotDF_orth$X2,
+                     y0 = plotDF_orth$Y1, y1 = plotDF_orth$Y2, 
+                     length = 0, 
+                     col = plotDF_temp$Color, 
+                     lty = plotDF_temp$LineStyle, 
+                     lwd = plotDF_temp$LineThickness)
     shape::Arrows(x0 = plotDF_end$X1, x1 = plotDF_end$X2,
                   y0 = plotDF_end$Y1, y1 = plotDF_end$Y2, 
                   code = 2, 

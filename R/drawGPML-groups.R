@@ -16,7 +16,7 @@
     maxY = as.numeric(nodes_df_groups$CenterY) + 0.5*as.numeric(nodes_df_groups$Height),
     minX = as.numeric(nodes_df_groups$CenterX) - 0.5*as.numeric(nodes_df_groups$Width),
     maxX = as.numeric(nodes_df_groups$CenterX) + 0.5*as.numeric(nodes_df_groups$Width)
-    )
+  )
   
   # Remove NA rows
   groups_df <- groups_df[!is.na(groups_df$GroupRef),]
@@ -132,35 +132,35 @@
   if (sum(!is.na(groups_df[[1]]))>0){
     plotDF <- groups_df[[1]]
     
-    polygon(x = plotDF$x,
-            y = -1 *plotDF$y,
-            col = "#F7F7EF",
-            border = "#737373")
+    graphics::polygon(x = plotDF$x,
+                      y = -1 *plotDF$y,
+                      col = "#F7F7EF",
+                      border = "#737373")
     
   }
   if (sum(!is.na(groups_df[[2]]))>0){
     
     plotDF <- groups_df[[2]]
     
-    rect(xleft = plotDF$xmin,
-         ybottom = plotDF$ymin,
-         xright =  plotDF$xmax,
-         ytop =  plotDF$ymax,
-         col = "#F7F7EF",
-         border = "#BDBDBD",
-         lty = "dashed")
+    graphics::rect(xleft = plotDF$xmin,
+                   ybottom = plotDF$ymin,
+                   xright =  plotDF$xmax,
+                   ytop =  plotDF$ymax,
+                   col = "#F7F7EF",
+                   border = "#BDBDBD",
+                   lty = "dashed")
   }
   if (sum(!is.na(groups_df[[3]]))>0){
     
     plotDF <- groups_df[[3]]
     
-    rect(xleft = plotDF$xmin,
-         ybottom = plotDF$ymin,
-         xright =  plotDF$xmax,
-         ytop =  plotDF$ymax,
-         col = "#E5FFE5",
-         border = "#BDBDBD",
-         lty = "dashed")
+    graphics::rect(xleft = plotDF$xmin,
+                   ybottom = plotDF$ymin,
+                   xright =  plotDF$xmax,
+                   ytop =  plotDF$ymax,
+                   col = "#E5FFE5",
+                   border = "#BDBDBD",
+                   lty = "dashed")
   }
 }
 

@@ -320,23 +320,23 @@
     
     for (id in unique(polygon_df_plot$id)){
       polygon_df_plot1 <- polygon_df_plot[polygon_df_plot$id == id,]
-      polygon(x = polygon_df_plot1$x,
-              y = -1 *polygon_df_plot1$y,
-              col = adjustcolor(polygon_df_plot1$FillColor[1], alpha.f = polygon_df_plot1$Alpha[1]),
-              border = polygon_df_plot1$EdgeColor[1],
-              lwd = polygon_df_plot1$LineThickness[1],
-              lty =  polygon_df_plot1$LineStyle[1])
+      graphics::polygon(x = polygon_df_plot1$x,
+                        y = -1 *polygon_df_plot1$y,
+                        col = adjustcolor(polygon_df_plot1$FillColor[1], alpha.f = polygon_df_plot1$Alpha[1]),
+                        border = polygon_df_plot1$EdgeColor[1],
+                        lwd = polygon_df_plot1$LineThickness[1],
+                        lty =  polygon_df_plot1$LineStyle[1])
     }
     
   }
   
   # Plot lines
   if  (length(line_df_plot) > 0){
-    arrows(x0 = line_df_plot$x1, x1 = line_df_plot$x2,
-           y0 = -1*line_df_plot$y1, y1 = -1*line_df_plot$y2,
-           lty = line_df_plot$LineStyle, code = 0,
-           col = line_df_plot$EdgeColor,
-           lwd = line_df_plot$LineThickness)
+    graphics::arrows(x0 = line_df_plot$x1, x1 = line_df_plot$x2,
+                     y0 = -1*line_df_plot$y1, y1 = -1*line_df_plot$y2,
+                     lty = line_df_plot$LineStyle, code = 0,
+                     col = line_df_plot$EdgeColor,
+                     lwd = line_df_plot$LineThickness)
   }
   
   # Plot text labels
@@ -366,14 +366,14 @@
     labels_df$FontFace[labels_df$FontFace == "italic"] <- 3
     labels_df$FontFace[labels_df$FontFace== "bold.italic"] <- 4
     
-    text(x = labels_df$CenterX+(labels_df$Align-0.5)*labels_df$Width+(0.5-labels_df$Align)*x_offset,
-         y = -1*(labels_df$CenterY-(labels_df$Valign-0.5)*labels_df$Height-(0.5-labels_df$Valign)*y_offset),
-         adj = c(labels_df$Align, labels_df$Valign),
-         labels = labels_df$Label,
-         cex = labels_df$FontSize/12.5,
-         col = labels_df$Color,
-         #pos = position,
-         font = as.numeric(labels_df$FontFace))
+    graphics::text(x = labels_df$CenterX+(labels_df$Align-0.5)*labels_df$Width+(0.5-labels_df$Align)*x_offset,
+                   y = -1*(labels_df$CenterY-(labels_df$Valign-0.5)*labels_df$Height-(0.5-labels_df$Valign)*y_offset),
+                   adj = c(labels_df$Align, labels_df$Valign),
+                   labels = labels_df$Label,
+                   cex = labels_df$FontSize/12.5,
+                   col = labels_df$Color,
+                   #pos = position,
+                   font = as.numeric(labels_df$FontFace))
   }
 }
 
@@ -388,7 +388,7 @@
 .drawBraces <- function(braces_df){
   
   # Order the data frame by the Z-order
-  braces_df <- dplyr::arrange(braces_df, by = ZOrder)
+  braces_df <- dplyr::arrange(braces_df, by = `ZOrder`)
   
   # Number of point used for drawing the brace
   npoints = 100
@@ -447,9 +447,9 @@
     
   }
   # Make plot
-  lines(x = plot_all$x, y = -1*plot_all$y, 
-        col = plot_all$color,
-        lwd = plot_all$thickness*2)
+  graphics::lines(x = plot_all$x, y = -1*plot_all$y, 
+                  col = plot_all$color,
+                  lwd = plot_all$thickness*2)
 }
 
 
@@ -498,7 +498,7 @@
       #img <- magick::image_read("C:/Users/jarno/GitHub/ShinyPath/rWikiPathways-devel/inst/pathwayElements/Mitochondria.png")
       img <- magick::image_rotate(img, (rotation*180)/pi)
       img <-  magick::image_transparent(img, color = "white")
-      rasterImage(img, xmin, -ymax, xmax, -ymin)
+      graphics::rasterImage(img, xmin, -ymax, xmax, -ymin)
       
     }
     
@@ -549,7 +549,7 @@
       #img <- magick::image_read("C:/Users/jarno/GitHub/ShinyPath/rWikiPathways-devel/inst/pathwayElements/Golgi.png")
       img <- magick::image_rotate(img, (rotation*180)/pi)
       img <-  magick::image_transparent(img, color = "white")
-      rasterImage(img, xmin, -ymax, xmax, -ymin)
+      graphics::rasterImage(img, xmin, -ymax, xmax, -ymin)
     }
   }
 }

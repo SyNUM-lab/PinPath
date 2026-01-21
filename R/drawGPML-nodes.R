@@ -27,7 +27,7 @@
                Align = ifelse(as.character(dataNodes$Graphics["Align"]) == "Middle", 0.5,
                               ifelse(as.character(dataNodes$Graphics["Align"]) == "Top", 1,0)), 
                ShapeType = ifelse(is.na(as.character(dataNodes$Graphics["ShapeType"])),
-                                        "Rectangle", as.character(dataNodes$Graphics["ShapeType"])),
+                                  "Rectangle", as.character(dataNodes$Graphics["ShapeType"])),
                Rotation = 0,
                LineThickness = as.numeric(ifelse(is.na(dataNodes$Graphics["LineThickness"]),
                                                  1, dataNodes$Graphics["LineThickness"]))/2,
@@ -50,11 +50,11 @@
   nodes_df$FontFace[(!is.na(nodes_df$FontWeight) & is.na(nodes_df$FontStyle))] <- nodes_df$FontWeight[(!is.na(nodes_df$FontWeight) & is.na(nodes_df$FontStyle))]
   nodes_df$FontFace[(is.na(nodes_df$FontWeight) & !is.na(nodes_df$FontStyle))] <- nodes_df$FontStyle[(is.na(nodes_df$FontWeight) & !is.na(nodes_df$FontStyle))]
   nodes_df$FontFace[((nodes_df$FontWeight == "bold") & (nodes_df$FontStyle == "italic")) |
-                       ((nodes_df$FontWeight == "italic") & (nodes_df$FontStyle == "bold"))] <- "bold.italic"
+                      ((nodes_df$FontWeight == "italic") & (nodes_df$FontStyle == "bold"))] <- "bold.italic"
   
   # Change line style
   nodes_df$LineStyle <- ifelse(nodes_df$LineStyle == "broken",
-                                "dashed", "solid")
+                               "dashed", "solid")
   
   return(nodes_df)
 }
@@ -83,20 +83,20 @@
   nodes_df$FontFace[nodes_df$FontFace == "bold.italic"] <- 4
   
   # Make plot
-  rect(xleft = nodes_df$CenterX - 0.5* nodes_df$Width,
-       ybottom = -1*( nodes_df$CenterY - 0.5*nodes_df$Height),
-       xright =  nodes_df$CenterX + 0.5*nodes_df$Width,
-       ytop =  -1*( nodes_df$CenterY + 0.5* nodes_df$Height),
-       col = adjustcolor(nodes_df$FillColor, 0),
-       border = nodes_df$Color,
-       lty = nodes_df$LineStyle,
-       lwd = nodes_df$LineThickness*2)
-  text(x = nodes_df$CenterX,
-       y = -1*nodes_df$CenterY,
-       labels = nodes_df$Label,
-       cex = nodes_df$FontSize/12.5,
-       col = nodes_df$Color,
-       font = as.numeric(nodes_df$FontFace))
+  graphics::rect(xleft = nodes_df$CenterX - 0.5* nodes_df$Width,
+                 ybottom = -1*( nodes_df$CenterY - 0.5*nodes_df$Height),
+                 xright =  nodes_df$CenterX + 0.5*nodes_df$Width,
+                 ytop =  -1*( nodes_df$CenterY + 0.5* nodes_df$Height),
+                 col = adjustcolor(nodes_df$FillColor, 0),
+                 border = nodes_df$Color,
+                 lty = nodes_df$LineStyle,
+                 lwd = nodes_df$LineThickness*2)
+  graphics::text(x = nodes_df$CenterX,
+                 y = -1*nodes_df$CenterY,
+                 labels = nodes_df$Label,
+                 cex = nodes_df$FontSize/12.5,
+                 col = nodes_df$Color,
+                 font = as.numeric(nodes_df$FontFace))
   
 }
 

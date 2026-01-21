@@ -11,14 +11,16 @@ Authors@R: c(person("Jarno", "Koetsier", role = c("aut","cre"),
 	     person("Egon", "Willighagen", role = "aut",
                      comment = c(ORCID = "0000-0001-7542-0286"))
            )
-Imports: httr, utils, XML, xml2, rjson, data.table, RCurl, magrittr, dplyr, tidyr, readr, stringr, purrr, lubridate, magick, shape, grid, gridBase, svglite, clusterProfiler, AnnotationDbi
+Author: Jarno Koetsier <jarno.koetsier@maastrichtuniversity.nl>
+Maintainer: Jarno Koetsier <jarno.koetsier@maastrichtuniversity.nl>
+Imports: utils, XML, xml2,  magrittr, dplyr, tidyr, stringr, magick, shape, grid, gridBase, svglite, AnnotationDbi, shiny, igraph, ggraph, ggplot2, BiocFileCache, BiocGenerics
 Suggests: 
     testthat (>= 3.0.0),
     BiocStyle,
     knitr,
     rmarkdown
 Encoding: UTF-8
-Description: Use this package to interface with the WikiPathways API. It provides programmatic access to WikiPathways content in multiple data and image formats, including official monthly release files and convenient GMT read/write functions.
+Description: Visualize of omics data onto pathways from WikiPathways and KEGG.
 License: MIT + file LICENSE
 URL: https://github.com/SyNUM-lab/PinPath
 BugReports: https://github.com/SyNUM-lab/PinPath/issues

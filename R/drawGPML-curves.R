@@ -30,8 +30,10 @@
     
     # We remove redundant X and Y coordinates, e.g., when two points describe 
     # the same direction
-    remove_index <- c(which(sapply(1:(length(X_all)-1), function(n) sum(duplicated(X_all)[c(n,n+1)]))==2),
-                      which(sapply(1:(length(Y_all)-1), function(n) sum(duplicated(Y_all)[c(n,n+1)]))==2))
+    remove_index <- c(which(vapply(1:(length(X_all)-1), function(n) sum(duplicated(X_all)[c(n,n+1)]),
+                                   FUN.VALUE = numeric(1))==2),
+                      which(vapply(1:(length(Y_all)-1), function(n) sum(duplicated(Y_all)[c(n,n+1)]),
+                                   FUN.VALUE = numeric(1))==2))
     
     if (length(remove_index) > 0){
       X_all <- X_all[-remove_index]
@@ -50,8 +52,10 @@
     
     # The mid points are in-between the corner points
     if (length(X_corners) > 1){
-      X_mid <- sapply(1:(length(X_corners)-1), function(n) mean(X_corners[c(n,n+1)]))
-      Y_mid <- sapply(1:(length(Y_corners)-1), function(n) mean(Y_corners[c(n,n+1)])) 
+      X_mid <- vapply(1:(length(X_corners)-1), function(n) mean(X_corners[c(n,n+1)]),
+                      FUN.VALUE = numeric(1))
+      Y_mid <- vapply(1:(length(Y_corners)-1), function(n) mean(Y_corners[c(n,n+1)]),
+                      FUN.VALUE = numeric(1)) 
       
       # Collect all relevant X and Y coordinates for plotting the curved edges
       X_points <- c(X_start, X_mid[!is.na(X_mid)], X_end)
