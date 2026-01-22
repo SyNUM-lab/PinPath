@@ -68,9 +68,14 @@
 #' @title Show nodes as rectangles vertically splitted by color scale.
 #'
 #' @description This geom allows for plotting nodes as vertically splitted rectangles.
+#' @inheritParams ggraph::geom_node_text
+#' @param nCol The number of columns the node should be split in.
+#' @param iCol The node column index of current variable.
+#' @param nodeSize The size of the nodes.
+#' @return Rectangular nodes vertically splitted by color scale.
 
 # Plot nodes in network
-geom_node_split <- function(mapping=NULL, data=NULL, position='identity',
+.geom_node_split <- function(mapping=NULL, data=NULL, position='identity',
                             show.legend=NA, nCol = 1, iCol = 1, nodeSize = 1, ...) {
   mapping1 <- mapping
   mapping_temp1 <- mapping
@@ -90,13 +95,13 @@ geom_node_split <- function(mapping=NULL, data=NULL, position='identity',
 }
 
 # ------------------------------------------------------------------------------
-#' @title Draw pathway from GPML file
+#' @title Draw network from GPML file
 #'
-#' @description This function draws a pathway from a GPML file with the option to map, e.g.,
-#'              expression data onto the pathway diagram.
+#' @description This function draws a network from a GPML file with the option to map, e.g.,
+#'              expression data onto the network diagram.
 #'
 #' @param infile Input GPML file. This can be a character string of the GPML file 
-#' location (e.g., "Downloads/WP42500.gpml") or a GPML string provided by \link{getPathway}.
+#' location (e.g., "Downloads/WP42500.gpml") or a GPML string provided by \link{rWikiPathways::getPathway}.
 #' @param outdir (optional) Output directory. The pathway and legend images will be 
 #' saved in this directory.
 #' @param outname (optional) The file name of the output pathway image. 
@@ -121,7 +126,6 @@ geom_node_split <- function(mapping=NULL, data=NULL, position='identity',
 #' @param layout (optional) Network layout from igraph.
 #' @param unconnectedNodes (optional) Logical (TRUE or FALSE). Should unconnected (isolated) nodes be shown in the network?
 #' @param alpha (optional) Transparency of the nodes.
-#' @param alpha (optional) Size of the nodes.
 #' @param legend (optional) Logical (TRUE or FALSE). Should the legend be plotted?
 #' @param nodeTable (optional) Logical (TRUE or FALSE). Should a node table be returned?
 #' @param pathInfo (optional) Logical (TRUE or FALSE). Should pathway information be returned?
@@ -152,8 +156,8 @@ GPML2Network <- function(infile,
                          outname = NULL,
                          geneIDs = NULL,
                          colorVar = NULL,
-                         annGenes,
-                         annMetabolites,
+                         annGenes = NULL,
+                         annMetabolites = NULL,
                          inputDB = NULL,
                          colorNames = NULL,
                          colorList = NULL,
@@ -195,7 +199,7 @@ GPML2Network <- function(infile,
                               "GraphicalLine", "State", "Group")]
   
   # Give each graphical element a unique ID
-  for (l in 1:length(gpml_fil)){
+  for (l in seq_along(gpml_fil)){
     gpml_fil[[l]]["ID"] <-  paste0("id", l)
   }
   
@@ -266,7 +270,7 @@ GPML2Network <- function(infile,
   group_ids <- unique(node2group$GroupRef)
   group_names <- rep(NA, length(group_ids))
   graph_ids<- rep(NA, length(group_ids))
-  for (g in 1:length(group_ids)){
+  for (g in seq_along(group_ids)){
     group_names[g] <- paste(sort(node2group$name[node2group$GroupRef == group_ids[g]]), collapse = "_")
     graph_ids[g] <- groups_df$GraphId[groups_df$GroupId == group_ids[g]][1]
   }
@@ -359,18 +363,18 @@ GPML2Network <- function(infile,
     ggraph::geom_edge_link(ggplot2::aes(color = type)) 
   
   # Add each scale to the network
-  for (g in 1:(ncol(nodes_df_split)-7)){
+  for (g in seq_len(ncol(nodes_df_split)-7)){
     
     #loop_input <- paste0("geom_node_split(fill = g_plot@data$ColorValue",g,", alpha = ",alpha,", nCol = ",(ncol(nodes_df_split)-7),", iCol = ", g, ", nodeSize = ", nodeSize, ")")
     
-    loop_input <- paste0("geom_node_split(ggplot2::aes(alpha = NodeType), fill = g_plot@data$ColorValue",g,",nCol = ",(ncol(nodes_df_split)-7),", iCol = ", g, ", nodeSize = ", nodeSize, ")")
+    loop_input <- paste0(".geom_node_split(ggplot2::aes(alpha = NodeType), fill = g_plot@data$ColorValue",g,",nCol = ",(ncol(nodes_df_split)-7),", iCol = ", g, ", nodeSize = ", nodeSize, ")")
     
     g_plot <- g_plot + eval(parse(text=loop_input))  
   }
   
   # Finalize network
   g_plot <- g_plot +
-    geom_node_split(ggplot2::aes(linewidth = NodeType), alpha = 0, color = "lightgrey", nCol = 1, iCol = 1, nodeSize = nodeSize) +
+    .geom_node_split(ggplot2::aes(linewidth = NodeType), alpha = 0, color = "lightgrey", nCol = 1, iCol = 1, nodeSize = nodeSize) +
     ggraph::geom_node_text(ggplot2::aes(label = name, alpha = NodeType), size = 2) +
     ggplot2::scale_alpha_manual(values = setNames(c(alpha,0), c("nonGroup", "Group"))) +
     ggraph::scale_edge_color_manual(values = setNames(c("black", "lightgrey"), 
@@ -392,7 +396,7 @@ GPML2Network <- function(infile,
     svglite::svglite(outfile, 
                      width = 13.3/nodeSize, 
                      height = 8.3/nodeSize)
-    print(g_plot)
+    plot(g_plot)
     dev.off()
   }else if (file_extension %in% c("png", "tiff", "pdf")){
     outfile <-  paste0(outdir,"/",outname)
@@ -410,7 +414,7 @@ GPML2Network <- function(infile,
     svglite::svglite(outfile, 
                      width = 13.3/nodeSize, 
                      height = 8.3/nodeSize)
-    print(g_plot)
+    plot(g_plot)
     dev.off()
   }
   

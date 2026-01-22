@@ -5,7 +5,7 @@
 #'              expression data onto the pathway diagram.
 #'
 #' @param infile Input GPML file. This can be a character string of the GPML file 
-#' location (e.g., "Downloads/WP42500.gpml") or a GPML string provided by \link{getPathway}.
+#' location (e.g., "Downloads/WP42500.gpml") or a GPML string provided by \link{rWikiPathways::getPathway}.
 #' @param outdir (optional) Output directory. The pathway and legend images will be 
 #' saved in this directory.
 #' @param outname (optional) The file name of the output pathway image. 
@@ -99,7 +99,7 @@ drawGPML <- function(infile,
                               "GraphicalLine", "State", "Group")]
   
   # Give each graphical element a unique ID
-  for (l in 1:length(gpml_fil)){
+  for (l in seq_along(gpml_fil)){
     gpml_fil[[l]]["ID"] <-  paste0("id", l)
   }
   
@@ -137,7 +137,7 @@ drawGPML <- function(infile,
   Type <- rep(NA, length(gpml_fil))
   GroupRef <- rep(NA, length(gpml_fil))
   StateRef <- rep(NA, length(gpml_fil))
-  for (i in 1:length(gpml_fil)){
+  for (i in seq_along(gpml_fil)){
     
     # Extract element type
     Type[i] <- names(gpml_fil[i])
@@ -179,7 +179,7 @@ drawGPML <- function(infile,
   }
   
   # Combine extracted values into a data frame
-  ZOrder_df <- data.frame(Index = 1:length(gpml_fil),
+  ZOrder_df <- data.frame(Index = seq_along(gpml_fil),
                           ZOrder = as.numeric(ZOrder),
                           GroupRef = GroupRef,
                           StateRef = StateRef,
@@ -187,7 +187,7 @@ drawGPML <- function(infile,
   
   # The group elements do not have a defined Z-order.
   # So, we set the order to be before the first node of the group
-  # for (i in 1:nrow(ZOrder_df)){
+  # for (i in seq_len(nrow(ZOrder_df))){
   #   if ((is.na(ZOrder_df$ZOrder[i])) & (!is.na(ZOrder_df$GroupRef[i]))){
   # 
   #     nodeZs <- ZOrder_df$ZOrder[ZOrder_df$GroupRef == ZOrder_df$GroupRef[i]]
@@ -204,7 +204,7 @@ drawGPML <- function(infile,
   
   # The state elements do not have a defined Z-order.
   # So, we set the order to be before the first node of the group
-  for (i in 1:nrow(ZOrder_df)){
+  for (i in seq_len(nrow(ZOrder_df))){
     if ((is.na(ZOrder_df$ZOrder[i])) & (!is.na(ZOrder_df$StateRef[i]))){
       
       nodeZs <- ZOrder_df$ZOrder[ZOrder_df$StateRef == ZOrder_df$StateRef[i]]
@@ -448,7 +448,7 @@ drawGPML <- function(infile,
       
       # draw edges
       if (length(edges_df$lines) > 0){
-        for (l in 1:nrow(edges_df$lines)){
+        for (l in seq_len(nrow(edges_df$lines))){
           .drawEdges(edges_df$lines[l,])
         }
       }
@@ -472,7 +472,7 @@ drawGPML <- function(infile,
       
       # draw edges
       if (length(edges_df$lines) > 0){
-        for (l in 1:nrow(edges_df$lines)){
+        for (l in seq_len(nrow(edges_df$lines))){
           .drawEdges(edges_df$lines[l,])
         }
       }

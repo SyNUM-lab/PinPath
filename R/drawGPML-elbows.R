@@ -11,7 +11,7 @@
   # Multiple straight lines for plotting.
   
   plotDF <- NULL
-  for (i in 1:nrow(df)){
+  for (i in seq_len(nrow(df))){
     
     # Set relative X and Y positions to -1, 0, or 1. 
     df$Xrel1[i] <- ifelse(abs(df$Xrel1[i]) != 1,

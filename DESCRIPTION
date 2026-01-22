@@ -9,7 +9,8 @@ Authors@R: c(person("Jarno", "Koetsier", role = c("aut","cre"),
              person("Lars", "Eijssen", role = "aut",
                      comment = c(ORCID = "0000-0002-6473-2839")),
 	     person("Egon", "Willighagen", role = "aut",
-                     comment = c(ORCID = "0000-0001-7542-0286"))
+                     comment = c(ORCID = "0000-0001-7542-0286")),
+             person("Stichting Terre - The Dutch Rett Syndrome Foundation", role="fnd")
            )
 Author: Jarno Koetsier <jarno.koetsier@maastrichtuniversity.nl>
 Maintainer: Jarno Koetsier <jarno.koetsier@maastrichtuniversity.nl>

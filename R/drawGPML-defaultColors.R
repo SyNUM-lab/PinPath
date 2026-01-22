@@ -36,7 +36,7 @@ defaultColorList <- function(ColorVar, ColorNames = NULL){
     warning("The number of color names is different than the number of color variables. 
             Default color names will be used instead.")
   }
-  for (c in 1:ncol(ColorVar)){
+  for (c in seq_len(ncol(ColorVar))){
     if (is.numeric(ColorVar[,c])){
       
       # Divergent color scale

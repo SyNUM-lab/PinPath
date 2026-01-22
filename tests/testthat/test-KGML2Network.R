@@ -1,15 +1,20 @@
-library(rWikiPathways)
 library(PinPath)
 library(org.Hs.eg.db)
+library(BiocFileCache)
 
-
-test_that("WikiPathways network visualization", {
+test_that("KEGG network visualization", {
   
   lung_expr <- read.csv(system.file("extdata","data-lung-cancer.csv", package="PinPath"), 
                         stringsAsFactors = FALSE)
   
-  pathVis <- PinPath::GPML2Network(
-    infile = rWikiPathways::getPathway("WP4255"),
+  # Select pathway
+  pathway_id <- "hsa05223"
+  infile <- BiocFileCache::bfcrpath(BiocFileCache::BiocFileCache(), 
+                                    paste0("https://rest.kegg.jp/get/",pathway_id,"/kgml"))
+  
+  # Plot pathway
+  pathVis <- PinPath::KGML2Network(
+    infile = infile,
     outdir = tempdir(),
     annGenes = "org.Hs.eg.db",
     inputDB = "ENSEMBL",

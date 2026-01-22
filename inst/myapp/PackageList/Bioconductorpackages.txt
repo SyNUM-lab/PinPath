@@ -1,0 +1,9 @@
+name	version
+rWikiPathways	1.29.2
+BiocFileCache	3.0.0
+enrichplot	1.30.4
+clusterProfiler	4.18.2
+org.Hs.eg.db	3.20.0
+org.Mm.eg.db	3.20.0
+org.Bt.eg.db	3.20.0
+org.Rn.eg.db	3.20.0
