@@ -1,10 +1,11 @@
 # ------------------------------------------------------------------------------
-#' @title Draw pathway from GPML file
+#' @title Draw network from KGML file
 #'
-#' @description This function draws a pathway from a GPML file with the option to map, e.g.,
+#' @description This function draws a pathway from a KGML file with the option to map, e.g.,
 #'              expression data onto the pathway diagram.
 #'
-#' @param id KEGG pathway id.
+#' @param infile Input KGML file. This can be a character string of the KGML file 
+#' location (e.g., "Downloads/WP42500.KGML").
 #' @param outdir (optional) Output directory. The pathway and legend images will be 
 #' saved in this directory.
 #' @param outname (optional) The file name of the output pathway image. 
@@ -16,7 +17,8 @@
 #' This can be for instance a \code{data.frame} with the log2FCs and significance in the columns.
 #' The (row) order should match \code{geneIDs}. 
 #' The color rules and palettes for the supplied values can be set in the colorList parameter.
-#' @param annPkg (optional) \code{character} string of the Bioconductor annotation package (e.g., org.Hs.eg.db).
+#' @param annGenes (optional) \code{character} string of the Bioconductor annotation package (e.g., org.Hs.eg.db).
+#' @param annMetabolites (optional) \code{tibble} or \code{data.frame} with metabolite mapping information (see metaboliteIDmapping package).
 #' @param inputDB (optional) Input gene ID type (SYMBOL, ENTREZID, ENSEMBL, UNIPROT).
 #' This can be a \code{character} vector of \code{length = 1} (if all gene IDs are of the same type) 
 #' or of \code{length = nrow(geneIDs)} (if you want to specify the type per gene ID).
@@ -28,20 +30,42 @@
 #' @param layout (optional) Network layout from igraph.
 #' @param unconnectedNodes (optional) Logical (TRUE or FALSE). Should unconnected (isolated) nodes be shown in the network?
 #' @param alpha (optional) Transparency of the nodes.
-#' @param alpha (optional) Size of the nodes.
 #' @param legend (optional) Logical (TRUE or FALSE). Should the legend be plotted?
-#' @param pathInfo (optional) Logical (TRUE or FALSE). Should pathway information be returned?
 #' @param nodeTable (optional) Logical (TRUE or FALSE). Should a node table be returned?
+#' @param pathInfo (optional) Logical (TRUE or FALSE). Should pathway information be returned?
 #' @param openFile (optional) Logical (TRUE or FALSE). Should the pathway file be opened after it has been saved?
 #' @return A \code{list} with the node table and the file location of the pathway and legend image.
+#' @examples
+#' 
+#' # Load example data
+#' lung_expr <- read.csv(system.file("extdata","data-lung-cancer.csv", package="PinPath"), 
+#' stringsAsFactors = FALSE)
+#' 
+#' # Select pathway
+#' pathway_id <- "hsa05223"
+#' bfc <- BiocFileCache::BiocFileCache()
+#' infile <- BiocFileCache::bfcrpath(bfc, paste0("https://rest.kegg.jp/get/",pathway_id,"/kgml"))
+#' 
+#' # Draw pathway
+#' pathVis <- PinPath::KGML2Network(
+#'             infile = infile,
+#'             outdir = tempdir(),
+#'             annGenes = "org.Hs.eg.db",
+#'             inputDB = "ENSEMBL",
+#'             geneIDs = lung_expr$GeneID,
+#'             colorVar = lung_expr[,"log2FC"],
+#'             nodeTable = TRUE,
+#'             legend = TRUE)
+#' 
 #' @export
 
-KGML2Network <- function(id,
+KGML2Network <- function(infile,
                          outdir = getwd(),
                          outname = NULL,
                          geneIDs = NULL,
                          colorVar = NULL,
-                         annPkg = NULL,
+                         annGenes = NULL,
+                         annMetabolites = NULL,
                          inputDB = NULL,
                          colorNames = NULL,
                          colorList = NULL,
@@ -63,14 +87,8 @@ KGML2Network <- function(id,
   # Start with empty output list
   outputList <- list()
   
-  # Get KGML file
-  bfc <- BiocFileCache::BiocFileCache()
-  if (tools::file_ext(id) == "xml"){
-    file_name <- id
-  }else{
-    file_name <- BiocFileCache::bfcrpath(bfc, paste0("https://rest.kegg.jp/get/",id,"/kgml"))
-  }
-  doc <- XML::xmlParse(file_name)
+  # Rad KGML file
+  doc <- XML::xmlParse(infile)
   kgml <- XML::xmlToList(doc)
   nms <- names(kgml)
   
@@ -115,11 +133,12 @@ KGML2Network <- function(id,
   entries_df <- .prepareEntries(dataEntries)
   
   # Map colors to entries
-  if (!(is.null(geneIDs) | is.null(colorVar) | is.null(annPkg) | is.null(inputDB))){
+  if (!(is.null(geneIDs) | is.null(colorVar) | (is.null(annGenes) & is.null(annMetabolites)) | is.null(inputDB))){
     colors_df <- .mapColors(nodes_df = entries_df,
                             geneIDs = geneIDs,
                             colorVar = colorVar,
-                            annPkg = annPkg,
+                            annGenes = annGenes,
+                            annMetabolites = data.frame(annMetabolites),
                             inputDB = inputDB,
                             colorList = colorList,
                             NAvalue = NAvalue)
@@ -215,9 +234,9 @@ KGML2Network <- function(id,
     ggraph::geom_edge_link() 
   
   # Add each scale to the network
-  for (g in 1:(ncol(entries_df_split)-14)){
+  for (g in seq_len((ncol(entries_df_split)-14))){
     
-    loop_input <- paste0("geom_node_split(fill = g_plot@data$ColorValue",g,", alpha = ",alpha,", nCol = ",(ncol(entries_df_split)-14),", iCol = ", g, ", nodeSize = ", nodeSize, ")")
+    loop_input <- paste0(".geom_node_split(fill = g_plot@data$ColorValue",g,", alpha = ",alpha,", nCol = ",(ncol(entries_df_split)-14),", iCol = ", g, ", nodeSize = ", nodeSize, ")")
     
     g_plot <- g_plot + eval(parse(text=loop_input))  
   }
@@ -241,7 +260,7 @@ KGML2Network <- function(id,
     svglite::svglite(outfile, 
                      width = 8/nodeSize, 
                      height = 5/nodeSize)
-    print(g_plot)
+    plot(g_plot)
     dev.off()
   }else if (file_extension %in% c("png", "tiff", "pdf")){
     outfile <-  paste0(outdir,"/",outname)
@@ -259,7 +278,7 @@ KGML2Network <- function(id,
     svglite::svglite(outfile, 
                      width = 8/nodeSize, 
                      height = 5/nodeSize)
-    print(g_plot)
+    plot(g_plot)
     dev.off()
   }
   

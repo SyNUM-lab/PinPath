@@ -88,7 +88,7 @@
   line_df_plot <- NULL
   rect_df_plot <- NULL
   #shapes_df <- dplyr::arrange(shapes_df, by = ZOrder)
-  for (i in 1:nrow(shapes_df)){
+  for (i in seq_len(nrow(shapes_df))){
     
     # Define variables
     width <- shapes_df$Width[i]
@@ -113,9 +113,9 @@
                     "Pentagon", "Hexagon", "Oval", "mim-degradation")){
       n_corners <- NULL
       if (type == "Triangle"){
-        starting_angle = 0
-        max_angle = 2*pi
-        n_corners = 3
+        starting_angle <- 0
+        max_angle <- 2*pi
+        n_corners <- 3
         adj <- 1
         
         # The width and coordinates of the triangle are not correctly defined 
@@ -126,34 +126,34 @@
       }
       if (type == "RoundedRectangle" |
           type == "Rectangle"){
-        starting_angle = 0.25*pi
-        max_angle = 2*pi
-        n_corners = 4
+        starting_angle <- 0.25*pi
+        max_angle <- 2*pi
+        n_corners <- 4
         adj <- sqrt(2)
       }
       if (type == "Pentagon"){
-        starting_angle = 0
-        max_angle = 2*pi
-        n_corners = 5
+        starting_angle <- 0
+        max_angle <- 2*pi
+        n_corners <- 5
         adj <- 1
       }
       if (type == "Hexagon"){
-        starting_angle = 0
-        max_angle = 2*pi
-        n_corners = 6
+        starting_angle <- 0
+        max_angle <- 2*pi
+        n_corners <- 6
         adj <- 1
       }
       if (type == "Oval"){
-        starting_angle = 0
-        max_angle = 2*pi
-        n_corners = 100
+        starting_angle <- 0
+        max_angle <- 2*pi
+        n_corners <- 100
         adj <- 1
       }
       
       if (type == "mim-degradation"){
-        starting_angle = 0
-        max_angle = 2*pi
-        n_corners = 100
+        starting_angle <- 0
+        max_angle <- 2*pi
+        n_corners <- 100
         adj <- 1
         width <- 0.7*width
         height <- 0.7*height
@@ -166,7 +166,7 @@
         x <- rep(NA, n_corners)
         y <- rep(NA, n_corners)
         corner_coords <- matrix(NA, nrow = n_corners, ncol = 2)
-        for (c in 1:n_corners){
+        for (c in seq_len(n_corners)){
           
           corner_coords[c,1] <- adj*width/2 * cos(angle[c] + starting_angle)
           corner_coords[c,2] <- adj*height/2 * sin(angle[c] + starting_angle)
@@ -266,9 +266,9 @@
       }
       
       if (type == "Arc"){
-        starting_angle = 0
-        max_angle = pi
-        n_corners = 100
+        starting_angle <- 0
+        max_angle <- pi
+        n_corners <- 100
         adj <- 1
         
         # Create angle offsets (no rotation yet)
@@ -276,7 +276,7 @@
         x <- rep(NA, n_corners)
         y <- rep(NA, n_corners)
         corner_coords <- matrix(NA, nrow = n_corners, ncol = 2)
-        for (c in 1:n_corners){
+        for (c in seq_len(n_corners)){
           
           corner_coords[c,1] <- adj*width/2 * cos(angle[c] + starting_angle)
           corner_coords[c,2] <- adj*height/2 * sin(angle[c] + starting_angle)
@@ -391,11 +391,11 @@
   braces_df <- dplyr::arrange(braces_df, by = `ZOrder`)
   
   # Number of point used for drawing the brace
-  npoints = 100
+  npoints <- 100
   
   # Collect coordinates of each brace
   plot_all <- NULL
-  for (i in 1:nrow(braces_df)){
+  for (i in seq_len(nrow(braces_df))){
     
     # Set start, mid, end coordinates
     xstart <- -0.5*braces_df$Width[i]
@@ -469,7 +469,7 @@
                                                     "Golgi Apparatus"),]
   
   # Plot component by component
-  for (i in 1:nrow(shapes_df)){
+  for (i in seq_len(nrow(shapes_df))){
     
     # Define variables
     width <- shapes_df$Width[i]
@@ -489,10 +489,10 @@
     if (type %in% c("Mitochondria")){
       newWidth <- abs(sin(rotation)*height) + abs(cos(rotation)*width)
       newHeight <- abs(cos(rotation)*height) + abs(sin(rotation)*width)
-      xmin = centerX - 0.5*newWidth
-      xmax = centerX + 0.5*newWidth 
-      ymin = centerY - 0.5*newHeight
-      ymax = centerY + 0.5*newHeight
+      xmin <- centerX - 0.5*newWidth
+      xmax <- centerX + 0.5*newWidth 
+      ymin <- centerY - 0.5*newHeight
+      ymax <- centerY + 0.5*newHeight
       
       img <- magick::image_read(system.file("pathwayElements","Mitochondria.png", package="rWikiPathways"))
       #img <- magick::image_read("C:/Users/jarno/GitHub/ShinyPath/rWikiPathways-devel/inst/pathwayElements/Mitochondria.png")
@@ -507,10 +507,10 @@
       height <- height*1.1
       newWidth <- abs(sin(rotation)*height) + abs(cos(rotation)*width)
       newHeight <- abs(cos(rotation)*height) + abs(sin(rotation)*width)
-      xmin = centerX - 0.5*newWidth
-      xmax = centerX + 0.5*newWidth 
-      ymin = centerY - 0.5*newHeight
-      ymax = centerY + 0.5*newHeight
+      xmin <- centerX - 0.5*newWidth
+      xmax <- centerX + 0.5*newWidth 
+      ymin <- centerY - 0.5*newHeight
+      ymax <- centerY + 0.5*newHeight
       
       img <- magick::image_read(system.file("pathwayElements","SR.png", package="rWikiPathways"))
       #img <- magick::image_read("C:/Users/jarno/GitHub/ShinyPath/rWikiPathways-devel/inst/pathwayElements/SR.png")
@@ -523,10 +523,10 @@
     if (type %in% c("Endoplasmic Reticulum")){
       newWidth <- abs(sin(rotation)*height) + abs(cos(rotation)*width)
       newHeight <- abs(cos(rotation)*height) + abs(sin(rotation)*width)
-      xmin = centerX - 0.5*newWidth
-      xmax = centerX + 0.5*newWidth 
-      ymin = centerY - 0.5*newHeight
-      ymax = centerY + 0.5*newHeight
+      xmin <- centerX - 0.5*newWidth
+      xmax <- centerX + 0.5*newWidth 
+      ymin <- centerY - 0.5*newHeight
+      ymax <- centerY + 0.5*newHeight
       
       img <- magick::image_read(system.file("pathwayElements","ER.png", package="rWikiPathways"))
       #img <- magick::image_read("C:/Users/jarno/GitHub/ShinyPath/rWikiPathways-devel/inst/pathwayElements/ER.png")
@@ -540,10 +540,10 @@
       height <- height*1.05
       newWidth <- abs(sin(rotation)*height) + abs(cos(rotation)*width)
       newHeight <- abs(cos(rotation)*height) + abs(sin(rotation)*width)
-      xmin = centerX - 0.5*newWidth
-      xmax = centerX + 0.5*newWidth 
-      ymin = centerY - 0.5*newHeight
-      ymax = centerY + 0.5*newHeight
+      xmin <- centerX - 0.5*newWidth
+      xmax <- centerX + 0.5*newWidth 
+      ymin <- centerY - 0.5*newHeight
+      ymax <- centerY + 0.5*newHeight
       
       img <- magick::image_read(system.file("pathwayElements","Golgi.png", package="rWikiPathways"))
       #img <- magick::image_read("C:/Users/jarno/GitHub/ShinyPath/rWikiPathways-devel/inst/pathwayElements/Golgi.png")

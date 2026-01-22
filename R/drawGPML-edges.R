@@ -29,7 +29,7 @@
       # This path exist of starting coordinates (X1 and Y1) and end 
       # coordinates (X2 and Y2)
       edges_df <- NULL
-      for (p in 1:(sum(names(dataEdges$Graphics) == "Point")-1)){
+      for (p in seq_len(sum(names(dataEdges$Graphics) == "Point")-1)){
         
         # For the starting point we need to determine the relative X and Y 
         # positions. The relative X and Y positions of the other points 
@@ -488,28 +488,28 @@
     # arrow head, because the arrow head looks weird when the line is dashed.
     
     # Collect X and Y coordinates in separate vectors
-    x1 = plotDF_temp$X1
-    x2 = plotDF_temp$X2
-    y1 = plotDF_temp$Y1
-    y2 = plotDF_temp$Y2
+    x1 <- plotDF_temp$X1
+    x2 <- plotDF_temp$X2
+    y1 <- plotDF_temp$Y1
+    y2 <- plotDF_temp$Y2
     
     # Offset is the distance at which the arrow head should be attached to the
     # main body of the arrow
     offset <- 5
     
     plotDF <- NULL
-    for (a in 1:nrow(plotDF_temp)){
+    for (a in seq_len(nrow(plotDF_temp))){
       
       if (plotDF_temp$ArrowEnd[a] == "first"){
         
-        Xstart = x1[a]-offset*((x1[a]-x2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
-        Xend = x2[a]
-        X1 = x1[a]
-        X2 = Xstart
-        Ystart = -1*(y1[a]-offset*((y1[a]-y2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
-        Yend = -y2[a]
-        Y1 = -y1[a]
-        Y2 = Ystart
+        Xstart <- x1[a]-offset*((x1[a]-x2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
+        Xend <- x2[a]
+        X1 <- x1[a]
+        X2 <- Xstart
+        Ystart <- -1*(y1[a]-offset*((y1[a]-y2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
+        Yend <- -y2[a]
+        Y1 <- -y1[a]
+        Y2 <- Ystart
         
         plotDF <- rbind.data.frame(
           plotDF,
@@ -522,14 +522,14 @@
       
       if (plotDF_temp$ArrowEnd[a] == "last"){
         
-        Xstart = x1[a]
-        Xend = x2[a]-offset*((x2[a]-x1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
-        X1 = Xend
-        X2 = x2[a]
-        Ystart = -y1[a]
-        Yend = -1*(y2[a]-offset*((y2[a]-y1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
-        Y1 = Yend
-        Y2 = -y2[a]
+        Xstart <- x1[a]
+        Xend <- x2[a]-offset*((x2[a]-x1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
+        X1 <- Xend
+        X2 <- x2[a]
+        Ystart <- -y1[a]
+        Yend <- -1*(y2[a]-offset*((y2[a]-y1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
+        Y1 <- Yend
+        Y2 <- -y2[a]
         
         plotDF <- rbind.data.frame(
           plotDF,
@@ -577,28 +577,28 @@
     # arrow head, because the arrow head looks weird when the line is dashed.
     
     # Collect X and Y coordinates in separate vectors
-    x1 = plotDF_temp$X1
-    x2 = plotDF_temp$X2
-    y1 = plotDF_temp$Y1
-    y2 = plotDF_temp$Y2
+    x1 <- plotDF_temp$X1
+    x2 <- plotDF_temp$X2
+    y1 <- plotDF_temp$Y1
+    y2 <- plotDF_temp$Y2
     
     # Offset is the distance at which the arrow head should be attached to the
     # main body of the arrow
     offset <- 5
     
     plotDF <- NULL
-    for (a in 1:nrow(plotDF_temp)){
+    for (a in seq_len(nrow(plotDF_temp))){
       
       if (plotDF_temp$ArrowEnd[a] == "first"){
         
-        Xstart = x1[a]-offset*((x1[a]-x2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
-        Xend = x2[a]
-        X1 = x1[a]
-        X2 = Xstart
-        Ystart = -1*(y1[a]-offset*((y1[a]-y2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
-        Yend = -y2[a]
-        Y1 = -y1[a]
-        Y2 = Ystart
+        Xstart <- x1[a]-offset*((x1[a]-x2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
+        Xend <- x2[a]
+        X1 <- x1[a]
+        X2 <- Xstart
+        Ystart <- -1*(y1[a]-offset*((y1[a]-y2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
+        Yend <- -y2[a]
+        Y1 <- -y1[a]
+        Y2 <- Ystart
         
         plotDF <- rbind.data.frame(
           plotDF,
@@ -611,14 +611,14 @@
       
       if (plotDF_temp$ArrowEnd[a] == "last"){
         
-        Xstart = x1[a]
-        Xend = x2[a]-offset*((x2[a]-x1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
-        X1 = Xend
-        X2 = x2[a]
-        Ystart = -y1[a]
-        Yend = -1*(y2[a]-offset*((y2[a]-y1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
-        Y1 = Yend
-        Y2 = -y2[a]
+        Xstart <- x1[a]
+        Xend <- x2[a]-offset*((x2[a]-x1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
+        X1 <- Xend
+        X2 <- x2[a]
+        Ystart <- -y1[a]
+        Yend <- -1*(y2[a]-offset*((y2[a]-y1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
+        Y1 <- Yend
+        Y2 <- -y2[a]
         
         plotDF <- rbind.data.frame(
           plotDF,
@@ -664,28 +664,28 @@
     # arrow head, because the arrow head looks weird when the line is dashed.
     
     # Collect X and Y coordinates in separate vectors
-    x1 = plotDF_temp$X1
-    x2 = plotDF_temp$X2
-    y1 = plotDF_temp$Y1
-    y2 = plotDF_temp$Y2
+    x1 <- plotDF_temp$X1
+    x2 <- plotDF_temp$X2
+    y1 <- plotDF_temp$Y1
+    y2 <- plotDF_temp$Y2
     
     # Offset is the distance at which the arrow head should be attached to the
     # main body of the arrow
     offset <- 5
     
     plotDF <- NULL
-    for (a in 1:nrow(plotDF_temp)){
+    for (a in seq_len(nrow(plotDF_temp))){
       
       if (plotDF_temp$ArrowEnd[a] == "first"){
         
-        Xstart = x1[a]-offset*((x1[a]-x2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
-        Xend = x2[a]
-        X1 = x1[a]
-        X2 = Xstart
-        Ystart = -1*(y1[a]-offset*((y1[a]-y2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
-        Yend = -y2[a]
-        Y1 = -y1[a]
-        Y2 = Ystart
+        Xstart <- x1[a]-offset*((x1[a]-x2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
+        Xend <- x2[a]
+        X1 <- x1[a]
+        X2 <- Xstart
+        Ystart <- -1*(y1[a]-offset*((y1[a]-y2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
+        Yend <- -y2[a]
+        Y1 <- -y1[a]
+        Y2 <- Ystart
         
         plotDF <- rbind.data.frame(
           plotDF,
@@ -698,14 +698,14 @@
       
       if (plotDF_temp$ArrowEnd[a] == "last"){
         
-        Xstart = x1[a]
-        Xend = x2[a]-offset*((x2[a]-x1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
-        X1 = Xend
-        X2 = x2[a]
-        Ystart = -y1[a]
-        Yend = -1*(y2[a]-offset*((y2[a]-y1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
-        Y1 = Yend
-        Y2 = -y2[a]
+        Xstart <- x1[a]
+        Xend <- x2[a]-offset*((x2[a]-x1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
+        X1 <- Xend
+        X2 <- x2[a]
+        Ystart <- -y1[a]
+        Yend <- -1*(y2[a]-offset*((y2[a]-y1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
+        Y1 <- Yend
+        Y2 <- -y2[a]
         
         plotDF <- rbind.data.frame(
           plotDF,
@@ -752,10 +752,10 @@
     # arrow head, because the arrow head looks weird when the line is dashed.
     
     # Collect X and Y coordinates in separate vectors
-    x1 = plotDF_temp$X1
-    x2 = plotDF_temp$X2
-    y1 = plotDF_temp$Y1
-    y2 = plotDF_temp$Y2
+    x1 <- plotDF_temp$X1
+    x2 <- plotDF_temp$X2
+    y1 <- plotDF_temp$Y1
+    y2 <- plotDF_temp$Y2
     
     # Offset is the distance at which the arrow head should be attached to the
     # main body of the arrow
@@ -766,18 +766,18 @@
     gap <- 10
     
     plotDF <- NULL
-    for (a in 1:nrow(plotDF_temp)){
+    for (a in seq_len(nrow(plotDF_temp))){
       
       if (plotDF_temp$ArrowEnd[a] == "first"){
         
-        Xstart = x1[a]-(offset+gap)*((x1[a]-x2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
-        Xend = x2[a]
-        X1 = x1[a]-(gap)*((x1[a]-x2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
-        X2 = Xstart
-        Ystart = -1*(y1[a]-(offset+gap)*((y1[a]-y2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
-        Yend = -y2[a]
-        Y1 = -1*(y1[a]-(gap)*((y1[a]-y2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
-        Y2 = Ystart
+        Xstart <- x1[a]-(offset+gap)*((x1[a]-x2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
+        Xend <- x2[a]
+        X1 <- x1[a]-(gap)*((x1[a]-x2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
+        X2 <- Xstart
+        Ystart <- -1*(y1[a]-(offset+gap)*((y1[a]-y2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
+        Yend <- -y2[a]
+        Y1 <- -1*(y1[a]-(gap)*((y1[a]-y2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
+        Y2 <- Ystart
         
         plotDF <- rbind.data.frame(
           plotDF,
@@ -790,14 +790,14 @@
       
       if (plotDF_temp$ArrowEnd[a] == "last"){
         
-        Xstart = x1[a]
-        Xend = x2[a]-(offset+gap)*((x2[a]-x1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
-        X1 = Xend
-        X2 = x2[a]-(gap)*((x2[a]-x1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
-        Ystart = -y1[a]
-        Yend = -1*(y2[a]-(offset+gap)*((y2[a]-y1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
-        Y1 = Yend
-        Y2 = -1*(y2[a]-(gap)*((y2[a]-y1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
+        Xstart <- x1[a]
+        Xend <- x2[a]-(offset+gap)*((x2[a]-x1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
+        X1 <- Xend
+        X2 <- x2[a]-(gap)*((x2[a]-x1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
+        Ystart <- -y1[a]
+        Yend <- -1*(y2[a]-(offset+gap)*((y2[a]-y1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
+        Y1 <- Yend
+        Y2 <- -1*(y2[a]-(gap)*((y2[a]-y1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
         
         plotDF <- rbind.data.frame(
           plotDF,
@@ -842,17 +842,17 @@
     # arrow head, because the arrow head looks weird when the line is dashed.
     
     # Collect X and Y coordinates in separate vectors
-    x1 = plotDF_temp$X1
-    x2 = plotDF_temp$X2
-    y1 = plotDF_temp$Y1
-    y2 = plotDF_temp$Y2
+    x1 <- plotDF_temp$X1
+    x2 <- plotDF_temp$X2
+    y1 <- plotDF_temp$Y1
+    y2 <- plotDF_temp$Y2
     
     # Offset is the distance at which the arrow head should be attached to the
     # main body of the arrow
     offset <- 5
     
     plotDF <- NULL
-    for (a in 1:nrow(plotDF_temp)){
+    for (a in seq_len(nrow(plotDF_temp))){
       
       if (plotDF_temp$ArrowEnd[a] == "first"){
         Xstart <- x1[a]-offset*((x1[a]-x2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
@@ -919,17 +919,17 @@
     # arrow head, because the arrow head looks weird when the line is dashed.
     
     # Collect X and Y coordinates in separate vectors
-    x1 = plotDF_temp$X1
-    x2 = plotDF_temp$X2
-    y1 = plotDF_temp$Y1
-    y2 = plotDF_temp$Y2
+    x1 <- plotDF_temp$X1
+    x2 <- plotDF_temp$X2
+    y1 <- plotDF_temp$Y1
+    y2 <- plotDF_temp$Y2
     
     # Offset is the distance at which the arrow head should be attached to the
     # main body of the arrow
     offset <- 5
     
     plotDF <- NULL
-    for (a in 1:nrow(plotDF_temp)){
+    for (a in seq_len(nrow(plotDF_temp))){
       
       if (plotDF_temp$ArrowEnd[a] == "first"){
         Xstart <- x1[a]-offset*((x1[a]-x2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
@@ -997,17 +997,17 @@
     # arrow head, because the arrow head looks weird when the line is dashed.
     
     # Collect X and Y coordinates in separate vectors
-    x1 = plotDF_temp$X1
-    x2 = plotDF_temp$X2
-    y1 = plotDF_temp$Y1
-    y2 = plotDF_temp$Y2
+    x1 <- plotDF_temp$X1
+    x2 <- plotDF_temp$X2
+    y1 <- plotDF_temp$Y1
+    y2 <- plotDF_temp$Y2
     
     # Gap is the distance that should be present between the end of the arrow 
     # and the node
     gap <- 10
     
     plotDF <- NULL
-    for (a in 1:nrow(plotDF_temp)){
+    for (a in seq_len(nrow(plotDF_temp))){
       
       if (plotDF_temp$ArrowEnd[a] == "first"){
         Xstart <- x1[a]-gap*((x1[a]-x2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
@@ -1065,10 +1065,10 @@
     # arrow head, because the arrow head looks weird when the line is dashed.
     
     # Collect X and Y coordinates in separate vectors
-    x1 = plotDF_temp$X1
-    x2 = plotDF_temp$X2
-    y1 = plotDF_temp$Y1
-    y2 = plotDF_temp$Y2
+    x1 <- plotDF_temp$X1
+    x2 <- plotDF_temp$X2
+    y1 <- plotDF_temp$Y1
+    y2 <- plotDF_temp$Y2
     
     # Offset is the distance from the end node to the start of the arrow head
     offset <- 15
@@ -1080,7 +1080,7 @@
     plotDF_main <- NULL
     plotDF_orth <- NULL
     plotDF_diag <- NULL
-    for (a in 1:nrow(plotDF_temp)){
+    for (a in seq_len(nrow(plotDF_temp))){
       
       if (plotDF_temp$ArrowEnd[a] == "first"){
         
@@ -1208,10 +1208,10 @@
   if (sum(df$ArrowType == "mim-transcription-translation")> 0){
     
     plotDF_temp <- df[df$ArrowType == "mim-transcription-translation",]
-    x1 = plotDF_temp$X1
-    x2 = plotDF_temp$X2
-    y1 = plotDF_temp$Y1
-    y2 = plotDF_temp$Y2
+    x1 <- plotDF_temp$X1
+    x2 <- plotDF_temp$X2
+    y1 <- plotDF_temp$Y1
+    y2 <- plotDF_temp$Y2
     
     # Gap is the distance between node and main line
     gap <- 15
@@ -1225,7 +1225,7 @@
     plotDF_main <- NULL
     plotDF_orth <- NULL
     plotDF_end <- NULL
-    for (a in 1:nrow(plotDF_temp)){
+    for (a in seq_len(nrow(plotDF_temp))){
       
       if (plotDF_temp$ArrowEnd[a] == "first"){
         

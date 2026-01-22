@@ -18,7 +18,7 @@
   # Each subedge consist of a starting point, a mid point, and an end point.
   # These points are needed to fit a bezier curve.
   df_all <- NULL
-  for (e in 1:length(edges)){
+  for (e in seq_along(edges)){
     
     # Get the information about a single edge
     curve_df <- df[df$GraphId == edges[e],]
@@ -30,9 +30,9 @@
     
     # We remove redundant X and Y coordinates, e.g., when two points describe 
     # the same direction
-    remove_index <- c(which(vapply(1:(length(X_all)-1), function(n) sum(duplicated(X_all)[c(n,n+1)]),
+    remove_index <- c(which(vapply(seq_len(length(X_all)-1), function(n) sum(duplicated(X_all)[c(n,n+1)]),
                                    FUN.VALUE = numeric(1))==2),
-                      which(vapply(1:(length(Y_all)-1), function(n) sum(duplicated(Y_all)[c(n,n+1)]),
+                      which(vapply(seq_len(length(Y_all)-1), function(n) sum(duplicated(Y_all)[c(n,n+1)]),
                                    FUN.VALUE = numeric(1))==2))
     
     if (length(remove_index) > 0){
@@ -52,9 +52,9 @@
     
     # The mid points are in-between the corner points
     if (length(X_corners) > 1){
-      X_mid <- vapply(1:(length(X_corners)-1), function(n) mean(X_corners[c(n,n+1)]),
+      X_mid <- vapply(seq_len(length(X_corners)-1), function(n) mean(X_corners[c(n,n+1)]),
                       FUN.VALUE = numeric(1))
-      Y_mid <- vapply(1:(length(Y_corners)-1), function(n) mean(Y_corners[c(n,n+1)]),
+      Y_mid <- vapply(seq_len(length(Y_corners)-1), function(n) mean(Y_corners[c(n,n+1)]),
                       FUN.VALUE = numeric(1)) 
       
       # Collect all relevant X and Y coordinates for plotting the curved edges
@@ -71,7 +71,7 @@
     
     # The last thing to do, is to separate the X and Y coordinates into sub-edges
     # Each curve can only be fitted to a sub-edge consisting of the start, mid, and end
-    for (i in 1:(length(X_points) - 1)){
+    for (i in seq_len(length(X_points) - 1)){
       
       # The arrow end and arrow type is by default "none"
       arrowEnd <- "none"
@@ -169,7 +169,7 @@
 
     plotDF_main <- NULL
     plotDF_end <- NULL
-    for (i in 1:length(groups)){
+    for (i in seq_along(groups)){
 
       temp_main <- plotDF_temp[plotDF_temp$group == groups[i],]
 
@@ -273,7 +273,7 @@
 
     plotDF_main <- NULL
     plotDF_end <- NULL
-    for (i in 1:length(groups)){
+    for (i in seq_along(groups)){
 
       temp_main <- plotDF_temp[plotDF_temp$group == groups[i],]
 
@@ -373,7 +373,7 @@
 
     plotDF_main <- NULL
     plotDF_end <- NULL
-    for (i in 1:length(groups)){
+    for (i in seq_along(groups)){
 
       temp_main <- plotDF_temp[plotDF_temp$group == groups[i],]
 
@@ -479,7 +479,7 @@
 
     plotDF_main <- NULL
     plotDF_end <- NULL
-    for (i in 1:length(groups)){
+    for (i in seq_along(groups)){
 
       temp_main <- plotDF_temp[plotDF_temp$group == groups[i],]
 
@@ -582,7 +582,7 @@
 
     plotDF_main <- NULL
     plotDF_end <- NULL
-    for (i in 1:length(groups)){
+    for (i in seq_along(groups)){
 
       temp_main <- plotDF_temp[plotDF_temp$group == groups[i],]
 
@@ -673,7 +673,7 @@
 
     plotDF_main <- NULL
     plotDF_end <- NULL
-    for (i in 1:length(groups)){
+    for (i in seq_along(groups)){
 
       temp_main <- plotDF_temp[plotDF_temp$group == groups[i],]
 
@@ -765,7 +765,7 @@
 
     plotDF_main <- NULL
     plotDF_end <- NULL
-    for (i in 1:length(groups)){
+    for (i in seq_along(groups)){
 
       temp_main <- plotDF_temp[plotDF_temp$group == groups[i],]
 
@@ -835,7 +835,7 @@
     plotDF_main <- NULL
     plotDF_orth <- NULL
     plotDF_diag <- NULL
-    for (i in 1:length(groups)){
+    for (i in seq_along(groups)){
       temp_main <- plotDF_temp[plotDF_temp$group == groups[i],]
 
       if ("last" %in% temp_main$arrowEnd){
@@ -965,7 +965,7 @@
     plotDF_main <- NULL
     plotDF_orth <- NULL
     plotDF_end <- NULL
-    for (i in 1:length(groups)){
+    for (i in seq_along(groups)){
       temp_main <- plotDF_temp[plotDF_temp$group == groups[i],]
 
       if ("last" %in% temp_main$arrowEnd){

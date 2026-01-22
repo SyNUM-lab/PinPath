@@ -47,77 +47,77 @@
 
 .drawStates <- function(states_df){
   states_df$ShapeType[is.na(states_df$ShapeType)] <- "Square"
-  starting_angle = 0
-  n_corners = 100
+  starting_angle <- 0
+  n_corners <- 100
   adj <- 1
   polygon_df_plot <- NULL
-  for (i in 1:nrow(states_df)){
+  for (i in seq_len(nrow(states_df))){
     
     # Define variables
     width <- states_df$Width[i]
     height <- states_df$Height[i]
     centerX <- states_df$X[i]
     centerY <- states_df$Y[i]
-    type = states_df$ShapeType[i]
-    textLabel = states_df$TextLabel[i]
-    graphId = states_df$GraphId[i]
+    type <- states_df$ShapeType[i]
+    textLabel <- states_df$TextLabel[i]
+    graphId <- states_df$GraphId[i]
     
     
     if (type %in% c("Triangle", "Square",
                     "Pentagon", "Hexagon", "Oval", "mim-degradation")){
       n_corners <- NULL
       if (type == "Square"){
-        starting_angle = 0.25*pi
-        max_angle = 2*pi
-        n_corners = 4
+        starting_angle <- 0.25*pi
+        max_angle <- 2*pi
+        n_corners <- 4
         adj <- sqrt(2)
-        rotation = 0
+        rotation <- 0
       }
       if (type == "Triangle"){
-        starting_angle = 0
-        max_angle = 2*pi
-        n_corners = 3
+        starting_angle <- 0
+        max_angle <- 2*pi
+        n_corners <- 3
         adj <- 1
-        rotation = 90
+        rotation <- 90
       }
       if (type == "RoundedRectangle" |
           type == "Rectangle"){
-        starting_angle = 0.25*pi
-        max_angle = 2*pi
-        n_corners = 4
+        starting_angle <- 0.25*pi
+        max_angle <- 2*pi
+        n_corners <- 4
         adj <- sqrt(2)
-        rotation = 0
+        rotation <- 0
       }
       if (type == "Pentagon"){
-        starting_angle = 0
-        max_angle = 2*pi
-        n_corners = 5
+        starting_angle <- 0
+        max_angle <- 2*pi
+        n_corners <- 5
         adj <- 1
-        rotation = 0
+        rotation <- 0
       }
       if (type == "Hexagon"){
-        starting_angle = 0
-        max_angle = 2*pi
-        n_corners = 6
+        starting_angle <- 0
+        max_angle <- 2*pi
+        n_corners <- 6
         adj <- 1
-        rotation = 0
+        rotation <- 0
       }
       if (type == "Oval"){
-        starting_angle = 0
-        max_angle = 2*pi
-        n_corners = 100
+        starting_angle <- 0
+        max_angle <- 2*pi
+        n_corners <- 100
         adj <- 1
-        rotation = 0
+        rotation <- 0
       }
       
       if (type == "mim-degradation"){
-        starting_angle = 0
-        max_angle = 2*pi
-        n_corners = 100
+        starting_angle <- 0
+        max_angle <- 2*pi
+        n_corners <- 100
         adj <- 1
         width <- 0.7*width
         height <- 0.7*height
-        rotation = 0
+        rotation <- 0
       }
       
       if (!is.null(n_corners)){
@@ -127,7 +127,7 @@
         x <- rep(NA, n_corners)
         y <- rep(NA, n_corners)
         corner_coords <- matrix(NA, nrow = n_corners, ncol = 2)
-        for (c in 1:n_corners){
+        for (c in seq_len(n_corners)){
           
           corner_coords[c,1] <- adj*width/2 * cos(angle[c] + starting_angle)
           corner_coords[c,2] <- adj*height/2 * sin(angle[c] + starting_angle)

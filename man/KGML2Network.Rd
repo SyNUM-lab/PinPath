@@ -2,15 +2,16 @@
 % Please edit documentation in R/KGML2Network.R
 \name{KGML2Network}
 \alias{KGML2Network}
-\title{Draw pathway from GPML file}
+\title{Draw network from KGML file}
 \usage{
 KGML2Network(
-  id,
+  infile,
   outdir = getwd(),
   outname = NULL,
   geneIDs = NULL,
   colorVar = NULL,
-  annPkg = NULL,
+  annGenes = NULL,
+  annMetabolites = NULL,
   inputDB = NULL,
   colorNames = NULL,
   colorList = NULL,
@@ -26,7 +27,8 @@ KGML2Network(
 )
 }
 \arguments{
-\item{id}{KEGG pathway id.}
+\item{infile}{Input KGML file. This can be a character string of the KGML file 
+location (e.g., "Downloads/WP42500.KGML").}
 
 \item{outdir}{(optional) Output directory. The pathway and legend images will be 
 saved in this directory.}
@@ -43,7 +45,9 @@ This can be for instance a \code{data.frame} with the log2FCs and significance i
 The (row) order should match \code{geneIDs}. 
 The color rules and palettes for the supplied values can be set in the colorList parameter.}
 
-\item{annPkg}{(optional) \code{character} string of the Bioconductor annotation package (e.g., org.Hs.eg.db).}
+\item{annGenes}{(optional) \code{character} string of the Bioconductor annotation package (e.g., org.Hs.eg.db).}
+
+\item{annMetabolites}{(optional) \code{tibble} or \code{data.frame} with metabolite mapping information (see metaboliteIDmapping package).}
 
 \item{inputDB}{(optional) Input gene ID type (SYMBOL, ENTREZID, ENSEMBL, UNIPROT).
 This can be a \code{character} vector of \code{length = 1} (if all gene IDs are of the same type) 
@@ -61,7 +65,7 @@ An example can be generated using the \link{defaultColorList} function.}
 
 \item{unconnectedNodes}{(optional) Logical (TRUE or FALSE). Should unconnected (isolated) nodes be shown in the network?}
 
-\item{alpha}{(optional) Size of the nodes.}
+\item{alpha}{(optional) Transparency of the nodes.}
 
 \item{legend}{(optional) Logical (TRUE or FALSE). Should the legend be plotted?}
 
@@ -75,6 +79,29 @@ An example can be generated using the \link{defaultColorList} function.}
 A \code{list} with the node table and the file location of the pathway and legend image.
 }
 \description{
-This function draws a pathway from a GPML file with the option to map, e.g.,
+This function draws a pathway from a KGML file with the option to map, e.g.,
              expression data onto the pathway diagram.
+}
+\examples{
+
+# Load example data
+lung_expr <- read.csv(system.file("extdata","data-lung-cancer.csv", package="PinPath"), 
+stringsAsFactors = FALSE)
+
+# Select pathway
+pathway_id <- "hsa05223"
+bfc <- BiocFileCache::BiocFileCache()
+infile <- BiocFileCache::bfcrpath(bfc, paste0("https://rest.kegg.jp/get/",pathway_id,"/kgml"))
+
+# Draw pathway
+pathVis <- PinPath::KGML2Network(
+            infile = infile,
+            outdir = tempdir(),
+            annGenes = "org.Hs.eg.db",
+            inputDB = "ENSEMBL",
+            geneIDs = lung_expr$GeneID,
+            colorVar = lung_expr[,"log2FC"],
+            nodeTable = TRUE,
+            legend = TRUE)
+
 }

@@ -1,25 +1,26 @@
 ---
-title: "Pathway Visualization"
+title: "1. Pathway Visualization (WikiPathways)"
 author: "Jarno Koetsier"
 package: PinPath
 date: "`r Sys.Date()`"
 output: 
-  BiocStyle::html_document:
+    BiocStyle::html_document:
     toc_float: true
     includes:
       in_header: Pathway-Visualization-schema.html
 # pdf_document:
 #   toc: true
 vignette: >
-  %\VignetteIndexEntry{5. Pathway Visualization}
+  %\VignetteIndexEntry{Pathway Visualization}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, echo = FALSE}
-knitr::opts_chunk$set(
-  eval=FALSE
-)
+```{r setup, echo=FALSE, results="hide"}
+knitr::opts_chunk$set(tidy = FALSE,
+                      cache = FALSE,
+                      dev = "png",
+                      message = FALSE, error = FALSE, warning = TRUE)
 ```
 
 This vignette will cover visualizing differential expression analysis results onto *WikiPathways* pathway diagrams.
@@ -27,12 +28,9 @@ This vignette will cover visualizing differential expression analysis results on
 # Installation
 First, make sure you have *PinPath* installed.
 ```{r, message = FALSE, warning = FALSE}
-if(!"PinPath" %in% installed.packages()){
-  if (!requireNamespace("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-  BiocManager::install("PinPath", update = FALSE)
-}
 library(PinPath)
+library(rWikiPathways)
+library(org.Hs.eg.db)
 ```
 
 
@@ -51,7 +49,7 @@ lung_expr$Significant <- ifelse(lung_expr$adj.P.Value < 0.05, "Yes", "No")
 # Set colors
 After we have loaded and prepared the differential expression analysis statistics, we need to define how to color the statistics in the pathway diagram. In this vignette, we will plot the log2FC and significance of each gene on the pathway diagram. We can start by loading the default color palette.
 ```{r}
-colorList <- rWikiPathways::defaultColorList(lung_expr[,c("log2FC", "Significant")])
+colorList <- PinPath::defaultColorList(lung_expr[,c("log2FC", "Significant")])
 ```
 
 In the next step, we can adjust the default color palette to the desired color values. For instance, we want to display a green color when a gene is differentially expressed  and a white color when it is not.
@@ -72,16 +70,13 @@ We can now plot the differential expression statistics on the *WP5087: Pleural m
 If not specified otherwise, the pathway and legend image will be saved in your working directory. 
 The pathway image will be opened by default.
 ```{r, message = FALSE, warning = FALSE}
-# Load human gene annotation
-library(org.Hs.eg.db)
-library(rWikiPathways)
-
 # WP5087: Pleural mesothelioma
 pathway_id <- "WP5087"
+infile <- rWikiPathways::getPathway(pathway_id)
 
 # Draw pathway
-pathVis <- rWikiPathways::drawGPML(
-  infile = rWikiPathways::getPathway(pathway_id),
+pathVis <- PinPath::drawGPML(
+  infile = infile,
   annGenes = "org.Hs.eg.db",
   inputDB = "ENSEMBL",
   geneIDs = lung_expr$GeneID,
@@ -98,6 +93,9 @@ Pathway image:
 Legend image:
 <img src="legend_Pleural_mesothelioma_WP5087_r140461_Homo_sapiens.svg" width="500">
 
+# Session info
 
-
+```{r sessionInfo}
+sessionInfo()
+```
 
