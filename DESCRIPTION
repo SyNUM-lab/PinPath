@@ -1,7 +1,7 @@
 Package: PinPath
 Type: Package
 Title: PinPath - R package for pathway visualization
-Version: 1.31.1
+Version: 0.1.0
 Date: 2026-01-20
 Authors@R: c(person("Jarno", "Koetsier", role = c("aut","cre"),
                      email = "jarno.koetsier@maastrichtuniversity.nl",
@@ -25,7 +25,7 @@ License: MIT + file LICENSE
 URL: https://github.com/SyNUM-lab/PinPath
 BugReports: https://github.com/SyNUM-lab/PinPath/issues
 LazyLoad: yes
-biocViews: Visualization, GraphAndNetwork
+biocViews: Pathways, Visualization, GraphAndNetwork, KEGG
 NeedsCompilation: no
 VignetteBuilder: knitr
 RoxygenNote: 7.3.3

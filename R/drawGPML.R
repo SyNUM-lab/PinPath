@@ -35,12 +35,13 @@
 #' @examples
 #' 
 #' # Load example data
-#' lung_expr <- read.csv(system.file("extdata","data-lung-cancer.csv", package="rWikiPathways"), 
+#' lung_expr <- read.csv(system.file("extdata","data-lung-cancer.csv", package="PinPath"), 
 #' stringsAsFactors = FALSE)
 #' 
 #' # Draw pathway
-#' pathVis <- rWikiPathways::drawGPML(
+#' pathVis <- PinPath::drawGPML(
 #'             infile = rWikiPathways::getPathway("WP4255"),
+#'             outdir = tempdir(),
 #'             annGenes = "org.Hs.eg.db",
 #'             inputDB = "ENSEMBL",
 #'             geneIDs = lung_expr$GeneID,

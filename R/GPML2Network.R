@@ -127,7 +127,25 @@ geom_node_split <- function(mapping=NULL, data=NULL, position='identity',
 #' @param pathInfo (optional) Logical (TRUE or FALSE). Should pathway information be returned?
 #' @param openFile (optional) Logical (TRUE or FALSE). Should the pathway file be opened after it has been saved?
 #' @return A \code{list} with the node table and the file location of the pathway and legend image.
+#' @examples
+#' 
+#' # Load example data
+#' lung_expr <- read.csv(system.file("extdata","data-lung-cancer.csv", package="PinPath"), 
+#' stringsAsFactors = FALSE)
+#' 
+#' # Draw pathway
+#' pathVis <- PinPath::GPML2Network(
+#'             infile = rWikiPathways::getPathway("WP4255"),
+#'             outdir = tempdir(),
+#'             annGenes = "org.Hs.eg.db",
+#'             inputDB = "ENSEMBL",
+#'             geneIDs = lung_expr$GeneID,
+#'             colorVar = lung_expr[,"log2FC"],
+#'             nodeTable = TRUE,
+#'             legend = TRUE)
+#' 
 #' @export
+
 
 GPML2Network <- function(infile,
                          outdir = getwd(),

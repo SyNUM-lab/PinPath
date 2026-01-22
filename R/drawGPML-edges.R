@@ -817,17 +817,17 @@
                      col = plotDF_temp$Color, 
                      lty = plotDF_temp$LineStyle, 
                      lwd = plotDF_temp$LineThickness)
-    graphics::shape::Arrows(x0 = plotDF$X1, x1 = plotDF$X2,
-                            y0 = plotDF$Y1, y1 = plotDF$Y2, 
-                            code = ifelse(plotDF_temp$ArrowEnd == "first", 1, 2), 
-                            arr.width = 0.4,
-                            arr.length = 0.5,
-                            arr.type = "T",
-                            lcol = plotDF_temp$Color, 
-                            arr.col = plotDF_temp$Color, 
-                            col = plotDF_temp$Color,
-                            lwd = plotDF_temp$LineThickness,
-                            arr.adj = 1)
+    shape::Arrows(x0 = plotDF$X1, x1 = plotDF$X2,
+                  y0 = plotDF$Y1, y1 = plotDF$Y2, 
+                  code = ifelse(plotDF_temp$ArrowEnd == "first", 1, 2), 
+                  arr.width = 0.4,
+                  arr.length = 0.5,
+                  arr.type = "T",
+                  lcol = plotDF_temp$Color, 
+                  arr.col = plotDF_temp$Color, 
+                  col = plotDF_temp$Color,
+                  lwd = plotDF_temp$LineThickness,
+                  arr.adj = 1)
   }
   
   #============================================================================#

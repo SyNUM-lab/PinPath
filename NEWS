@@ -1,0 +1,7 @@
+Changes in version 0.1.0
++ New features
+    - Pathway visualization functions: drawGPML and drawKGML
+    - Pathway to network functions: GPML2Network and KGML2Network
+    - Function to set default colors for pathway/network visualization:	defaultColorList
++ Bug fixes
+    - First official release. So, no bugs yet...

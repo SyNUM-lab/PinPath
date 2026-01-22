@@ -10,7 +10,8 @@ GPML2Network(
   outname = NULL,
   geneIDs = NULL,
   colorVar = NULL,
-  annPkg = NULL,
+  annGenes,
+  annMetabolites,
   inputDB = NULL,
   colorNames = NULL,
   colorList = NULL,
@@ -44,7 +45,9 @@ This can be for instance a \code{data.frame} with the log2FCs and significance i
 The (row) order should match \code{geneIDs}. 
 The color rules and palettes for the supplied values can be set in the colorList parameter.}
 
-\item{annPkg}{(optional) \code{character} string of the Bioconductor annotation package (e.g., org.Hs.eg.db).}
+\item{annGenes}{(optional) \code{character} string of the Bioconductor annotation package (e.g., org.Hs.eg.db).}
+
+\item{annMetabolites}{(optional) \code{tibble} or \code{data.frame} with metabolite mapping information (see metaboliteIDmapping package).}
 
 \item{inputDB}{(optional) Input gene ID type (SYMBOL, ENTREZID, ENSEMBL, UNIPROT).
 This can be a \code{character} vector of \code{length = 1} (if all gene IDs are of the same type) 
@@ -78,4 +81,21 @@ A \code{list} with the node table and the file location of the pathway and legen
 \description{
 This function draws a pathway from a GPML file with the option to map, e.g.,
              expression data onto the pathway diagram.
+}
+\examples{
+
+# Load example data
+lung_expr <- read.csv(system.file("extdata","data-lung-cancer.csv", package="PinPath"), 
+stringsAsFactors = FALSE)
+
+# Draw pathway
+pathVis <- PinPath::GPML2Network(
+            infile = rWikiPathways::getPathway("WP4255"),
+            annGenes = "org.Hs.eg.db",
+            inputDB = "ENSEMBL",
+            geneIDs = lung_expr$GeneID,
+            colorVar = lung_expr[,"log2FC"],
+            nodeTable = TRUE,
+            legend = TRUE)
+
 }
