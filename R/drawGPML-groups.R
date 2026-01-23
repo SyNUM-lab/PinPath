@@ -6,16 +6,22 @@
 #' @param nodes_df_groups A data frame with information about the nodes of the group.
 #' @return A data frame for plotting groups.
 #' @importFrom magrittr `%>%`
+#' @importFrom rlang .data
+#' @noRd
 
 .prepareGroups <- function(dataGroups, nodes_df_groups){
   
   # Collect X and Y coordinates of the nodes in the group
   groups_df <- data.frame(
     GroupRef = nodes_df_groups$GroupRef,
-    minY = as.numeric(nodes_df_groups$CenterY) - 0.5*as.numeric(nodes_df_groups$Height),
-    maxY = as.numeric(nodes_df_groups$CenterY) + 0.5*as.numeric(nodes_df_groups$Height),
-    minX = as.numeric(nodes_df_groups$CenterX) - 0.5*as.numeric(nodes_df_groups$Width),
-    maxX = as.numeric(nodes_df_groups$CenterX) + 0.5*as.numeric(nodes_df_groups$Width)
+    minY = as.numeric(nodes_df_groups$CenterY) - 
+      0.5*as.numeric(nodes_df_groups$Height),
+    maxY = as.numeric(nodes_df_groups$CenterY) + 
+      0.5*as.numeric(nodes_df_groups$Height),
+    minX = as.numeric(nodes_df_groups$CenterX) - 
+      0.5*as.numeric(nodes_df_groups$Width),
+    maxX = as.numeric(nodes_df_groups$CenterX) + 
+      0.5*as.numeric(nodes_df_groups$Width)
   )
   
   # Remove NA rows
@@ -25,11 +31,11 @@
     
     # Get the most extreme X and Y coordinates of the nodes in the group
     groups_df <- groups_df %>%
-      dplyr::group_by(GroupRef) %>%
-      dplyr::mutate(maxX1 = max(maxX)) %>%
-      dplyr::mutate(minX1 = min(minX)) %>%
-      dplyr::mutate(maxY1 = max(maxY)) %>%
-      dplyr::mutate(minY1 = min(minY))
+      dplyr::group_by(.data$GroupRef) %>%
+      dplyr::mutate(maxX1 = max(.data$maxX)) %>%
+      dplyr::mutate(minX1 = min(.data$minX)) %>%
+      dplyr::mutate(maxY1 = max(.data$maxY)) %>%
+      dplyr::mutate(minY1 = min(.data$minY))
     groups_df <- unique(groups_df[,c(1,6,7,8,9)])
     
     # Convert this to coordinates of a polygon
@@ -86,10 +92,30 @@
     
     # Make data frame for plotting complex-style groups
     groups_df_all <- list(NULL, NULL)
-    GroupIds <- unlist(lapply(dataGroups, function(x) unlist(x)[stringr::str_detect(names(unlist(x)),"GroupId")]))
-    complex <- unlist(lapply(dataGroups, function(x) sum(stringr::str_detect(unlist(x), "Complex") & stringr::str_detect(names(unlist(x)), "Style"))>0))
+    GroupIds <- unlist(
+      lapply(
+        dataGroups, 
+        function(x){
+          unlist(x)[stringr::str_detect(names(unlist(x)),"GroupId")]
+        } 
+      )
+    )
+    complex <- unlist(
+      lapply(
+        dataGroups, 
+        function(x){
+          sum(stringr::str_detect(unlist(x), "Complex") & 
+                stringr::str_detect(names(unlist(x)), "Style"))>0
+        }
+      )
+    )
     if (sum(complex) > 0){
-      groups_df_complex <- do.call(rbind, apply(groups_df[groups_df$GroupRef %in% GroupIds[complex],], 1, makeComplex))
+      groups_df_complex <- do.call(
+        rbind, 
+        apply(groups_df[groups_df$GroupRef %in% GroupIds[complex],], 
+              1, 
+              makeComplex)
+      )
       groups_df_complex$Style <- "Complex"
       groups_df_all[[1]] <- groups_df_complex
     } else{
@@ -97,9 +123,20 @@
     }
     
     # Make data frame for plotting empty-style groups
-    group <- unlist(lapply(dataGroups, function(x) sum(stringr::str_detect(names(unlist(x)), "Style")) == 0)) 
+    group <- unlist(
+      lapply(
+        dataGroups, 
+        function(x){
+          sum(stringr::str_detect(names(unlist(x)), "Style")) == 0
+        } 
+      ))
     if (sum(group) > 0){
-      groups_df_empty <- do.call(rbind, apply(groups_df[groups_df$GroupRef %in% GroupIds[group],], 1, makeEmptyGroup))
+      groups_df_empty <- do.call(
+        rbind, 
+        apply(groups_df[groups_df$GroupRef %in% GroupIds[group],], 
+              1, 
+              makeEmptyGroup)
+      )
       groups_df_empty$Style <- "Empty"
       groups_df_all[[2]] <- groups_df_empty
     } else{
@@ -107,9 +144,22 @@
     }
     
     # Make data frame for plotting empty-style groups
-    pathway <- unlist(lapply(dataGroups, function(x) sum(stringr::str_detect(unlist(x), "Pathway") & stringr::str_detect(names(unlist(x)), "Style"))>0))
+    pathway <- unlist(
+      lapply(
+        dataGroups, 
+        function(x){
+          sum(stringr::str_detect(unlist(x), "Pathway") & 
+                stringr::str_detect(names(unlist(x)), "Style"))>0
+        } 
+      )
+    )
     if (sum(pathway) > 0){
-      groups_df_pathway <- do.call(rbind, apply(groups_df[groups_df$GroupRef %in% GroupIds[pathway],], 1, makeEmptyGroup))
+      groups_df_pathway <- do.call(
+        rbind, 
+        apply(groups_df[groups_df$GroupRef %in% GroupIds[pathway],], 
+              1, 
+              makeEmptyGroup)
+      )
       groups_df_pathway$Style <- "Empty"
       groups_df_all[[3]] <- groups_df_pathway
     } else{
@@ -125,8 +175,10 @@
 #' @title Draw groups
 #'
 #' @description This function adds groups to the pathway image.
-#' @param groups_df A data frame with group information, as generated by the .prepareGroups() function.
+#' @param groups_df A data frame with group information, as generated by the 
+#' .prepareGroups() function.
 #' @return A plot with groups.
+#' @noRd
 
 .drawGroups <- function(groups_df){
   if (sum(!is.na(groups_df[[1]]))>0){

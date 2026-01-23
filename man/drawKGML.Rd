@@ -74,17 +74,19 @@ This function draws a pathway from a KGML file with the option to map, e.g.,
 }
 \examples{
 
-# Load example data
-lung_expr <- read.csv(system.file("extdata","data-lung-cancer.csv", package="PinPath"), 
-stringsAsFactors = FALSE)
+ # Load example data
+ lung_expr <- read.csv(system.file("extdata",
+                                  "data-lung-cancer.csv", 
+                                  package="PinPath"), 
+                      stringsAsFactors = FALSE)
 
-# Select pathway
-pathway_id <- "hsa05223"
-bfc <- BiocFileCache::BiocFileCache()
-infile <- BiocFileCache::bfcrpath(bfc, paste0("https://rest.kegg.jp/get/",pathway_id,"/kgml"))
+ # Select pathway
+ pathway_id <- "hsa05223"
+ bfc <- BiocFileCache::BiocFileCache()
+ infile <- BiocFileCache::bfcrpath(bfc, paste0("https://rest.kegg.jp/get/",pathway_id,"/kgml"))
 
-# Draw pathway
-pathVis <- PinPath::drawKGML(
+ # Draw pathway
+ pathVis <- PinPath::drawKGML(
             infile = infile,
             outdir = tempdir(),
             annGenes = "org.Hs.eg.db",

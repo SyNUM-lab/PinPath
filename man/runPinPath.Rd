@@ -2,15 +2,19 @@
 % Please edit documentation in R/runPinPath.R
 \name{runPinPath}
 \alias{runPinPath}
-\title{runPinPath}
+\title{Run the PinPath shiny app.}
 \usage{
 runPinPath(force.browser = FALSE)
+}
+\arguments{
+\item{force.browser}{(optional) Logical (TRUE or FALSE). 
+Should the app be opened the the browser?.}
 }
 \value{
 This function will run the PinPath shiny app
 }
 \description{
-runPinPath
+This function runs the PinPath shiny app.
 }
 \examples{
 runPinPath()

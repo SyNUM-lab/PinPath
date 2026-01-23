@@ -4,6 +4,7 @@
 #' @description This function makes a data frame for plotting elbow edges.
 #' @param df A data frame with information about elbow edges.
 #' @return A data frame for plotting elbow edges.
+#' @noRd
 
 .prepareElbow <- function(df){
   
@@ -27,15 +28,15 @@
     # 1) Elbow edges that follow the default path.
     # 2) Elbow edges that follow a custom path set by the GPML creator.
     
-    #==========================================================================#
+    #=======================================================================#
     # Custom edges
-    #==========================================================================#
+    #=======================================================================#
     
     if (df$Force[i]){
       
-      #------------------------------------------------------------------------#
+      #---------------------------------------------------------------------#
       # If only the starting point is in the X direction
-      #------------------------------------------------------------------------#
+      #---------------------------------------------------------------------#
       if (abs(df$Xrel1[i]) == 1){
         
         xs <- df$X1[i]
@@ -50,10 +51,9 @@
         
       }
       
-      
-      #------------------------------------------------------------------------#
+      #---------------------------------------------------------------------#
       # If only the end point is in the X direction
-      #------------------------------------------------------------------------#
+      #---------------------------------------------------------------------#
       if (abs(df$Xrel2[i]) == 1){
         
         xs <- df$X1[i]
@@ -68,9 +68,9 @@
         
       }
       
-      #------------------------------------------------------------------------#
+      #---------------------------------------------------------------------#
       # If neither/both starting point and end point are in the X direction
-      #------------------------------------------------------------------------#
+      #---------------------------------------------------------------------#
       if ((abs(df$Xrel2[i]) != 1) & (abs(df$Xrel1[i]) != 1)){
         
         xs <- df$X1[i]
@@ -85,7 +85,8 @@
         
       }
       
-      # Combine the straight edges of each elbow edge into a temporary data frame
+      # Combine the straight edges of each elbow edge into a temporary 
+      # data.frame
       if (df$ArrowEnd[i] == "last"){
         temp <- data.frame(X1 = c(xs,xi),
                            Y1 = c(ys,yi),
@@ -155,9 +156,9 @@
       
       
       
-      #==========================================================================#
+      #=====================================================================#
       # Default edges
-      #==========================================================================# 
+      #=====================================================================# 
     } else{
       padding <- 17 # Default distance an edge moves away from a node
       minMove <- 5  # Minimum required movement of an edge
@@ -181,9 +182,9 @@
                                padding*sign(df$Yrel2[i]),0)
       
       
-      #------------------------------------------------------------------------#
+      #---------------------------------------------------------------------#
       # If both attachment points are in Y direction
-      #------------------------------------------------------------------------#
+      #---------------------------------------------------------------------#
       if ((ys1-ys2 != 0) & (ye1-ye2 != 0)){
         
         # Both ends cannot move in y-direction
@@ -263,9 +264,9 @@
         }
       }
       
-      #------------------------------------------------------------------------#
+      #---------------------------------------------------------------------#
       # If both attachment points are in X direction
-      #------------------------------------------------------------------------#
+      #---------------------------------------------------------------------#
       if ((xs1-xs2 != 0) & (xe1-xe2 != 0)){
         
         # Both ends cannot move in x-direction
@@ -346,9 +347,9 @@
       }
       
       
-      #------------------------------------------------------------------------#
+      #---------------------------------------------------------------------#
       # If only starting point is in X direction
-      #------------------------------------------------------------------------#
+      #---------------------------------------------------------------------#
       if ((xs1-xs2 != 0) & (xe1-xe2 == 0)){
         
         # Starting point cannot move in x-direction
@@ -407,9 +408,9 @@
       }
       
       
-      #------------------------------------------------------------------------#
+      #---------------------------------------------------------------------#
       # If only end point is in X direction
-      #------------------------------------------------------------------------#
+      #---------------------------------------------------------------------#
       if ((xs1-xs2 == 0) & (xe1-xe2 != 0)){
         
         # End point cannot move in x-direction
@@ -468,104 +469,134 @@
         
       }
       
-      # Combine the straight edges of each elbow edge into a temporary data frame
+      # Combine the straight edges of each elbow edge into a temporary 
+      # data.frame
       if (df$ArrowEnd[i] == "last"){
-        temp <- data.frame(X1 = c(xs1,xs2,xi1,xi2,xe2),
-                           Y1 = c(ys1,ys2,yi1,yi2,ye2),
-                           GraphRef1 = df$GraphRef1[i],
-                           Xrel1 = df$Xrel1[i],
-                           Yrel1 = df$Yrel1[i],
-                           ArrowHead1 = df$ArrowHead1[i],
-                           X2 = c(xs2,xi1,xi2,xe2,xe1),
-                           Y2 = c(ys2,yi1,yi2,ye2,ye1),
-                           GraphRef2 = df$GraphRef2[i],
-                           Xrel2 = df$Xrel2[i],
-                           Yrel2 = df$Yrel2[i],
-                           ArrowHead2 = df$ArrowHead2[i],
-                           LineStyle = df$LineStyle[i],
-                           Color = df$Color[i],
-                           ConnectorType = df$ConnectorType[i],
-                           LineThickness = df$LineThickness[i],
-                           Force = df$Force[i],
-                           ArrowEnd = c("none", "none", "none", "none", "last"),
-                           ArrowType = c("none", "none", "none", "none", df$ArrowType[i]),
-                           GraphId = df$GraphId[i])
+        temp <- data.frame(
+          X1 = c(xs1,xs2,xi1,xi2,xe2),
+          Y1 = c(ys1,ys2,yi1,yi2,ye2),
+          GraphRef1 = df$GraphRef1[i],
+          Xrel1 = df$Xrel1[i],
+          Yrel1 = df$Yrel1[i],
+          ArrowHead1 = df$ArrowHead1[i],
+          X2 = c(xs2,xi1,xi2,xe2,xe1),
+          Y2 = c(ys2,yi1,yi2,ye2,ye1),
+          GraphRef2 = df$GraphRef2[i],
+          Xrel2 = df$Xrel2[i],
+          Yrel2 = df$Yrel2[i],
+          ArrowHead2 = df$ArrowHead2[i],
+          LineStyle = df$LineStyle[i],
+          Color = df$Color[i],
+          ConnectorType = df$ConnectorType[i],
+          LineThickness = df$LineThickness[i],
+          Force = df$Force[i],
+          ArrowEnd = c("none", 
+                       "none", 
+                       "none", 
+                       "none", 
+                       "last"),
+          ArrowType = c("none", 
+                        "none", 
+                        "none", 
+                        "none", 
+                        df$ArrowType[i]),
+          GraphId = df$GraphId[i])
       }
       if (df$ArrowEnd[i] == "first"){
-        temp <- data.frame(X1 = c(xs1,xs2,xi1,xi2,xe2),
-                           Y1 = c(ys1,ys2,yi1,yi2,ye2),
-                           GraphRef1 = df$GraphRef1[i],
-                           Xrel1 = df$Xrel1[i],
-                           Yrel1 = df$Yrel1[i],
-                           ArrowHead1 = df$ArrowHead1[i],
-                           X2 = c(xs2,xi1,xi2,xe2,xe1),
-                           Y2 = c(ys2,yi1,yi2,ye2,ye1),
-                           GraphRef2 = df$GraphRef2[i],
-                           Xrel2 = df$Xrel2[i],
-                           Yrel2 = df$Yrel2[i],
-                           ArrowHead2 = df$ArrowHead2[i],
-                           LineStyle = df$LineStyle[i],
-                           Color = df$Color[i],
-                           ConnectorType = df$ConnectorType[i],
-                           LineThickness = df$LineThickness[i],
-                           Force = df$Force[i],
-                           ArrowEnd = c("first", "none", "none", "none", "none"),
-                           ArrowType = c(df$ArrowType[i], "none", "none", "none", "none"),
-                           GraphId = df$GraphId[i])
+        temp <- data.frame(
+          X1 = c(xs1,xs2,xi1,xi2,xe2),
+          Y1 = c(ys1,ys2,yi1,yi2,ye2),
+          GraphRef1 = df$GraphRef1[i],
+          Xrel1 = df$Xrel1[i],
+          Yrel1 = df$Yrel1[i],
+          ArrowHead1 = df$ArrowHead1[i],
+          X2 = c(xs2,xi1,xi2,xe2,xe1),
+          Y2 = c(ys2,yi1,yi2,ye2,ye1),
+          GraphRef2 = df$GraphRef2[i],
+          Xrel2 = df$Xrel2[i],
+          Yrel2 = df$Yrel2[i],
+          ArrowHead2 = df$ArrowHead2[i],
+          LineStyle = df$LineStyle[i],
+          Color = df$Color[i],
+          ConnectorType = df$ConnectorType[i],
+          LineThickness = df$LineThickness[i],
+          Force = df$Force[i],
+          ArrowEnd = c("first", 
+                       "none", 
+                       "none", 
+                       "none", 
+                       "none"),
+          ArrowType = c(df$ArrowType[i], 
+                        "none", 
+                        "none", 
+                        "none", 
+                        "none"),
+          GraphId = df$GraphId[i])
       }
       if (df$ArrowEnd[i] == "none"){
-        temp <- data.frame(X1 = c(xs1,xs2,xi1,xi2,xe2),
-                           Y1 = c(ys1,ys2,yi1,yi2,ye2),
-                           GraphRef1 = df$GraphRef1[i],
-                           Xrel1 = df$Xrel1[i],
-                           Yrel1 = df$Yrel1[i],
-                           ArrowHead1 = df$ArrowHead1[i],
-                           X2 = c(xs2,xi1,xi2,xe2,xe1),
-                           Y2 = c(ys2,yi1,yi2,ye2,ye1),
-                           GraphRef2 = df$GraphRef2[i],
-                           Xrel2 = df$Xrel2[i],
-                           Yrel2 = df$Yrel2[i],
-                           ArrowHead2 = df$ArrowHead2[i],
-                           LineStyle = df$LineStyle[i],
-                           Color = df$Color[i],
-                           ConnectorType = df$ConnectorType[i],
-                           LineThickness = df$LineThickness[i],
-                           Force = df$Force[i],
-                           ArrowEnd = "none",
-                           ArrowType = "none",
-                           GraphId = df$GraphId[i])
+        temp <- data.frame(
+          X1 = c(xs1,xs2,xi1,xi2,xe2),
+          Y1 = c(ys1,ys2,yi1,yi2,ye2),
+          GraphRef1 = df$GraphRef1[i],
+          Xrel1 = df$Xrel1[i],
+          Yrel1 = df$Yrel1[i],
+          ArrowHead1 = df$ArrowHead1[i],
+          X2 = c(xs2,xi1,xi2,xe2,xe1),
+          Y2 = c(ys2,yi1,yi2,ye2,ye1),
+          GraphRef2 = df$GraphRef2[i],
+          Xrel2 = df$Xrel2[i],
+          Yrel2 = df$Yrel2[i],
+          ArrowHead2 = df$ArrowHead2[i],
+          LineStyle = df$LineStyle[i],
+          Color = df$Color[i],
+          ConnectorType = df$ConnectorType[i],
+          LineThickness = df$LineThickness[i],
+          Force = df$Force[i],
+          ArrowEnd = "none",
+          ArrowType = "none",
+          GraphId = df$GraphId[i])
       }
       if (df$ArrowEnd[i] == "both"){
-        temp <- data.frame(X1 = c(xs1,xs2,xi1,xi2,xe2),
-                           Y1 = c(ys1,ys2,yi1,yi2,ye2),
-                           GraphRef1 = df$GraphRef1[i],
-                           Xrel1 = df$Xrel1[i],
-                           Yrel1 = df$Yrel1[i],
-                           ArrowHead1 = df$ArrowHead1[i],
-                           X2 = c(xs2,xi1,xi2,xe2,xe1),
-                           Y2 = c(ys2,yi1,yi2,ye2,ye1),
-                           GraphRef2 = df$GraphRef2[i],
-                           Xrel2 = df$Xrel2[i],
-                           Yrel2 = df$Yrel2[i],
-                           ArrowHead2 = df$ArrowHead2[i],
-                           LineStyle = df$LineStyle[i],
-                           Color = df$Color[i],
-                           ConnectorType = df$ConnectorType[i],
-                           LineThickness = df$LineThickness[i],
-                           Force = df$Force[i],
-                           ArrowEnd = c("first", "none", "none", "none", "last"),
-                           ArrowType = c(df$ArrowHead1[i], "none", "none", "none", df$ArrowHead1[i]),
-                           GraphId = df$GraphId[i])
+        temp <- data.frame(
+          X1 = c(xs1,xs2,xi1,xi2,xe2),
+          Y1 = c(ys1,ys2,yi1,yi2,ye2),
+          GraphRef1 = df$GraphRef1[i],
+          Xrel1 = df$Xrel1[i],
+          Yrel1 = df$Yrel1[i],
+          ArrowHead1 = df$ArrowHead1[i],
+          X2 = c(xs2,xi1,xi2,xe2,xe1),
+          Y2 = c(ys2,yi1,yi2,ye2,ye1),
+          GraphRef2 = df$GraphRef2[i],
+          Xrel2 = df$Xrel2[i],
+          Yrel2 = df$Yrel2[i],
+          ArrowHead2 = df$ArrowHead2[i],
+          LineStyle = df$LineStyle[i],
+          Color = df$Color[i],
+          ConnectorType = df$ConnectorType[i],
+          LineThickness = df$LineThickness[i],
+          Force = df$Force[i],
+          ArrowEnd = c("first", 
+                       "none", 
+                       "none", 
+                       "none", 
+                       "last"),
+          ArrowType = c(df$ArrowHead1[i], 
+                        "none", 
+                        "none", 
+                        "none", 
+                        df$ArrowHead1[i]),
+          GraphId = df$GraphId[i])
       }
     } # EO Default edges
     
-    # Combine temporary data frames into a single combined data frame for plotting
+    # Combine temporary data frames into a single combined data frame for 
+    # plotting
     plotDF <- rbind.data.frame(plotDF, temp)
     
   }
   
   # The "broken" linetype should be "dashed" linetype to be consistent with
-  # ggplot2 naming conventions
+  # naming conventions
   plotDF$LineStyle[plotDF$LineStyle == "broken"] <- "dashed"
   
   return(plotDF)

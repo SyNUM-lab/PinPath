@@ -67,6 +67,8 @@ An example can be generated using the \link{defaultColorList} function.}
 
 \item{alpha}{(optional) Transparency of the nodes.}
 
+\item{nodeSize}{(optional) Size of the nodes.}
+
 \item{legend}{(optional) Logical (TRUE or FALSE). Should the legend be plotted?}
 
 \item{nodeTable}{(optional) Logical (TRUE or FALSE). Should a node table be returned?}
@@ -84,17 +86,19 @@ This function draws a pathway from a KGML file with the option to map, e.g.,
 }
 \examples{
 
-# Load example data
-lung_expr <- read.csv(system.file("extdata","data-lung-cancer.csv", package="PinPath"), 
-stringsAsFactors = FALSE)
+ # Load example data
+ lung_expr <- read.csv(system.file("extdata",
+                                  "data-lung-cancer.csv", 
+                                  package="PinPath"), 
+                      stringsAsFactors = FALSE)
 
-# Select pathway
-pathway_id <- "hsa05223"
-bfc <- BiocFileCache::BiocFileCache()
-infile <- BiocFileCache::bfcrpath(bfc, paste0("https://rest.kegg.jp/get/",pathway_id,"/kgml"))
+ # Select pathway
+ pathway_id <- "hsa05223"
+ bfc <- BiocFileCache::BiocFileCache()
+ infile <- BiocFileCache::bfcrpath(bfc, paste0("https://rest.kegg.jp/get/",pathway_id,"/kgml"))
 
-# Draw pathway
-pathVis <- PinPath::KGML2Network(
+ # Draw pathway
+ pathVis <- PinPath::KGML2Network(
             infile = infile,
             outdir = tempdir(),
             annGenes = "org.Hs.eg.db",

@@ -28,7 +28,7 @@ GPML2Network(
 }
 \arguments{
 \item{infile}{Input GPML file. This can be a character string of the GPML file 
-location (e.g., "Downloads/WP42500.gpml") or a GPML string provided by \link{rWikiPathways::getPathway}.}
+location (e.g., "Downloads/WP42500.gpml") or a GPML string provided by [rWikiPathways::getPathway].}
 
 \item{outdir}{(optional) Output directory. The pathway and legend images will be 
 saved in this directory.}
@@ -67,6 +67,8 @@ An example can be generated using the \link{defaultColorList} function.}
 
 \item{alpha}{(optional) Transparency of the nodes.}
 
+\item{nodeSize}{(optional) Size of the nodes.}
+
 \item{legend}{(optional) Logical (TRUE or FALSE). Should the legend be plotted?}
 
 \item{nodeTable}{(optional) Logical (TRUE or FALSE). Should a node table be returned?}
@@ -83,14 +85,19 @@ This function draws a network from a GPML file with the option to map, e.g.,
              expression data onto the network diagram.
 }
 \examples{
+ 
+ # Load example data
+ lung_expr <- read.csv(system.file("extdata",
+                                  "data-lung-cancer.csv", 
+                                  package="PinPath"), 
+                      stringsAsFactors = FALSE)
 
-# Load example data
-lung_expr <- read.csv(system.file("extdata","data-lung-cancer.csv", package="PinPath"), 
-stringsAsFactors = FALSE)
-
-# Draw pathway
-pathVis <- PinPath::GPML2Network(
-            infile = rWikiPathways::getPathway("WP4255"),
+ # Select pathway
+ infile <- rWikiPathways::getPathway("WP4255")
+ 
+ # Draw pathway
+ pathVis <- PinPath::GPML2Network(
+            infile = infile,
             outdir = tempdir(),
             annGenes = "org.Hs.eg.db",
             inputDB = "ENSEMBL",

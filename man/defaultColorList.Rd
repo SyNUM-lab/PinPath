@@ -7,30 +7,37 @@
 defaultColorList(ColorVar, ColorNames = NULL)
 }
 \arguments{
-\item{colorVar}{\code{vector} or \code{data.frame} for coloring the nodes in the pathway. 
-This can be for instance a \code{data.frame} with the log2FCs and significance in the columns.}
+\item{ColorVar}{\code{vector} or \code{data.frame} for coloring the nodes 
+in the pathway. This can be for instance a \code{data.frame} with the 
+log2FCs and significance in the columns.}
 
-\item{colorNames}{(optional) \code{character} vector with names of the color variables. 
-These will be used to set the names in the legend.
-If \code{colorNames} is NULL, the column names of the \code{colorVar} \code{data.frame} will be used.}
+\item{ColorNames}{(optional) \code{character} vector with names of the 
+color variables. These will be used to set the names in the legend.
+If \code{colorNames} is NULL, the column names of the \code{colorVar} 
+\code{data.frame} will be used.}
 }
 \value{
 A list that can be provided to \link{drawGPML} to set the node 
 colors in the pathway diagram.
 }
 \description{
-This function makes default list that can be used to set the node colors in the pathway diagram.
+This function makes default list that can be used to set the 
+node colors in the pathway diagram.
 }
 \examples{
 
 # Load example data
-lung_expr <- read.csv(system.file("extdata","data-lung-cancer.csv", package="rWikiPathways"), 
-stringsAsFactors = FALSE)
+lung_expr <- read.csv(system.file("extdata",
+                                  "data-lung-cancer.csv", 
+                                   package="rWikiPathways"), 
+                      stringsAsFactors = FALSE)
 
 # Set significance as a binary variable
-lung_expr$Significant <- ifelse(lung_expr$adj.P.Value < 0.05, "Yes", "No")
+lung_expr$Significant <- ifelse(lung_expr$adj.P.Value < 0.05, 
+                                "Yes", "No")
 
 # Make default color list
-colorList <- rWikiPathways::defaultColorList(lung_expr[,c("log2FC", "Significant")])
+colorList <- rWikiPathways::defaultColorList(
+lung_expr[,c("log2FC", "Significant")])
 
 }

@@ -34,17 +34,19 @@
 #' @return A \code{list} with the node table and the file location of the pathway and legend image.
 #' @examples
 #' 
-#' # Load example data
-#' lung_expr <- read.csv(system.file("extdata","data-lung-cancer.csv", package="PinPath"), 
-#' stringsAsFactors = FALSE)
+#'  # Load example data
+#'  lung_expr <- read.csv(system.file("extdata",
+#'                                   "data-lung-cancer.csv", 
+#'                                   package="PinPath"), 
+#'                       stringsAsFactors = FALSE)
 #' 
-#' # Select pathway
-#' pathway_id <- "hsa05223"
-#' bfc <- BiocFileCache::BiocFileCache()
-#' infile <- BiocFileCache::bfcrpath(bfc, paste0("https://rest.kegg.jp/get/",pathway_id,"/kgml"))
+#'  # Select pathway
+#'  pathway_id <- "hsa05223"
+#'  bfc <- BiocFileCache::BiocFileCache()
+#'  infile <- BiocFileCache::bfcrpath(bfc, paste0("https://rest.kegg.jp/get/",pathway_id,"/kgml"))
 #' 
-#' # Draw pathway
-#' pathVis <- PinPath::drawKGML(
+#'  # Draw pathway
+#'  pathVis <- PinPath::drawKGML(
 #'             infile = infile,
 #'             outdir = tempdir(),
 #'             annGenes = "org.Hs.eg.db",
@@ -134,14 +136,14 @@ drawKGML <- function(infile,
                      width = ImageWidth*0.015, 
                      height = ImageHeight*0.015)
   }else if (file_extension == "png"){
-    png(file = outfile,
+    grDevices::png(file = outfile,
         width = ImageWidth*6,
         height = ImageHeight*6,
         units = "px",
         res = 1200,
         pointsize = 4)
   }else if (file_extension == "pdf"){
-    pdf(outfile, 
+    grDevices::pdf(outfile, 
         width = ImageWidth*0.015, 
         height = ImageHeight*0.015)
   }else{
@@ -159,7 +161,7 @@ drawKGML <- function(infile,
   #****************************************************************************#
   
   # Set margins
-  par(mar = c(0,0,0,0))
+  graphics::par(mar = c(0,0,0,0))
   
   # Make empty canvas
   plot(c(0, ImageWidth),
@@ -191,7 +193,7 @@ drawKGML <- function(infile,
   }
   
   # Draw colors
-  rect(
+  graphics::rect(
     xleft = colors_df$CenterX - 0.5 * colors_df$Width,
     ybottom = -1 * (colors_df$CenterY - 0.5 * colors_df$Height),
     xright =  colors_df$CenterX + 0.5 * colors_df$Width,
@@ -203,13 +205,13 @@ drawKGML <- function(infile,
   )
   
   # Draw image
-  rasterImage(img, 0, -ImageHeight, ImageWidth, 0)
+  graphics::rasterImage(img, 0, -ImageHeight, ImageWidth, 0)
   
   #==============================================================================#
   # Export and open plot
   #==============================================================================#
   
-  dev.off()
+  grDevices::dev.off()
   
   # Save file location in output list
   outputList[["Pathway"]] <- outfile
@@ -233,18 +235,18 @@ drawKGML <- function(infile,
                        width = 5,
                        height = length(colorList) + 1.25)
       .makeLegend(colorList)
-      dev.off()
+      grDevices::dev.off()
     }
     else if (file_extension %in% c("png", "tiff", "pdf")){
       outfile_legend  <-  paste0(outdir,"/legend_",outname)
-      png(file = outfile_legend,
+      grDevices::png(file = outfile_legend,
           width = 5,
           height = length(colorList) + 1.25,
           units = "in",
           res = 1200,
           pointsize = 8)
       .makeLegend(colorList)
-      dev.off()
+      grDevices::dev.off()
     }
     else{
       outfile_legend <- paste0(outdir,"/legend_",outname, ".svg")
@@ -252,7 +254,7 @@ drawKGML <- function(infile,
                        width = 5,
                        height = length(colorList) + 1.25)
       .makeLegend(colorList)
-      dev.off()
+      grDevices::dev.off()
     }
     
     # Save file location in output list
@@ -270,8 +272,8 @@ drawKGML <- function(infile,
     colnames(outputTable) <- c("Node Label", "ID", "Scale Name", "Scale Value")
     outputTable <- outputTable |>
       tidyr::pivot_wider(
-        names_from = `Scale Name`,
-        values_from = `Scale Value`
+        names_from = "Scale Name",
+        values_from = "Scale Value"
       )
     
     # Save node table in output list

@@ -4,7 +4,7 @@ Title: PinPath - R package for pathway visualization
 Version: 0.1.0
 Date: 2026-01-20
 Authors@R: c(person("Jarno", "Koetsier", role = c("aut","cre"),
-                     email = "jarno.koetsier@maastrichtuniversity.nl",
+                     email = "jarno.koetsier@gmail.com",
                      comment = c(ORCID = "0000-0002-7981-1345")),
              person("Lars", "Eijssen", role = "aut",
                      comment = c(ORCID = "0000-0002-6473-2839")),
@@ -14,12 +14,38 @@ Authors@R: c(person("Jarno", "Koetsier", role = c("aut","cre"),
            )
 Author: Jarno Koetsier <jarno.koetsier@maastrichtuniversity.nl>
 Maintainer: Jarno Koetsier <jarno.koetsier@maastrichtuniversity.nl>
-Imports: utils, XML, xml2,  magrittr, dplyr, tidyr, stringr, magick, shape, grid, gridBase, svglite, AnnotationDbi, shiny, igraph, ggraph, ggplot2, BiocFileCache, BiocGenerics
+Imports: 
+    grDevices, 
+    graphics, 
+    stats, 
+    XML, 
+    xml2,  
+    magrittr, 
+    dplyr, 
+    tidyr, 
+    stringr, 
+    magick, 
+    shape, 
+    grid, 
+    gridBase, 
+    svglite, 
+    AnnotationDbi, 
+    shiny, 
+    igraph, 
+    ggraph, 
+    ggplot2, 
+    BiocFileCache, 
+    BiocGenerics,
+    rlang
 Suggests: 
     testthat (>= 3.0.0),
     BiocStyle,
     knitr,
-    rmarkdown
+    rmarkdown,
+    rWikiPathways,
+    org.Hs.eg.db
+Depends:
+    R (>= 4.1.0)
 Encoding: UTF-8
 Description: Visualize of omics data onto pathways from WikiPathways and KEGG.
 License: MIT + file LICENSE

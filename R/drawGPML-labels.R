@@ -4,6 +4,7 @@
 #' @description This function makes a data frame for plotting labels.
 #' @param dataLabels  A GPML list filtered for labels.
 #' @return A data frame for plotting labels.
+#' @noRd
 
 .prepareLabels <- function(dataLabels){
   

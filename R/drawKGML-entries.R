@@ -4,6 +4,7 @@
 #' @description This function makes a data frame for plotting entries.
 #' @param dataEntries A KGML list filtered for entries.
 #' @return A data frame for plotting entries.
+#' @noRd
 
 .prepareEntries <- function(dataEntries){
   

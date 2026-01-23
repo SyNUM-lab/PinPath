@@ -30,24 +30,28 @@
 #' @param layout (optional) Network layout from igraph.
 #' @param unconnectedNodes (optional) Logical (TRUE or FALSE). Should unconnected (isolated) nodes be shown in the network?
 #' @param alpha (optional) Transparency of the nodes.
+#' @param nodeSize (optional) Size of the nodes.
 #' @param legend (optional) Logical (TRUE or FALSE). Should the legend be plotted?
 #' @param nodeTable (optional) Logical (TRUE or FALSE). Should a node table be returned?
 #' @param pathInfo (optional) Logical (TRUE or FALSE). Should pathway information be returned?
 #' @param openFile (optional) Logical (TRUE or FALSE). Should the pathway file be opened after it has been saved?
 #' @return A \code{list} with the node table and the file location of the pathway and legend image.
+#' @importFrom rlang .data
 #' @examples
 #' 
-#' # Load example data
-#' lung_expr <- read.csv(system.file("extdata","data-lung-cancer.csv", package="PinPath"), 
-#' stringsAsFactors = FALSE)
+#'  # Load example data
+#'  lung_expr <- read.csv(system.file("extdata",
+#'                                   "data-lung-cancer.csv", 
+#'                                   package="PinPath"), 
+#'                       stringsAsFactors = FALSE)
 #' 
-#' # Select pathway
-#' pathway_id <- "hsa05223"
-#' bfc <- BiocFileCache::BiocFileCache()
-#' infile <- BiocFileCache::bfcrpath(bfc, paste0("https://rest.kegg.jp/get/",pathway_id,"/kgml"))
+#'  # Select pathway
+#'  pathway_id <- "hsa05223"
+#'  bfc <- BiocFileCache::BiocFileCache()
+#'  infile <- BiocFileCache::bfcrpath(bfc, paste0("https://rest.kegg.jp/get/",pathway_id,"/kgml"))
 #' 
-#' # Draw pathway
-#' pathVis <- PinPath::KGML2Network(
+#'  # Draw pathway
+#'  pathVis <- PinPath::KGML2Network(
 #'             infile = infile,
 #'             outdir = tempdir(),
 #'             annGenes = "org.Hs.eg.db",
@@ -56,7 +60,7 @@
 #'             colorVar = lung_expr[,"log2FC"],
 #'             nodeTable = TRUE,
 #'             legend = TRUE)
-#' 
+#'
 #' @export
 
 KGML2Network <- function(infile,
@@ -181,9 +185,9 @@ KGML2Network <- function(infile,
   relations_df <- .prepareRelations_network(dataRelations)
   
   # Filter edges for nodes
-  relations_df$from <- replace(setNames(relations_df$from,relations_df$from), 
+  relations_df$from <- replace(stats::setNames(relations_df$from,relations_df$from), 
                                entries_df$GraphId1, entries_df$name)[relations_df$from]
-  relations_df$to <- replace(setNames(relations_df$to,relations_df$to), 
+  relations_df$to <- replace(stats::setNames(relations_df$to,relations_df$to), 
                              entries_df$GraphId1, entries_df$name)[relations_df$to]
   
   relations_df <- relations_df[(relations_df$from %in% entries_df$name) &
@@ -243,7 +247,7 @@ KGML2Network <- function(infile,
   
   # Finalize network
   g_plot <- g_plot +
-    ggraph::geom_node_text(ggplot2::aes(label = name), size = 2) +
+    ggraph::geom_node_text(ggplot2::aes(label = .data$name), size = 2) +
     ggplot2::theme_void() +
     ggplot2::theme(legend.position = "none")
   
@@ -261,7 +265,7 @@ KGML2Network <- function(infile,
                      width = 8/nodeSize, 
                      height = 5/nodeSize)
     plot(g_plot)
-    dev.off()
+    grDevices::dev.off()
   }else if (file_extension %in% c("png", "tiff", "pdf")){
     outfile <-  paste0(outdir,"/",outname)
     ggplot2::ggsave(g_plot, file = outfile,
@@ -279,7 +283,7 @@ KGML2Network <- function(infile,
                      width = 8/nodeSize, 
                      height = 5/nodeSize)
     plot(g_plot)
-    dev.off()
+    grDevices::dev.off()
   }
   
   # Save file location in output list
@@ -303,18 +307,18 @@ KGML2Network <- function(infile,
                        width = 5,
                        height = length(colorList) + 1.25)
       .makeLegend(colorList)
-      dev.off()
+      grDevices::dev.off()
     }
     else if (file_extension %in% c("png", "tiff", "pdf")){
       outfile_legend  <-  paste0(outdir,"/legend_",outname)
-      png(file = outfile_legend,
-          width = 5,
-          height = length(colorList) + 1.25,
-          units = "in",
-          res = 1200,
-          pointsize = 8)
+      grDevices::png(file = outfile_legend,
+                     width = 5,
+                     height = length(colorList) + 1.25,
+                     units = "in",
+                     res = 1200,
+                     pointsize = 8)
       .makeLegend(colorList)
-      dev.off()
+      grDevices::dev.off()
     }
     else{
       outfile_legend <- paste0(outdir,"/legend_",outname, ".svg")
@@ -322,7 +326,7 @@ KGML2Network <- function(infile,
                        width = 5,
                        height = length(colorList) + 1.25)
       .makeLegend(colorList)
-      dev.off()
+      grDevices::dev.off()
     }
     
     # Save file location in output list
@@ -340,8 +344,8 @@ KGML2Network <- function(infile,
     colnames(outputTable) <- c("Node Label", "ID", "Scale Name", "Scale Value")
     outputTable <- outputTable |>
       tidyr::pivot_wider(
-        names_from = `Scale Name`,
-        values_from = `Scale Value`
+        names_from = "Scale Name",
+        values_from = "Scale Value"
       )
     
     # Save node table in output list

@@ -4,6 +4,7 @@
 #' @description This function makes a data frame for plotting edges.
 #' @param dataEdges A GPML list filtered for edges.
 #' @return A data frame for plotting edges.
+#' @noRd
 
 # Prepare edges for network
 .prepareEdges_network <- function(dataEdges){
@@ -26,6 +27,7 @@
 #' @description This function makes a data frame for plotting nodes.
 #' @param dataNodes A GPML list filtered for nodes.
 #' @return A data frame for plotting nodes.
+#' @noRd
 
 # Prepare nodes for network
 .prepareNodes_network <- function(dataNodes){
@@ -52,6 +54,7 @@
 #' @description This function makes a data frame for plotting groups.
 #' @param dataGroups A GPML list filtered for groups.
 #' @return A data frame for plotting groups.
+#' @noRd
 
 # Prepare groups for network
 .prepareGroups_network <- function(dataGroups){
@@ -73,6 +76,8 @@
 #' @param iCol The node column index of current variable.
 #' @param nodeSize The size of the nodes.
 #' @return Rectangular nodes vertically splitted by color scale.
+#' @importFrom rlang .data
+#' @noRd
 
 # Plot nodes in network
 .geom_node_split <- function(mapping=NULL, data=NULL, position='identity',
@@ -101,7 +106,7 @@
 #'              expression data onto the network diagram.
 #'
 #' @param infile Input GPML file. This can be a character string of the GPML file 
-#' location (e.g., "Downloads/WP42500.gpml") or a GPML string provided by \link{rWikiPathways::getPathway}.
+#' location (e.g., "Downloads/WP42500.gpml") or a GPML string provided by [rWikiPathways::getPathway].
 #' @param outdir (optional) Output directory. The pathway and legend images will be 
 #' saved in this directory.
 #' @param outname (optional) The file name of the output pathway image. 
@@ -126,20 +131,27 @@
 #' @param layout (optional) Network layout from igraph.
 #' @param unconnectedNodes (optional) Logical (TRUE or FALSE). Should unconnected (isolated) nodes be shown in the network?
 #' @param alpha (optional) Transparency of the nodes.
+#' @param nodeSize (optional) Size of the nodes.
 #' @param legend (optional) Logical (TRUE or FALSE). Should the legend be plotted?
 #' @param nodeTable (optional) Logical (TRUE or FALSE). Should a node table be returned?
 #' @param pathInfo (optional) Logical (TRUE or FALSE). Should pathway information be returned?
 #' @param openFile (optional) Logical (TRUE or FALSE). Should the pathway file be opened after it has been saved?
 #' @return A \code{list} with the node table and the file location of the pathway and legend image.
+#' @importFrom rlang .data
 #' @examples
+#'  
+#'  # Load example data
+#'  lung_expr <- read.csv(system.file("extdata",
+#'                                   "data-lung-cancer.csv", 
+#'                                   package="PinPath"), 
+#'                       stringsAsFactors = FALSE)
 #' 
-#' # Load example data
-#' lung_expr <- read.csv(system.file("extdata","data-lung-cancer.csv", package="PinPath"), 
-#' stringsAsFactors = FALSE)
-#' 
-#' # Draw pathway
-#' pathVis <- PinPath::GPML2Network(
-#'             infile = rWikiPathways::getPathway("WP4255"),
+#'  # Select pathway
+#'  infile <- rWikiPathways::getPathway("WP4255")
+#'  
+#'  # Draw pathway
+#'  pathVis <- PinPath::GPML2Network(
+#'             infile = infile,
 #'             outdir = tempdir(),
 #'             annGenes = "org.Hs.eg.db",
 #'             inputDB = "ENSEMBL",
@@ -306,9 +318,9 @@ GPML2Network <- function(infile,
                      rep("node_group", nrow(group_edges_df)))
   
   # Filter edges for nodes
-  edges_df$from <- replace(setNames(edges_df$from,edges_df$from), 
+  edges_df$from <- replace(stats::setNames(edges_df$from,edges_df$from), 
                            nodes_df$GraphId, nodes_df$Label)[edges_df$from]
-  edges_df$to <- replace(setNames(edges_df$to,edges_df$to), 
+  edges_df$to <- replace(stats::setNames(edges_df$to,edges_df$to), 
                          nodes_df$GraphId, nodes_df$Label)[edges_df$to]
   
   edges_df <- edges_df[(edges_df$from %in% nodes_df$name) &
@@ -360,7 +372,7 @@ GPML2Network <- function(infile,
   
   # Make basis of network
   g_plot <- ggraph::ggraph(graph, layout = layout) +
-    ggraph::geom_edge_link(ggplot2::aes(color = type)) 
+    ggraph::geom_edge_link(ggplot2::aes(color = .data$type)) 
   
   # Add each scale to the network
   for (g in seq_len(ncol(nodes_df_split)-7)){
@@ -374,12 +386,12 @@ GPML2Network <- function(infile,
   
   # Finalize network
   g_plot <- g_plot +
-    .geom_node_split(ggplot2::aes(linewidth = NodeType), alpha = 0, color = "lightgrey", nCol = 1, iCol = 1, nodeSize = nodeSize) +
-    ggraph::geom_node_text(ggplot2::aes(label = name, alpha = NodeType), size = 2) +
-    ggplot2::scale_alpha_manual(values = setNames(c(alpha,0), c("nonGroup", "Group"))) +
-    ggraph::scale_edge_color_manual(values = setNames(c("black", "lightgrey"), 
+    .geom_node_split(ggplot2::aes(linewidth = .data$NodeType), alpha = 0, color = "lightgrey", nCol = 1, iCol = 1, nodeSize = nodeSize) +
+    ggraph::geom_node_text(ggplot2::aes(label = .data$name, alpha = .data$NodeType), size = 2) +
+    ggplot2::scale_alpha_manual(values = stats::setNames(c(alpha,0), c("nonGroup", "Group"))) +
+    ggraph::scale_edge_color_manual(values = stats::setNames(c("black", "lightgrey"), 
                                                      c("node_node", "node_group"))) +
-    ggplot2::scale_linewidth_manual(values = setNames(c(0.3,0), c("nonGroup", "Group"))) +
+    ggplot2::scale_linewidth_manual(values = stats::setNames(c(0.3,0), c("nonGroup", "Group"))) +
     ggplot2::theme_void() +
     ggplot2::theme(legend.position = "none")
   
@@ -397,7 +409,7 @@ GPML2Network <- function(infile,
                      width = 13.3/nodeSize, 
                      height = 8.3/nodeSize)
     plot(g_plot)
-    dev.off()
+    grDevices::dev.off()
   }else if (file_extension %in% c("png", "tiff", "pdf")){
     outfile <-  paste0(outdir,"/",outname)
     ggplot2::ggsave(g_plot, file = outfile,
@@ -415,7 +427,7 @@ GPML2Network <- function(infile,
                      width = 13.3/nodeSize, 
                      height = 8.3/nodeSize)
     plot(g_plot)
-    dev.off()
+    grDevices::dev.off()
   }
   
   # Save file location in output list
@@ -439,18 +451,18 @@ GPML2Network <- function(infile,
                        width = 5,
                        height = length(colorList) + 1.25)
       .makeLegend(colorList)
-      dev.off()
+      grDevices::dev.off()
     }
     else if (file_extension %in% c("png", "tiff", "pdf")){
       outfile_legend  <-  paste0(outdir,"/legend_",outname)
-      png(file = outfile_legend,
+      grDevices::png(file = outfile_legend,
           width = 5,
           height = length(colorList) + 1.25,
           units = "in",
           res = 1200,
           pointsize = 8)
       .makeLegend(colorList)
-      dev.off()
+      grDevices::dev.off()
     }
     else{
       outfile_legend <- paste0(outdir,"/legend_",outname, ".svg")
@@ -458,7 +470,7 @@ GPML2Network <- function(infile,
                        width = 5,
                        height = length(colorList) + 1.25)
       .makeLegend(colorList)
-      dev.off()
+      grDevices::dev.off()
     }
     
     # Save file location in output list
@@ -476,8 +488,8 @@ GPML2Network <- function(infile,
     colnames(outputTable) <- c("Node Label", "ID", "Scale Name", "Scale Value")
     outputTable <- outputTable |>
       tidyr::pivot_wider(
-        names_from = `Scale Name`,
-        values_from = `Scale Value`
+        names_from = "Scale Name",
+        values_from = "Scale Value"
       )
     
     # Save node table in output list
@@ -506,7 +518,6 @@ GPML2Network <- function(infile,
 
 
 # library(shinyCyJS)
-# nodes_df1 <- data.frame(id = nodes_df$name,
 #                         bgColor = c(rep("red",20), rep("blue",29)),
 #                         labelColor = "black",
 #                         shape = "rectangle",

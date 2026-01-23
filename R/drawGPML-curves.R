@@ -4,6 +4,7 @@
 #' @description This function makes a data frame for plotting curved edges.
 #' @param df data frame with information about curved edges.
 #' @return A data frame for plotting curved edges.
+#' @noRd
 
 .prepareCurve <- function(df){
   
@@ -22,7 +23,8 @@
     
     # Get the information about a single edge
     curve_df <- df[df$GraphId == edges[e],]
-    curve_df <- curve_df[!((curve_df$X1 == curve_df$X2) & (curve_df$Y1 == curve_df$Y2)),]
+    curve_df <- curve_df[!((curve_df$X1 == curve_df$X2) & 
+                             (curve_df$Y1 == curve_df$Y2)),]
     
     # Get all X and Y coordinates defining the path of edge
     X_all <- c(curve_df$X1[1],curve_df$X2)
@@ -30,10 +32,14 @@
     
     # We remove redundant X and Y coordinates, e.g., when two points describe 
     # the same direction
-    remove_index <- c(which(vapply(seq_len(length(X_all)-1), function(n) sum(duplicated(X_all)[c(n,n+1)]),
-                                   FUN.VALUE = numeric(1))==2),
-                      which(vapply(seq_len(length(Y_all)-1), function(n) sum(duplicated(Y_all)[c(n,n+1)]),
-                                   FUN.VALUE = numeric(1))==2))
+    remove_index <- c(
+      which(vapply(seq_len(length(X_all)-1), 
+                   function(n) sum(duplicated(X_all)[c(n,n+1)]),
+                   FUN.VALUE = numeric(1))==2),
+      which(vapply(seq_len(length(Y_all)-1), 
+                   function(n) sum(duplicated(Y_all)[c(n,n+1)]),
+                   FUN.VALUE = numeric(1))==2)
+    )
     
     if (length(remove_index) > 0){
       X_all <- X_all[-remove_index]
@@ -52,9 +58,11 @@
     
     # The mid points are in-between the corner points
     if (length(X_corners) > 1){
-      X_mid <- vapply(seq_len(length(X_corners)-1), function(n) mean(X_corners[c(n,n+1)]),
+      X_mid <- vapply(seq_len(length(X_corners)-1), 
+                      function(n) mean(X_corners[c(n,n+1)]),
                       FUN.VALUE = numeric(1))
-      Y_mid <- vapply(seq_len(length(Y_corners)-1), function(n) mean(Y_corners[c(n,n+1)]),
+      Y_mid <- vapply(seq_len(length(Y_corners)-1), 
+                      function(n) mean(Y_corners[c(n,n+1)]),
                       FUN.VALUE = numeric(1)) 
       
       # Collect all relevant X and Y coordinates for plotting the curved edges
@@ -69,8 +77,9 @@
     
     
     
-    # The last thing to do, is to separate the X and Y coordinates into sub-edges
-    # Each curve can only be fitted to a sub-edge consisting of the start, mid, and end
+    # The last thing to do: separate the X and Y coordinates into sub-edges
+    # Each curve can only be fitted to a sub-edge consisting of the 
+    # start, mid, and end
     for (i in seq_len(length(X_points) - 1)){
       
       # The arrow end and arrow type is by default "none"
@@ -90,8 +99,12 @@
       }
       
       # Combine the sub-edge data into a data frame
-      df_subedge <- data.frame(x = c(X_points[i], rep(X_corners[i],2), X_points[i+1]),
-                               y = c(Y_points[i], rep(Y_corners[i],2), Y_points[i+1]),
+      df_subedge <- data.frame(x = c(X_points[i], 
+                                     rep(X_corners[i],2), 
+                                     X_points[i+1]),
+                               y = c(Y_points[i], 
+                                     rep(Y_corners[i],2), 
+                                     Y_points[i+1]),
                                edge = edges[e],
                                subedge = i,
                                group = paste0(edges[e], "_", i),
@@ -122,13 +135,14 @@
 #' @description This function adds curved edges to the pathway image.
 #' @param df data frame with information about curved edges.
 #' @return A plot with curved edges.
+#' @noRd
 
 .drawCurves <- function(df){
   
   
-  #============================================================================#
+  #========================================================================#
   # Edges without arrow head (`none`, `mim-necessary-stimulation`)
-  #============================================================================#
+  #========================================================================#
   
   if (sum(df$arrowType == "none"  |
           df$arrowType == "mim-necessary-stimulation") > 0){
@@ -148,9 +162,10 @@
   }
   
   
-  #============================================================================#
+  #========================================================================#
   # Filled black arrow head (`Arrow`, `mim-conversion`)
-  #============================================================================#
+  #========================================================================#
+  
   
   if (sum(df$arrowType == "Arrow" |
           df$arrowType == "mim-conversion") > 0){
@@ -159,78 +174,80 @@
     plotDF_temp <- df[df$arrowType == "Arrow" |
                         df$arrowType == "mim-conversion",]
     
-    # Get all edge groups. Each edge group corresponds to a single bezier curve
+    # Get all edge groups. Each edge group corresponds to one bezier curve
     groups <- unique(plotDF_temp$group)
-
-
+    
+    
     # Offset is the distance at which the arrow head should be attached to the
     # main body of the arrow
     offset <- 5
-
+    
     plotDF_main <- NULL
     plotDF_end <- NULL
     for (i in seq_along(groups)){
-
+      
       temp_main <- plotDF_temp[plotDF_temp$group == groups[i],]
-
+      
       if ("last" %in% temp_main$arrowEnd){
-
+        
         # Collect X and Y coordinates in separate vectors
         x1 <- temp_main$x[nrow(temp_main)-1]
         x2 <- temp_main$x[nrow(temp_main)]
         y1 <- temp_main$y[nrow(temp_main)-1]
         y2 <- temp_main$y[nrow(temp_main)]
-
+        
         # Calculate offsets
         x_offset <- offset*((x1-x2)/(abs(x1-x2) + abs(y1-y2)))
         y_offset <- offset*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
-
+        
         temp_main$x[nrow(temp_main)] <- temp_main$x[nrow(temp_main)] + x_offset
         temp_main$y[nrow(temp_main)] <- temp_main$y[nrow(temp_main)] + y_offset
-
+        
         # Collect plotting information for the arrow head
-        temp_end <- data.frame(X2 = x2,
-                               X1 = temp_main$x[nrow(temp_main)],
-                               Y2 = y2,
-                               Y1 = temp_main$y[nrow(temp_main)],
-                               ArrowEnd = temp_main$arrowEnd[nrow(temp_main)],
-                               ArrowType = temp_main$arrowType[nrow(temp_main)],
-                               LineThickness = temp_main$linewidth[nrow(temp_main)],
-                               LineType = temp_main$linetype[nrow(temp_main)],
-                               Color = temp_main$color[nrow(temp_main)]
+        temp_end <- data.frame(
+          X2 = x2,
+          X1 = temp_main$x[nrow(temp_main)],
+          Y2 = y2,
+          Y1 = temp_main$y[nrow(temp_main)],
+          ArrowEnd = temp_main$arrowEnd[nrow(temp_main)],
+          ArrowType = temp_main$arrowType[nrow(temp_main)],
+          LineThickness = temp_main$linewidth[nrow(temp_main)],
+          LineType = temp_main$linetype[nrow(temp_main)],
+          Color = temp_main$color[nrow(temp_main)]
         )
       }
       if ("first" %in% temp_main$arrowEnd){
-
+        
         # Collect X and Y coordinates in separate vectors
         x1 <- temp_main$x[1]
         x2 <- temp_main$x[2]
         y1 <- temp_main$y[1]
         y2 <- temp_main$y[2]
-
+        
         # Calculate offsets
         x_offset <- offset*((x1-x2)/(abs(x1-x2) + abs(y1-y2)))
         y_offset <- offset*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
-
+        
         temp_main$x[1] <- temp_main$x[1] - x_offset
         temp_main$y[1] <- temp_main$y[1] + y_offset
-
+        
         # Collect plotting information for the arrow head
-        temp_end <- data.frame(X1 = x1,
-                               X2 = temp_main$x[1],
-                               Y1 = y1,
-                               Y2 = temp_main$y[1],
-                               ArrowEnd = temp_main$arrowEnd[1],
-                               ArrowType = temp_main$arrowType[1],
-                               LineThickness = temp_main$linewidth[1],
-                               LineType = temp_main$linetype[1],
-                               Color = temp_main$color[1]
+        temp_end <- data.frame(
+          X1 = x1,
+          X2 = temp_main$x[1],
+          Y1 = y1,
+          Y2 = temp_main$y[1],
+          ArrowEnd = temp_main$arrowEnd[1],
+          ArrowType = temp_main$arrowType[1],
+          LineThickness = temp_main$linewidth[1],
+          LineType = temp_main$linetype[1],
+          Color = temp_main$color[1]
         )
       }
       plotDF_main <- rbind.data.frame(plotDF_main,temp_main)
       plotDF_end <- rbind.data.frame(plotDF_end,temp_end)
     }
-
+    
     # Draw edges
     grid::grid.bezier(x = plotDF_main$x,
                       y = -1*plotDF_main$y,
@@ -253,9 +270,9 @@
   
   
   
-  #============================================================================#
+  #========================================================================#
   # Open arrow head (`mim-binding`, `mim-modification`)
-  #============================================================================#
+  #========================================================================#
   
   if (sum(df$arrowType == "mim-binding"|
           df$arrowType == "mim-modification") > 0){
@@ -264,71 +281,73 @@
     plotDF_temp <- df[df$arrowType == "mim-binding"|
                         df$arrowType == "mim-modification",]
     
-    # Get all edge groups. Each edge group corresponds to a single bezier curve
+    # Get all edge groups. Each edge group corresponds to one bezier curve
     groups <- unique(plotDF_temp$group)
-
+    
     # Offset is the distance at which the arrow head should be attached to the
     # main body of the arrow
     offset <- 5
-
+    
     plotDF_main <- NULL
     plotDF_end <- NULL
     for (i in seq_along(groups)){
-
+      
       temp_main <- plotDF_temp[plotDF_temp$group == groups[i],]
-
+      
       if ("last" %in% temp_main$arrowEnd){
-
+        
         # Collect X and Y coordinates in separate vectors
         x1 <- temp_main$x[nrow(temp_main)-1]
         x2 <- temp_main$x[nrow(temp_main)]
         y1 <- temp_main$y[nrow(temp_main)-1]
         y2 <- temp_main$y[nrow(temp_main)]
-
+        
         # Calculate offsets
         x_offset <- offset*((x1-x2)/(abs(x1-x2) + abs(y1-y2)))
         y_offset <- offset*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
-
+        
         temp_main$x[nrow(temp_main)] <- temp_main$x[nrow(temp_main)] + x_offset
         temp_main$y[nrow(temp_main)] <- temp_main$y[nrow(temp_main)] + y_offset
-
+        
         # Collect plotting information for the arrow head
-        temp_end <- data.frame(X2 = x2,
-                               X1 = temp_main$x[nrow(temp_main)],
-                               Y2 = y2,
-                               Y1 = temp_main$y[nrow(temp_main)],
-                               ArrowEnd = temp_main$arrowEnd[nrow(temp_main)],
-                               ArrowType = temp_main$arrowType[nrow(temp_main)],
-                               LineThickness = temp_main$linewidth[nrow(temp_main)],
-                               LineType = temp_main$linetype[nrow(temp_main)],
-                               Color = temp_main$color[nrow(temp_main)]
+        temp_end <- data.frame(
+          X2 = x2,
+          X1 = temp_main$x[nrow(temp_main)],
+          Y2 = y2,
+          Y1 = temp_main$y[nrow(temp_main)],
+          ArrowEnd = temp_main$arrowEnd[nrow(temp_main)],
+          ArrowType = temp_main$arrowType[nrow(temp_main)],
+          LineThickness = temp_main$linewidth[nrow(temp_main)],
+          LineType = temp_main$linetype[nrow(temp_main)],
+          Color = temp_main$color[nrow(temp_main)]
         )
       }
       if ("first" %in% temp_main$arrowEnd){
-
+        
         # Collect X and Y coordinates in separate vectors
         x1 <- temp_main$x[1]
         x2 <- temp_main$x[2]
         y1 <- temp_main$y[1]
         y2 <- temp_main$y[2]
-
+        
         # Calculate offsets
         x_offset <- offset*((x1-x2)/(abs(x1-x2) + abs(y1-y2)))
         y_offset <- offset*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
-
+        
         temp_main$x[1] <- temp_main$x[1] - x_offset
         temp_main$y[1] <- temp_main$y[1] + y_offset
-
+        
         # Collect plotting information for the arrow head
-        temp_end <- data.frame(X1 = x1,
-                               X2 = temp_main$x[1],
-                               Y1 = y1,
-                               Y2 = temp_main$y[1],
-                               ArrowEnd = temp_main$arrowEnd[1],
-                               ArrowType = temp_main$arrowType[1],
-                               LineThickness = temp_main$linewidth[1],
-                               LineType = temp_main$linetype[1],
-                               Color = temp_main$color[1]
+        temp_end <- data.frame(
+          X1 = x1,
+          X2 = temp_main$x[1],
+          Y1 = y1,
+          Y2 = temp_main$y[1],
+          ArrowEnd = temp_main$arrowEnd[1],
+          ArrowType = temp_main$arrowType[1],
+          LineThickness = temp_main$linewidth[1],
+          LineType = temp_main$linetype[1],
+          Color = temp_main$color[1]
         )
       }
       plotDF_main <- rbind.data.frame(plotDF_main,temp_main)
@@ -356,79 +375,81 @@
   }
   
   
-  #============================================================================#
+  #========================================================================#
   # Filled white arrow (`mim-stimulation`)
-  #============================================================================#
+  #========================================================================#
   
   if (sum(df$arrowType == "mim-stimulation") > 0){
     
     plotDF_temp <- df[df$arrowType == "mim-stimulation",]
     
-    # Get all edge groups. Each edge group corresponds to a single bezier curve
+    # Get all edge groups. Each edge group corresponds to one bezier curve
     groups <- unique(plotDF_temp$group)
-
+    
     # Offset is the distance at which the arrow head should be attached to the
     # main body of the arrow
     offset <- 5
-
+    
     plotDF_main <- NULL
     plotDF_end <- NULL
     for (i in seq_along(groups)){
-
+      
       temp_main <- plotDF_temp[plotDF_temp$group == groups[i],]
-
+      
       if ("last" %in% temp_main$arrowEnd){
-
+        
         # Collect X and Y coordinates in separate vectors
         x1 <- temp_main$x[nrow(temp_main)-1]
         x2 <- temp_main$x[nrow(temp_main)]
         y1 <- temp_main$y[nrow(temp_main)-1]
         y2 <- temp_main$y[nrow(temp_main)]
-
+        
         # Calculate offsets
         x_offset <- offset*((x1-x2)/(abs(x1-x2) + abs(y1-y2)))
         y_offset <- offset*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
-
+        
         temp_main$x[nrow(temp_main)] <- temp_main$x[nrow(temp_main)] + x_offset
         temp_main$y[nrow(temp_main)] <- temp_main$y[nrow(temp_main)] + y_offset
-
+        
         # Collect plotting information for the arrow head
-        temp_end <- data.frame(X2 = x2,
-                               X1 = temp_main$x[nrow(temp_main)],
-                               Y2 = y2,
-                               Y1 = temp_main$y[nrow(temp_main)],
-                               ArrowEnd = temp_main$arrowEnd[nrow(temp_main)],
-                               ArrowType = temp_main$arrowType[nrow(temp_main)],
-                               LineThickness = temp_main$linewidth[nrow(temp_main)],
-                               LineType = temp_main$linetype[nrow(temp_main)],
-                               Color = temp_main$color[nrow(temp_main)]
+        temp_end <- data.frame(
+          X2 = x2,
+          X1 = temp_main$x[nrow(temp_main)],
+          Y2 = y2,
+          Y1 = temp_main$y[nrow(temp_main)],
+          ArrowEnd = temp_main$arrowEnd[nrow(temp_main)],
+          ArrowType = temp_main$arrowType[nrow(temp_main)],
+          LineThickness = temp_main$linewidth[nrow(temp_main)],
+          LineType = temp_main$linetype[nrow(temp_main)],
+          Color = temp_main$color[nrow(temp_main)]
         )
       }
       if ("first" %in% temp_main$arrowEnd){
-
+        
         # Collect X and Y coordinates in separate vectors
         x1 <- temp_main$x[1]
         x2 <- temp_main$x[2]
         y1 <- temp_main$y[1]
         y2 <- temp_main$y[2]
-
+        
         # Calculate offsets
         x_offset <- offset*((x1-x2)/(abs(x1-x2) + abs(y1-y2)))
         y_offset <- offset*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
-
+        
         temp_main$x[1] <- temp_main$x[1] - x_offset
         temp_main$y[1] <- temp_main$y[1] + y_offset
-
+        
         # Collect plotting information for the arrow head
-        temp_end <- data.frame(X1 = x1,
-                               X2 = temp_main$x[1],
-                               Y1 = y1,
-                               Y2 = temp_main$y[1],
-                               ArrowEnd = temp_main$arrowEnd[1],
-                               ArrowType = temp_main$arrowType[1],
-                               LineThickness = temp_main$linewidth[1],
-                               LineType = temp_main$linetype[1],
-                               Color = temp_main$color[1]
+        temp_end <- data.frame(
+          X1 = x1,
+          X2 = temp_main$x[1],
+          Y1 = y1,
+          Y2 = temp_main$y[1],
+          ArrowEnd = temp_main$arrowEnd[1],
+          ArrowType = temp_main$arrowType[1],
+          LineThickness = temp_main$linewidth[1],
+          LineType = temp_main$linetype[1],
+          Color = temp_main$color[1]
         )
       }
       plotDF_main <- rbind.data.frame(plotDF_main,temp_main)
@@ -456,9 +477,9 @@
   }
   
   
-  #============================================================================#
+  #========================================================================#
   # T-bar (`mim-inhibition`, `T-bar`)
-  #============================================================================#
+  #========================================================================#
   
   if (sum(df$arrowType == "mim-inhibition" |
           df$arrowType == "TBar") > 0){
@@ -466,79 +487,83 @@
     plotDF_temp <- df[df$arrowType == "mim-inhibition" |
                         df$arrowType == "TBar",]
     
-    # Get all edge groups. Each edge group corresponds to a single bezier curve
+    # Get all edge groups. Each edge group corresponds to one bezier curve
     groups <- unique(plotDF_temp$group)
-
+    
     # Offset is the distance at which the arrow head should be attached to the
     # main body of the arrow
     offset <- 5
-
+    
     # Gap is the distance that should be present between the end of the arrow
     # and the node
     gap <- 10
-
+    
     plotDF_main <- NULL
     plotDF_end <- NULL
     for (i in seq_along(groups)){
-
+      
       temp_main <- plotDF_temp[plotDF_temp$group == groups[i],]
-
+      
       if ("last" %in% temp_main$arrowEnd){
-
+        
         # Collect X and Y coordinates in separate vectors
         x1 <- temp_main$x[nrow(temp_main)-1]
         x2 <- temp_main$x[nrow(temp_main)]
         y1 <- temp_main$y[nrow(temp_main)-1]
         y2 <- temp_main$y[nrow(temp_main)]
-
+        
         # Calculate offsets
         x_offset <- offset*((x1-x2)/(abs(x1-x2) + abs(y1-y2)))
         x_gap <- gap*((x1-x2)/(abs(x1-x2) + abs(y1-y2)))
         y_offset <- offset*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
         y_gap <- gap*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
-
-        temp_main$x[nrow(temp_main)] <- temp_main$x[nrow(temp_main)] + x_offset + x_gap
-        temp_main$y[nrow(temp_main)] <- temp_main$y[nrow(temp_main)] + y_offset + y_gap
-
+        
+        temp_main$x[nrow(temp_main)] <- temp_main$x[nrow(temp_main)] + 
+          x_offset + x_gap
+        temp_main$y[nrow(temp_main)] <- temp_main$y[nrow(temp_main)] + 
+          y_offset + y_gap
+        
         # Collect plotting information for the arrow head
-        temp_end <- data.frame(X2 = x2 + x_gap,
-                               X1 = temp_main$x[nrow(temp_main)],
-                               Y2 = y2 + y_gap,
-                               Y1 = temp_main$y[nrow(temp_main)],
-                               ArrowEnd = temp_main$arrowEnd[nrow(temp_main)],
-                               ArrowType = temp_main$arrowType[nrow(temp_main)],
-                               LineThickness = temp_main$linewidth[nrow(temp_main)],
-                               LineType = temp_main$linetype[nrow(temp_main)],
-                               Color = temp_main$color[nrow(temp_main)]
+        temp_end <- data.frame(
+          X2 = x2 + x_gap,
+          X1 = temp_main$x[nrow(temp_main)],
+          Y2 = y2 + y_gap,
+          Y1 = temp_main$y[nrow(temp_main)],
+          ArrowEnd = temp_main$arrowEnd[nrow(temp_main)],
+          ArrowType = temp_main$arrowType[nrow(temp_main)],
+          LineThickness = temp_main$linewidth[nrow(temp_main)],
+          LineType = temp_main$linetype[nrow(temp_main)],
+          Color = temp_main$color[nrow(temp_main)]
         )
       }
       if ("first" %in% temp_main$arrowEnd){
-
+        
         # Collect X and Y coordinates in separate vectors
         x1 <- temp_main$x[1]
         x2 <- temp_main$x[2]
         y1 <- temp_main$y[1]
         y2 <- temp_main$y[2]
-
+        
         # Calculate offsets
         x_offset <- offset*((x1-x2)/(abs(x1-x2) + abs(y1-y2)))
         x_gap<- gap*((x1-x2)/(abs(x1-x2) + abs(y1-y2)))
         y_offset <- offset*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
         y_gap <- gap*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
-
+        
         temp_main$x[1] <- temp_main$x[1] - (x_offset+x_gap)
         temp_main$y[1] <- temp_main$y[1] + (y_offset+y_gap)
-
+        
         # Collect plotting information for the arrow head
-        temp_end <- data.frame(X1 = x1 - x_gap,
-                               X2 = temp_main$x[1],
-                               Y1 = y1 + y_gap,
-                               Y2 = temp_main$y[1],
-                               ArrowEnd = temp_main$arrowEnd[1],
-                               ArrowType = temp_main$arrowType[1],
-                               LineThickness = temp_main$linewidth[1],
-                               LineType = temp_main$linetype[1],
-                               Color = temp_main$color[1]
+        temp_end <- data.frame(
+          X1 = x1 - x_gap,
+          X2 = temp_main$x[1],
+          Y1 = y1 + y_gap,
+          Y2 = temp_main$y[1],
+          ArrowEnd = temp_main$arrowEnd[1],
+          ArrowType = temp_main$arrowType[1],
+          LineThickness = temp_main$linewidth[1],
+          LineType = temp_main$linetype[1],
+          Color = temp_main$color[1]
         )
       }
       plotDF_main <- rbind.data.frame(plotDF_main,temp_main)
@@ -565,9 +590,9 @@
                   arr.adj = 1)
   }
   
-  #============================================================================#
+  #========================================================================#
   # Filled white circle (`mim-catalysis`)
-  #============================================================================#
+  #========================================================================#
   
   if (sum(df$arrowType == "mim-catalysis") > 0){
     
@@ -575,57 +600,58 @@
     
     # Get all edge groups. Each edge group corresponds to a single bezier curve
     groups <- unique(plotDF_temp$group)
-
+    
     # Offset is the distance at which the arrow head should be attached to the
     # main body of the arrow
     offset <- 5
-
+    
     plotDF_main <- NULL
     plotDF_end <- NULL
     for (i in seq_along(groups)){
-
+      
       temp_main <- plotDF_temp[plotDF_temp$group == groups[i],]
-
+      
       if ("last" %in% temp_main$arrowEnd){
-
+        
         # Collect X and Y coordinates in separate vectors
         x1 <- temp_main$x[nrow(temp_main)-1]
         x2 <- temp_main$x[nrow(temp_main)]
         y1 <- temp_main$y[nrow(temp_main)-1]
         y2 <- temp_main$y[nrow(temp_main)]
-
+        
         # Calculate offsets
         x_offset <- offset*((x1-x2)/(abs(x1-x2) + abs(y1-y2)))
         y_offset <- offset*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
-
+        
         temp_main$x[nrow(temp_main)] <- temp_main$x[nrow(temp_main)] + x_offset
         temp_main$y[nrow(temp_main)] <- temp_main$y[nrow(temp_main)] + y_offset
-
+        
         # Collect plotting information for the arrow head
-        temp_end <- data.frame(Xpoint =  temp_main$x[nrow(temp_main)],
-                               Ypoint = temp_main$y[nrow(temp_main)],
-                               ArrowEnd = temp_main$arrowEnd[nrow(temp_main)],
-                               ArrowType = temp_main$arrowType[nrow(temp_main)],
-                               LineThickness = temp_main$linewidth[nrow(temp_main)],
-                               LineType = temp_main$linetype[nrow(temp_main)],
-                               Color = temp_main$color[nrow(temp_main)]
+        temp_end <- data.frame(
+          Xpoint =  temp_main$x[nrow(temp_main)],
+          Ypoint = temp_main$y[nrow(temp_main)],
+          ArrowEnd = temp_main$arrowEnd[nrow(temp_main)],
+          ArrowType = temp_main$arrowType[nrow(temp_main)],
+          LineThickness = temp_main$linewidth[nrow(temp_main)],
+          LineType = temp_main$linetype[nrow(temp_main)],
+          Color = temp_main$color[nrow(temp_main)]
         )
       }
       if ("first" %in% temp_main$arrowEnd){
-
+        
         # Collect X and Y coordinates in separate vectors
         x1 <- temp_main$x[1]
         x2 <- temp_main$x[2]
         y1 <- temp_main$y[1]
         y2 <- temp_main$y[2]
-
+        
         # Calculate offsets
         x_offset <- offset*((x1-x2)/(abs(x1-x2) + abs(y1-y2)))
         y_offset <- offset*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
-
+        
         temp_main$x[1] <- temp_main$x[1] - x_offset
         temp_main$y[1] <- temp_main$y[1] + y_offset
-
+        
         # Collect plotting information for the arrow head
         temp_end <- data.frame(Xpoint = temp_main$x[1],
                                Ypoint = temp_main$y[1],
@@ -639,7 +665,7 @@
       plotDF_main <- rbind.data.frame(plotDF_main,temp_main)
       plotDF_end <- rbind.data.frame(plotDF_end,temp_end)
     }
-
+    
     # Draw edges
     grid::grid.bezier(x = plotDF_main$x,
                       y = -1*plotDF_main$y,
@@ -647,90 +673,92 @@
                       gp=grid::gpar(col= plotDF_main$color[1], 
                                     lwd = plotDF_main$linewidth[1], 
                                     lty = plotDF_main$linetype[1]))
-    points(x = plotDF_end$Xpoint,
-         y = -1*plotDF_end$Ypoint,
-         pch = 21,
-         cex = 2,
-         bg = "white",
-         col = plotDF_main$color[1])
+    graphics::points(x = plotDF_end$Xpoint,
+                     y = -1*plotDF_end$Ypoint,
+                     pch = 21,
+                     cex = 2,
+                     bg = "white",
+                     col = plotDF_main$color[1])
   }
   
   
-  #============================================================================#
+  #========================================================================#
   # Filled white square (`min-covalent-bond`)
-  #============================================================================#
+  #========================================================================#
   
   if (sum(df$arrowType == "mim-covalent-bond") > 0){
     
     plotDF_temp <- df[df$arrowType == "mim-covalent-bond",]
     
-    # Get all edge groups. Each edge group corresponds to a single bezier curve
+    # Get all edge groups. Each edge group corresponds to one bezier curve
     groups <- unique(plotDF_temp$group)
-
+    
     # Offset is the distance at which the arrow head should be attached to the
     # main body of the arrow
     offset <- 5
-
+    
     plotDF_main <- NULL
     plotDF_end <- NULL
     for (i in seq_along(groups)){
-
+      
       temp_main <- plotDF_temp[plotDF_temp$group == groups[i],]
-
+      
       if ("last" %in% temp_main$arrowEnd){
-
+        
         # Collect X and Y coordinates in separate vectors
         x1 <- temp_main$x[nrow(temp_main)-1]
         x2 <- temp_main$x[nrow(temp_main)]
         y1 <- temp_main$y[nrow(temp_main)-1]
         y2 <- temp_main$y[nrow(temp_main)]
-
+        
         # Calculate offsets
         x_offset <- offset*((x1-x2)/(abs(x1-x2) + abs(y1-y2)))
         y_offset <- offset*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
-
+        
         temp_main$x[nrow(temp_main)] <- temp_main$x[nrow(temp_main)] + x_offset
         temp_main$y[nrow(temp_main)] <- temp_main$y[nrow(temp_main)] + y_offset
-
+        
         # Collect plotting information for the arrow head
-        temp_end <- data.frame(Xpoint =  temp_main$x[nrow(temp_main)],
-                               Ypoint = temp_main$y[nrow(temp_main)],
-                               ArrowEnd = temp_main$arrowEnd[nrow(temp_main)],
-                               ArrowType = temp_main$arrowType[nrow(temp_main)],
-                               LineThickness = temp_main$linewidth[nrow(temp_main)],
-                               LineType = temp_main$linetype[nrow(temp_main)],
-                               Color = temp_main$color[nrow(temp_main)]
+        temp_end <- data.frame(
+          Xpoint =  temp_main$x[nrow(temp_main)],
+          Ypoint = temp_main$y[nrow(temp_main)],
+          ArrowEnd = temp_main$arrowEnd[nrow(temp_main)],
+          ArrowType = temp_main$arrowType[nrow(temp_main)],
+          LineThickness = temp_main$linewidth[nrow(temp_main)],
+          LineType = temp_main$linetype[nrow(temp_main)],
+          Color = temp_main$color[nrow(temp_main)]
         )
       }
       if ("first" %in% temp_main$arrowEnd){
-
+        
         # Collect X and Y coordinates in separate vectors
         x1 <- temp_main$x[1]
         x2 <- temp_main$x[2]
         y1 <- temp_main$y[1]
         y2 <- temp_main$y[2]
-
+        
         # Calculate offsets
         x_offset <- offset*((x1-x2)/(abs(x1-x2) + abs(y1-y2)))
         y_offset <- offset*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
-
+        
         temp_main$x[1] <- temp_main$x[1] - x_offset
         temp_main$y[1] <- temp_main$y[1] + y_offset
-
+        
         # Collect plotting information for the arrow head
-        temp_end <- data.frame(Xpoint = temp_main$x[1],
-                               Ypoint = temp_main$y[1],
-                               ArrowEnd = temp_main$arrowEnd[1],
-                               ArrowType = temp_main$arrowType[1],
-                               LineThickness = temp_main$linewidth[1],
-                               LineType = temp_main$linetype[1],
-                               Color = temp_main$color[1]
+        temp_end <- data.frame(
+          Xpoint = temp_main$x[1],
+          Ypoint = temp_main$y[1],
+          ArrowEnd = temp_main$arrowEnd[1],
+          ArrowType = temp_main$arrowType[1],
+          LineThickness = temp_main$linewidth[1],
+          LineType = temp_main$linetype[1],
+          Color = temp_main$color[1]
         )
       }
       plotDF_main <- rbind.data.frame(plotDF_main,temp_main)
       plotDF_end <- rbind.data.frame(plotDF_end,temp_end)
     }
-
+    
     # Draw edges
     grid::grid.bezier(x = plotDF_main$x,
                       y = -1*plotDF_main$y,
@@ -738,72 +766,72 @@
                       gp=grid::gpar(col= plotDF_main$color[1], 
                                     lwd = plotDF_main$linewidth[1], 
                                     lty = plotDF_main$linetype[1]))
-    points(x = plotDF_end$Xpoint,
-           y = -1*plotDF_end$Ypoint,
-           pch = 22,
-           cex = 2,
-           bg = "white",
-           col = plotDF_main$color[1])
+    graphics::points(x = plotDF_end$Xpoint,
+                     y = -1*plotDF_end$Ypoint,
+                     pch = 22,
+                     cex = 2,
+                     bg = "white",
+                     col = plotDF_main$color[1])
   }
   
   
   
-  #============================================================================#
+  #========================================================================#
   # Straight line with gap at the end (`mim-gap`)
-  #============================================================================#
+  #========================================================================#
   
   if (sum(df$arrowType == "mim-gap") > 0){
     
     plotDF_temp <- df[df$arrowType == "mim-gap",]
     
-    # Get all edge groups. Each edge group corresponds to a single bezier curve
+    # Get all edge groups. Each edge group corresponds to onee bezier curve
     groups <- unique(plotDF_temp$group)
-
+    
     # Gap is the distance that should be present between the end of the arrow
     # and the node
     gap <- 10
-
+    
     plotDF_main <- NULL
     plotDF_end <- NULL
     for (i in seq_along(groups)){
-
+      
       temp_main <- plotDF_temp[plotDF_temp$group == groups[i],]
-
+      
       if ("last" %in% temp_main$arrowEnd){
-
+        
         # Collect X and Y coordinates in separate vectors
         x1 <- temp_main$x[nrow(temp_main)-1]
         x2 <- temp_main$x[nrow(temp_main)]
         y1 <- temp_main$y[nrow(temp_main)-1]
         y2 <- temp_main$y[nrow(temp_main)]
-
+        
         # Calculate gaps
         x_gap <- gap*((x1-x2)/(abs(x1-x2) + abs(y1-y2)))
         y_gap <- gap*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
-
+        
         temp_main$x[nrow(temp_main)] <- temp_main$x[nrow(temp_main)] + x_gap
         temp_main$y[nrow(temp_main)] <- temp_main$y[nrow(temp_main)] + y_gap
       }
-
+      
       if ("first" %in% temp_main$arrowEnd){
-
+        
         # Collect X and Y coordinates in separate vectors
         x1 <- temp_main$x[1]
         x2 <- temp_main$x[2]
         y1 <- temp_main$y[1]
         y2 <- temp_main$y[2]
-
+        
         # Calculate offsets
         x_gap <- gap*((x1-x2)/(abs(x1-x2) + abs(y1-y2)))
         y_gap <- gap*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
-
+        
         temp_main$x[1] <- temp_main$x[1] - x_gap
         temp_main$y[1] <- temp_main$y[1] + y_gap
       }
-
+      
       plotDF_main <- rbind.data.frame(plotDF_main,temp_main)
     }
-
+    
     # Draw edges
     grid::grid.bezier(x = plotDF_main$x,
                       y = -1*plotDF_main$y,
@@ -814,113 +842,121 @@
   }
   
   
-  #============================================================================#
+  #========================================================================#
   # `mim-cleavage`
-  #============================================================================#
+  #========================================================================#
   
   
   if (sum(df$arrowType == "mim-cleavage")> 0){
     
     plotDF_temp<- df[df$arrowType == "mim-cleavage",]
     
-    # Get all edge groups. Each edge group corresponds to a single bezier curve
+    # Get all edge groups. Each edge group corresponds to one bezier curve
     groups <- unique(plotDF_temp$group)
-
+    
     # Offset is the distance from the end node to the start of the arrow head
     offset <- 15
-
+    
     # Deviation is the length of the orthogonal distance of the arrow head
     deviation <- 12
-
+    
     plotDF_main <- NULL
     plotDF_orth <- NULL
     plotDF_diag <- NULL
     for (i in seq_along(groups)){
       temp_main <- plotDF_temp[plotDF_temp$group == groups[i],]
-
+      
       if ("last" %in% temp_main$arrowEnd){
-
+        
         # Collect X and Y coordinates in separate vectors
         x1 <- temp_main$x[nrow(temp_main)-1]
         x2 <- temp_main$x[nrow(temp_main)]
         y1 <- temp_main$y[nrow(temp_main)-1]
         y2 <- temp_main$y[nrow(temp_main)]
-
+        
         # Calculate offsets
         x_offset <- offset*((x1-x2)/(abs(x1-x2) + abs(y1-y2)))
         y_offset <- offset*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
-
+        
         # Main part of the line
         temp_main$x[nrow(temp_main)] <- temp_main$x[nrow(temp_main)] + x_offset
         temp_main$y[nrow(temp_main)] <- temp_main$y[nrow(temp_main)] + y_offset
-
+        
         # Orthogonal part of the line
-        rotated_coords <- t(.rotation_matrix(-0.5*pi) %*% c(deviation*((x1-x2)/(abs(x1-x2) + abs(y1-y2))),
-                                                            deviation*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
-        ))
-
-        temp_orth <- data.frame(X1 = temp_main$x[nrow(temp_main)],
-                                X2 = temp_main$x[nrow(temp_main)] + rotated_coords[1,1],
-                                Y1 = temp_main$y[nrow(temp_main)],
-                                Y2 = temp_main$y[nrow(temp_main)] + rotated_coords[1,2],
-                                LineThickness = temp_main$linewidth[nrow(temp_main)],
-                                LineType = temp_main$linetype[nrow(temp_main)],
-                                Color = temp_main$color[nrow(temp_main)])
-
+        rotated_coords <- t(
+          .rotation_matrix(-0.5*pi) %*% 
+            c(deviation*((x1-x2)/(abs(x1-x2) + abs(y1-y2))),
+              deviation*((y1-y2)/(abs(x1-x2) + abs(y1-y2))))
+        )
+        
+        temp_orth <- data.frame(
+          X1 = temp_main$x[nrow(temp_main)],
+          X2 = temp_main$x[nrow(temp_main)] + rotated_coords[1,1],
+          Y1 = temp_main$y[nrow(temp_main)],
+          Y2 = temp_main$y[nrow(temp_main)] + rotated_coords[1,2],
+          LineThickness = temp_main$linewidth[nrow(temp_main)],
+          LineType = temp_main$linetype[nrow(temp_main)],
+          Color = temp_main$color[nrow(temp_main)])
+        
         # Diagonal part of the line
-        temp_diag <- data.frame(X2 =  x2,
-                                X1 = temp_main$x[nrow(temp_main)] + rotated_coords[1,1],
-                                Y2 = y2,
-                                Y1 = temp_main$y[nrow(temp_main)] + rotated_coords[1,2],
-                                LineThickness = temp_main$linewidth[nrow(temp_main)],
-                                LineType = temp_main$linetype[nrow(temp_main)],
-                                Color = temp_main$color[nrow(temp_main)])
-
+        temp_diag <- data.frame(
+          X2 =  x2,
+          X1 = temp_main$x[nrow(temp_main)] + rotated_coords[1,1],
+          Y2 = y2,
+          Y1 = temp_main$y[nrow(temp_main)] + rotated_coords[1,2],
+          LineThickness = temp_main$linewidth[nrow(temp_main)],
+          LineType = temp_main$linetype[nrow(temp_main)],
+          Color = temp_main$color[nrow(temp_main)])
+        
       }
       if ("first" %in% temp_main$arrowEnd){
-
+        
         # Collect X and Y coordinates in separate vectors
         x1 <- temp_main$x[1]
         x2 <- temp_main$x[2]
         y1 <- temp_main$y[1]
         y2 <- temp_main$y[2]
-
-
+        
+        
         # Calculate offsets
         x_offset <- offset*((x1-x2)/(abs(x1-x2) + abs(y1-y2)))
         y_offset <- offset*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
-
+        
         # Main part of the line
         temp_main$x[1] <- temp_main$x[1] + x_offset
         temp_main$y[1] <- temp_main$y[1] + y_offset
-
+        
         # Orthogonal part of the line
-        rotated_coords <- t(.rotation_matrix(-0.5*pi) %*% c(deviation*((x1-x2)/(abs(x1-x2) + abs(y1-y2))),
-                                                            deviation*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
-        ))
-
-        temp_orth <- data.frame(X1 = temp_main$x[1],
-                                X2 = temp_main$x[1] + rotated_coords[1,1],
-                                Y1 = temp_main$y[1],
-                                Y2 = temp_main$y[1] + rotated_coords[1,2],
-                                LineThickness = temp_g$linewidth[1],
-                                LineType = temp_g$linetype[1],
-                                Color = temp_g$color[1])
-
+        rotated_coords <- t(
+          .rotation_matrix(-0.5*pi) %*% 
+            c(deviation*((x1-x2)/(abs(x1-x2) + abs(y1-y2))),
+              deviation*((y1-y2)/(abs(x1-x2) + abs(y1-y2))))
+        )
+        
+        temp_orth <- data.frame(
+          X1 = temp_main$x[1],
+          X2 = temp_main$x[1] + rotated_coords[1,1],
+          Y1 = temp_main$y[1],
+          Y2 = temp_main$y[1] + rotated_coords[1,2],
+          LineThickness = temp_main$linewidth[1],
+          LineType = temp_main$linetype[1],
+          Color = temp_main$color[1])
+        
         # Diagonal part of the line
-        temp_diag <- data.frame(X2 =  x2,
-                                X1 = temp_main$x[1] + rotated_coords[1,1],
-                                Y2 = y2,
-                                Y1 = temp_main$y[n1] + rotated_coords[1,2],
-                                LineThickness = temp_main$linewidth[1],
-                                LineType = temp_main$linetype[1],
-                                Color = temp_main$color[1])
+        temp_diag <- data.frame(
+          X2 =  x2,
+          X1 = temp_main$x[1] + rotated_coords[1,1],
+          Y2 = y2,
+          Y1 = temp_main$y[1] + rotated_coords[1,2],
+          LineThickness = temp_main$linewidth[1],
+          LineType = temp_main$linetype[1],
+          Color = temp_main$color[1])
       }
       plotDF_main <- rbind.data.frame(plotDF_main,temp_main)
       plotDF_orth <- rbind.data.frame(plotDF_orth,temp_orth)
       plotDF_diag <- rbind.data.frame(plotDF_diag,temp_diag)
     }
-
+    
     # Draw edges
     grid::grid.bezier(x = plotDF_main$x,
                       y = -1*plotDF_main$y,
@@ -928,13 +964,13 @@
                       gp=grid::gpar(col= plotDF_main$color[1], 
                                     lwd = plotDF_main$linewidth[1], 
                                     lty = plotDF_main$linetype[1]))
-    arrows(x0 = plotDF_orth$X1, x1 = plotDF_orth$X2,
+    graphics::arrows(x0 = plotDF_orth$X1, x1 = plotDF_orth$X2,
            y0 = -1*plotDF_orth$Y1, y1 = -1*plotDF_orth$Y2, 
            length = 0, 
            col = plotDF_orth$Color, 
            lty = plotDF_orth$LineStyle, 
            lwd = plotDF_orth$LineThickness)
-    arrows(x0 = plotDF_diag$X1, x1 = plotDF_diag$X2,
+    graphics::arrows(x0 = plotDF_diag$X1, x1 = plotDF_diag$X2,
            y0 = -1*plotDF_diag$Y1, y1 = -1*plotDF_diag$Y2, 
            length = 0, 
            col = plotDF_diag$Color, 
@@ -942,109 +978,119 @@
            lwd = plotDF_diag$LineThickness)
   }
   
-  #============================================================================#
+  #========================================================================#
   # `mim-transcription-translation`
-  #============================================================================#
+  #========================================================================#
   
   if (sum(df$arrowType == "mim-transcription-translation")> 0){
     
     plotDF_temp<- df[df$arrowType == "mim-transcription-translation",]
     
-    # Get all edge groups. Each edge group corresponds to a single bezier curve
+    # Get all edge groups. Each edge group corresponds to one bezier curve
     groups <- unique(plotDF_temp$group)
-
+    
     # Gap is the distance between node and main line
     gap <- 15
-
+    
     # extend is how much the main line should extend beyond the gap
     extend <- 5
-
+    
     # Deviation is the length of the orthogonal distance of the arrow head
     deviation <- 10
-
+    
     plotDF_main <- NULL
     plotDF_orth <- NULL
     plotDF_end <- NULL
     for (i in seq_along(groups)){
       temp_main <- plotDF_temp[plotDF_temp$group == groups[i],]
-
+      
       if ("last" %in% temp_main$arrowEnd){
-
+        
         # Collect X and Y coordinates in separate vectors
         x1 <- temp_main$x[nrow(temp_main)-1]
         x2 <- temp_main$x[nrow(temp_main)]
         y1 <- temp_main$y[nrow(temp_main)-1]
         y2 <- temp_main$y[nrow(temp_main)]
-
+        
         # Calculate gaps
         x_gap <- gap*((x1-x2)/(abs(x1-x2) + abs(y1-y2)))
         x_extend <- extend*((x1-x2)/(abs(x1-x2) + abs(y1-y2)))
         y_gap <- gap*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
         y_extend <- extend*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
-
+        
         # Orthogonal part of the line
-        rotated_coords <- t(.rotation_matrix(-0.5*pi) %*% c(deviation*((x1-x2)/(abs(x1-x2) + abs(y1-y2))),
-                                                            deviation*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
-        ))
-
-        temp_orth <- data.frame(X1 = temp_main$x[nrow(temp_main)] + x_gap,
-                                X2 = temp_main$x[nrow(temp_main)] + x_gap - rotated_coords[1,1],
-                                Y1 = temp_main$y[nrow(temp_main)] + y_gap,
-                                Y2 = temp_main$y[nrow(temp_main)] + y_gap - rotated_coords[1,2],
-                                LineThickness = temp_main$linewidth[nrow(temp_main)],
-                                LineType = temp_main$linetype[nrow(temp_main)],
-                                Color = temp_main$color[nrow(temp_main)])
-
+        rotated_coords <- t(
+          .rotation_matrix(-0.5*pi) %*% 
+            c(deviation*((x1-x2)/(abs(x1-x2) + abs(y1-y2))),
+              deviation*((y1-y2)/(abs(x1-x2) + abs(y1-y2))))
+        )
+        
+        temp_orth <- data.frame(
+          X1 = temp_main$x[nrow(temp_main)] + x_gap,
+          X2 = temp_main$x[nrow(temp_main)] + x_gap - rotated_coords[1,1],
+          Y1 = temp_main$y[nrow(temp_main)] + y_gap,
+          Y2 = temp_main$y[nrow(temp_main)] + y_gap - rotated_coords[1,2],
+          LineThickness = temp_main$linewidth[nrow(temp_main)],
+          LineType = temp_main$linetype[nrow(temp_main)],
+          Color = temp_main$color[nrow(temp_main)])
+        
         # End part of the line
-        temp_end <- data.frame(X2 =  x2 - rotated_coords[1,1],
-                                X1 = temp_main$x[nrow(temp_main)] + x_gap - rotated_coords[1,1],
-                                Y2 = y2 - rotated_coords[1,2],
-                                Y1 = temp_main$y[nrow(temp_main)] + y_gap - rotated_coords[1,2],
-                                LineThickness = temp_main$linewidth[nrow(temp_main)],
-                                LineType = temp_main$linetype[nrow(temp_main)],
-                                Color = temp_main$color[nrow(temp_main)])
-
+        temp_end <- data.frame(
+          X2 =  x2 - rotated_coords[1,1],
+          X1 = temp_main$x[nrow(temp_main)] + x_gap - rotated_coords[1,1],
+          Y2 = y2 - rotated_coords[1,2],
+          Y1 = temp_main$y[nrow(temp_main)] + y_gap - rotated_coords[1,2],
+          LineThickness = temp_main$linewidth[nrow(temp_main)],
+          LineType = temp_main$linetype[nrow(temp_main)],
+          Color = temp_main$color[nrow(temp_main)])
+        
         # Main part of the line
-        temp_main$x[nrow(temp_main)] <- temp_main$x[nrow(temp_main)] + x_gap - x_extend
-        temp_main$y[nrow(temp_main)] <- temp_main$y[nrow(temp_main)] + y_gap - y_extend
-
+        temp_main$x[nrow(temp_main)] <- temp_main$x[nrow(temp_main)] + 
+          x_gap - x_extend
+        temp_main$y[nrow(temp_main)] <- temp_main$y[nrow(temp_main)] + 
+          y_gap - y_extend
+        
       }
       if ("first" %in% temp_main$arrowEnd){
-
+        
         # Collect X and Y coordinates in separate vectors
         x1 <- temp_main$x[1]
         x2 <- temp_main$x[2]
         y1 <- temp_main$y[1]
         y2 <- temp_main$y[2]
-
+        
         # Calculate offsets
         x_gap <- gap*((x1-x2)/(abs(x1-x2) + abs(y1-y2)))
         x_extend <- extend*((x1-x2)/(abs(x1-x2) + abs(y1-y2)))
         y_gap <- gap*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
         y_extend <- extend*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
-
+        
         # Orthogonal part of the line
-        rotated_coords <- t(.rotation_matrix(-0.5*pi) %*% c(deviation*((x1-x2)/(abs(x1-x2) + abs(y1-y2))),
-                                                            deviation*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
-        ))
-
-        temp_orth <- data.frame(X1 = temp_main$x[1] + x_gap,
-                                X2 = temp_main$x[1] + x_gap - rotated_coords[1,1],
-                                Y1 = temp_main$y[1] + y_gap,
-                                Y2 = temp_main$y[1] + y_gap - rotated_coords[1,2],
-                                LineThickness = temp_main$linewidth[1],
-                                LineType = temp_main$linetype[1],
-                                Color = temp_main$color[1])
-
+        rotated_coords <- t(
+          .rotation_matrix(-0.5*pi) %*% 
+            c(deviation*((x1-x2)/(abs(x1-x2) + abs(y1-y2))),
+              deviation*((y1-y2)/(abs(x1-x2) + abs(y1-y2))))
+        )
+        
+        temp_orth <- data.frame(
+          X1 = temp_main$x[1] + x_gap,
+          X2 = temp_main$x[1] + x_gap - rotated_coords[1,1],
+          Y1 = temp_main$y[1] + y_gap,
+          Y2 = temp_main$y[1] + y_gap - rotated_coords[1,2],
+          LineThickness = temp_main$linewidth[1],
+          LineType = temp_main$linetype[1],
+          Color = temp_main$color[1])
+        
         # End part of the line
-        temp_end<- data.frame(X2 =  x2 - rotated_coords[1,1],
-                                X1 = temp_main$x[1] + x_gap - rotated_coords[1,1],
-                                Y2 = y2 - rotated_coords[1,2],
-                                Y1 = temp_main$y[1] + y_gap - rotated_coords[1,2],
-                                LineThickness = temp_main$linewidth[1],
-                                LineType = temp_main$linetype[1],
-                                Color = temp_main$color[1])
-
+        temp_end<- data.frame(
+          X2 =  x2 - rotated_coords[1,1],
+          X1 = temp_main$x[1] + x_gap - rotated_coords[1,1],
+          Y2 = y2 - rotated_coords[1,2],
+          Y1 = temp_main$y[1] + y_gap - rotated_coords[1,2],
+          LineThickness = temp_main$linewidth[1],
+          LineType = temp_main$linetype[1],
+          Color = temp_main$color[1])
+        
         # Main part of the line
         temp_main$x[1] <- temp_main$x[1] + x_gap - x_extend
         temp_main$y[1] <- temp_main$y[1] + y_gap - y_extend
@@ -1052,7 +1098,7 @@
       plotDF_main <- rbind.data.frame(plotDF_main,temp_main)
       plotDF_orth <- rbind.data.frame(plotDF_orth,temp_orth)
       plotDF_end <- rbind.data.frame(plotDF_end,temp_end)
-
+      
     }
     
     # Draw edges
@@ -1062,7 +1108,7 @@
                       gp=grid::gpar(col= plotDF_main$color[1], 
                                     lwd = plotDF_main$linewidth[1], 
                                     lty = plotDF_main$linetype[1]))
-    arrows(x0 = plotDF_orth$X1, x1 = plotDF_orth$X2,
+    graphics::arrows(x0 = plotDF_orth$X1, x1 = plotDF_orth$X2,
            y0 = -1*plotDF_orth$Y1, y1 = -1*plotDF_orth$Y2, 
            length = 0, 
            col = plotDF_orth$Color, 

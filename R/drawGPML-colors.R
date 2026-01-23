@@ -17,6 +17,7 @@
 #' An example can be generated using the defaultColorList() function.
 #' @param NAvalue Node color for NA color values.
 #' @return A data frame used for plotting colored nodes.
+#' @noRd
 
 .mapColors <- function(nodes_df,
                        annGenes,
@@ -33,12 +34,12 @@
   # Get gene/protein/metabolite IDs of all nodes
   geneIDs_nodes <- nodes_df[,c("Database", "ID", "GraphId1")]
   
-  #============================================================================#
+  #======================================================================#
   # Perform gene mapping
-  #============================================================================#
+  #======================================================================#
   
   geneDBs <- c("Ensembl", "Entrez Gene", "Uniprot-TrEMBL", "HGNC")
-  geneDBs_name <- AnnotationDbi::columns(get(annGenes))
+  geneDBs_name <- AnnotationDbi::columns(get(annGenes, envir = asNamespace(annGenes)))
   
   # Filter geneIDs
   geneIDs_fil <- geneIDs_nodes[geneIDs_nodes$Database %in% geneDBs,]
@@ -98,7 +99,7 @@
         temp <- tryCatch({
           temp <- geneIDs_fil[geneIDs_fil$Database == keytype, ]
           ann <- suppressMessages(
-            AnnotationDbi::select(BiocGenerics::get(annGenes), 
+            AnnotationDbi::select(BiocGenerics::get(annGenes, envir = asNamespace(annGenes)), 
                                   columns = c(keytype, db), 
                                   keys = temp$ID,
                                   keytype = keytype))
@@ -138,9 +139,9 @@
   }
   
   
-  #============================================================================#
+  #======================================================================#
   # Perform metabolite mapping
-  #============================================================================#
+  #======================================================================#
   
   metaboliteDBs <- c("HMDB", "CAS", "ChEBI")
   metaboliteDBs_name <- colnames(annMetabolites)
@@ -188,7 +189,8 @@
       }else{
         temp <- tryCatch({
           temp <- geneIDs_fil[geneIDs_fil$Database == keytype, ]
-          ann <- annMetabolites[annMetabolites[,keytype] %in% temp$ID,c(keytype, db)]
+          ann <- annMetabolites[annMetabolites[,keytype] %in% 
+                                  temp$ID,c(keytype, db)]
           ann <- ann[!(is.na(ann[,1]) | is.na(ann[,2])),]
           temp <- dplyr::left_join(temp, ann, by = c("ID" = keytype),
                                    relationship = "many-to-many")
@@ -229,9 +231,9 @@
   nodeAnn_all <- rbind.data.frame(nodeAnn_gene,
                                   nodeAnn_metabolite)
   
-  #============================================================================#
+  #======================================================================#
   # Prepare data for plotting
-  #============================================================================#
+  #======================================================================#
   
   # Add node annotation to the node graphical elements
   colors_df <- dplyr::left_join(nodes_df, nodeAnn_all, by = "GraphId1")
@@ -289,10 +291,11 @@
 #'
 #' @description This function generates a data frame that can be used to map 
 #' colors onto the pathway diagram.
-#' @param nodes_df A data frame with values for coloring added to the nodes.
+#' @param colors_df A data frame with values for coloring added to the nodes.
 #' @param colorList A list with information about the coloring of the nodes.
 #' @param NAvalue Node color for NA color values.
 #' @return A data frame used for mapping colors onto the pathway diagram.
+#' @noRd
 
 .addColor <- function(colors_df, colorList, NAvalue = "#F0F0F0"){
   
@@ -344,14 +347,18 @@
         
         # Set up values
         plot_df_up <- plot_df[plot_df$MapColor >= midvalue,]
-        col_index <- round((plot_df_up$MapColor - midvalue)/(maxvalue - midvalue)*100,0) + 1
+        col_index <- round(
+          (plot_df_up$MapColor - midvalue)/(maxvalue - midvalue)*100,0
+        ) + 1
         col_index[col_index>100] <- 100
         plot_df_up$ColorValue <- pal_up[col_index]
         
         
         # Set down values
         plot_df_down <- plot_df[plot_df$MapColor < midvalue,]
-        col_index <- round((plot_df_down$MapColor - midvalue)/(minvalue - midvalue)*100,0) + 1
+        col_index <- round(
+          (plot_df_down$MapColor - midvalue)/(minvalue - midvalue)*100,0
+        ) + 1
         col_index[col_index>100] <- 100
         plot_df_down$ColorValue <- pal_down[col_index]
         
@@ -379,7 +386,9 @@
         maxvalue <-  as.numeric(colorList[[s]]$ColorVal["MaxVal"])
         
         # Set color values
-        col_index <- round((plot_df$MapColor - minvalue)/(maxvalue - minvalue)*100,0) + 1
+        col_index <- round(
+          (plot_df$MapColor - minvalue)/(maxvalue - minvalue)*100,0
+        ) + 1
         col_index[col_index>100] <- 100
         col_index[col_index<1] <- 1
         plot_df$ColorValue <- pal[col_index]
@@ -412,6 +421,7 @@
 #' @param colors_df A data frame with edge information, as generated by the 
 #' .mapColors() function.
 #' @return A plot with colored nodes.
+#' @noRd
 
 .drawColors <- function(colors_df) {
   
@@ -436,11 +446,12 @@
 #' @param colorList A list with information about the coloring of the nodes. 
 #' An example can be generated using the defaultColorList() function.
 #' @return A legend for the node colors.
+#' @noRd
 
 .makeLegend <- function(colorList){
   nScales <- length(colorList)
   
-  par(mar = c(1,1,1,1))
+  graphics::par(mar = c(1,1,1,1))
   
   # Make empty canvas
   plot(c(0,2),
@@ -472,9 +483,9 @@
       minVal <- colorList[[s]]$ColorVal["MinVal"]
       midVal <- colorList[[s]]$ColorVal["MidVal"]
       maxVal <- colorList[[s]]$ColorVal["MaxVal"]
-      pal <- colorRampPalette(colors = c(colorList[[s]]$Color["MinCol"], 
-                                         colorList[[s]]$Color["MidCol"], 
-                                         colorList[[s]]$Color["MaxCol"]))
+      pal <- grDevices::colorRampPalette(colors = c(colorList[[s]]$Color["MinCol"], 
+                                                    colorList[[s]]$Color["MidCol"], 
+                                                    colorList[[s]]$Color["MaxCol"]))
       
       graphics::text(x = 1.5,
                      y = (s-1)-nScales + 0.5* height,
