@@ -306,8 +306,10 @@
         x_offset <- offset*((x1-x2)/(abs(x1-x2) + abs(y1-y2)))
         y_offset <- offset*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
         
-        temp_main$x[nrow(temp_main)] <- temp_main$x[nrow(temp_main)] + x_offset
-        temp_main$y[nrow(temp_main)] <- temp_main$y[nrow(temp_main)] + y_offset
+        temp_main$x[nrow(temp_main)] <- temp_main$x[nrow(temp_main)] + 
+          x_offset
+        temp_main$y[nrow(temp_main)] <- temp_main$y[nrow(temp_main)] + 
+          y_offset
         
         # Collect plotting information for the arrow head
         temp_end <- data.frame(
@@ -408,8 +410,10 @@
         x_offset <- offset*((x1-x2)/(abs(x1-x2) + abs(y1-y2)))
         y_offset <- offset*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
         
-        temp_main$x[nrow(temp_main)] <- temp_main$x[nrow(temp_main)] + x_offset
-        temp_main$y[nrow(temp_main)] <- temp_main$y[nrow(temp_main)] + y_offset
+        temp_main$x[nrow(temp_main)] <- temp_main$x[nrow(temp_main)] + 
+          x_offset
+        temp_main$y[nrow(temp_main)] <- temp_main$y[nrow(temp_main)] + 
+          y_offset
         
         # Collect plotting information for the arrow head
         temp_end <- data.frame(
@@ -598,7 +602,7 @@
     
     plotDF_temp <- df[df$arrowType == "mim-catalysis",]
     
-    # Get all edge groups. Each edge group corresponds to a single bezier curve
+    # Get all edge groups. Each edge group corresponds to one bezier curve
     groups <- unique(plotDF_temp$group)
     
     # Offset is the distance at which the arrow head should be attached to the
@@ -623,8 +627,10 @@
         x_offset <- offset*((x1-x2)/(abs(x1-x2) + abs(y1-y2)))
         y_offset <- offset*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
         
-        temp_main$x[nrow(temp_main)] <- temp_main$x[nrow(temp_main)] + x_offset
-        temp_main$y[nrow(temp_main)] <- temp_main$y[nrow(temp_main)] + y_offset
+        temp_main$x[nrow(temp_main)] <- temp_main$x[nrow(temp_main)] + 
+          x_offset
+        temp_main$y[nrow(temp_main)] <- temp_main$y[nrow(temp_main)] + 
+          y_offset
         
         # Collect plotting information for the arrow head
         temp_end <- data.frame(
@@ -715,8 +721,10 @@
         x_offset <- offset*((x1-x2)/(abs(x1-x2) + abs(y1-y2)))
         y_offset <- offset*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
         
-        temp_main$x[nrow(temp_main)] <- temp_main$x[nrow(temp_main)] + x_offset
-        temp_main$y[nrow(temp_main)] <- temp_main$y[nrow(temp_main)] + y_offset
+        temp_main$x[nrow(temp_main)] <- temp_main$x[nrow(temp_main)] + 
+          x_offset
+        temp_main$y[nrow(temp_main)] <- temp_main$y[nrow(temp_main)] + 
+          y_offset
         
         # Collect plotting information for the arrow head
         temp_end <- data.frame(
@@ -809,8 +817,10 @@
         x_gap <- gap*((x1-x2)/(abs(x1-x2) + abs(y1-y2)))
         y_gap <- gap*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
         
-        temp_main$x[nrow(temp_main)] <- temp_main$x[nrow(temp_main)] + x_gap
-        temp_main$y[nrow(temp_main)] <- temp_main$y[nrow(temp_main)] + y_gap
+        temp_main$x[nrow(temp_main)] <- temp_main$x[nrow(temp_main)] + 
+          x_gap
+        temp_main$y[nrow(temp_main)] <- temp_main$y[nrow(temp_main)] + 
+          y_gap
       }
       
       if ("first" %in% temp_main$arrowEnd){
@@ -879,8 +889,10 @@
         y_offset <- offset*((y1-y2)/(abs(x1-x2) + abs(y1-y2)))
         
         # Main part of the line
-        temp_main$x[nrow(temp_main)] <- temp_main$x[nrow(temp_main)] + x_offset
-        temp_main$y[nrow(temp_main)] <- temp_main$y[nrow(temp_main)] + y_offset
+        temp_main$x[nrow(temp_main)] <- temp_main$x[nrow(temp_main)] + 
+          x_offset
+        temp_main$y[nrow(temp_main)] <- temp_main$y[nrow(temp_main)] + 
+          y_offset
         
         # Orthogonal part of the line
         rotated_coords <- t(
@@ -965,17 +977,17 @@
                                     lwd = plotDF_main$linewidth[1], 
                                     lty = plotDF_main$linetype[1]))
     graphics::arrows(x0 = plotDF_orth$X1, x1 = plotDF_orth$X2,
-           y0 = -1*plotDF_orth$Y1, y1 = -1*plotDF_orth$Y2, 
-           length = 0, 
-           col = plotDF_orth$Color, 
-           lty = plotDF_orth$LineStyle, 
-           lwd = plotDF_orth$LineThickness)
+                     y0 = -1*plotDF_orth$Y1, y1 = -1*plotDF_orth$Y2, 
+                     length = 0, 
+                     col = plotDF_orth$Color, 
+                     lty = plotDF_orth$LineStyle, 
+                     lwd = plotDF_orth$LineThickness)
     graphics::arrows(x0 = plotDF_diag$X1, x1 = plotDF_diag$X2,
-           y0 = -1*plotDF_diag$Y1, y1 = -1*plotDF_diag$Y2, 
-           length = 0, 
-           col = plotDF_diag$Color, 
-           lty = plotDF_diag$LineStyle, 
-           lwd = plotDF_diag$LineThickness)
+                     y0 = -1*plotDF_diag$Y1, y1 = -1*plotDF_diag$Y2, 
+                     length = 0, 
+                     col = plotDF_diag$Color, 
+                     lty = plotDF_diag$LineStyle, 
+                     lwd = plotDF_diag$LineThickness)
   }
   
   #========================================================================#
@@ -1109,11 +1121,11 @@
                                     lwd = plotDF_main$linewidth[1], 
                                     lty = plotDF_main$linetype[1]))
     graphics::arrows(x0 = plotDF_orth$X1, x1 = plotDF_orth$X2,
-           y0 = -1*plotDF_orth$Y1, y1 = -1*plotDF_orth$Y2, 
-           length = 0, 
-           col = plotDF_orth$Color, 
-           lty = plotDF_orth$LineStyle, 
-           lwd = plotDF_orth$LineThickness)
+                     y0 = -1*plotDF_orth$Y1, y1 = -1*plotDF_orth$Y2, 
+                     length = 0, 
+                     col = plotDF_orth$Color, 
+                     lty = plotDF_orth$LineStyle, 
+                     lwd = plotDF_orth$LineThickness)
     shape::Arrows(x0 = plotDF_end$X1, x1 = plotDF_end$X2,
                   y0 = -1*plotDF_end$Y1, y1 = -1*plotDF_end$Y2, 
                   code = 2, 

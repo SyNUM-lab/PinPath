@@ -23,7 +23,8 @@ knitr::opts_chunk$set(tidy = FALSE,
                       message = FALSE, error = FALSE, warning = TRUE)
 ```
 
-This vignette will cover visualizing differential expression analysis results onto *WikiPathways* pathway diagrams.
+This vignette will cover visualizing differential expression analysis results 
+onto *WikiPathways* pathway diagrams.
 
 # Installation
 First, make sure you have *PinPath* installed.
@@ -35,30 +36,40 @@ library(org.Hs.eg.db)
 
 
 # Dataset
-The example dataset we will use compares the expression of transcripts in lung cancer biopsies versus normal tissue. Differential expression analysis has already been performed, generating log2FCs and p-values for each gene. 
+The example dataset we will use compares the expression of transcripts in 
+lung cancer biopsies versus normal tissue. Differential expression analysis 
+has already been performed, generating log2FCs and p-values for each gene. 
 ```{r, message = FALSE, warning = FALSE}
-lung_expr <- read.csv(system.file("extdata","data-lung-cancer.csv", package="PinPath"), 
+lung_expr <- read.csv(system.file("extdata","data-lung-cancer.csv", 
+                                  package="PinPath"), 
                       stringsAsFactors = FALSE)
 ```
 
-In the pathway, we want to show which gene is significantly differentially expressed. For this, we will use an adjusted p-value cutoff of 0.05.
+In the pathway, we want to show which gene is significantly differentially 
+expressed. For this, we will use an adjusted p-value cutoff of 0.05.
 ```{r, results = 'asis'}
 lung_expr$Significant <- ifelse(lung_expr$adj.P.Value < 0.05, "Yes", "No")
 ```
 
 # Set colors
-After we have loaded and prepared the differential expression analysis statistics, we need to define how to color the statistics in the pathway diagram. In this vignette, we will plot the log2FC and significance of each gene on the pathway diagram. We can start by loading the default color palette.
+After we have loaded and prepared the differential expression analysis 
+statistics, we need to define how to color the statistics in the pathway 
+diagram. In this vignette, we will plot the log2FC and significance of each 
+gene on the pathway diagram. We can start by loading the default color palette.
 ```{r}
 colorList <- PinPath::defaultColorList(lung_expr[,c("log2FC", "Significant")])
 ```
 
-In the next step, we can adjust the default color palette to the desired color values. For instance, we want to display a green color when a gene is differentially expressed  and a white color when it is not.
+In the next step, we can adjust the default color palette to the desired color 
+values. For instance, we want to display a green color when a gene is 
+differentially expressed  and a white color when it is not.
 ```{r}
 colorList[["Significant"]]$Color <- c("Yes" = "green",
                                       "No" = "white")
 ```
 
-Furthermore, we can set the minimum and maximum value  of the log2FC color gradient to -1.5 and 1.5, respectively.
+Furthermore, we can set the minimum and maximum value  of the log2FC color
+gradient to -1.5 and 1.5, respectively.
 ```{r}
 colorList[["log2FC"]]$ColorVal <- c("MinVal" = -1.5,
                                     "MidVal" = 0,
@@ -66,9 +77,10 @@ colorList[["log2FC"]]$ColorVal <- c("MinVal" = -1.5,
 ```
 
 # Plot pathway
-We can now plot the differential expression statistics on the *WP5087: Pleural mesothelioma* pathway.
-If not specified otherwise, the pathway and legend image will be saved in your working directory. 
-The pathway image will be opened by default.
+We can now plot the differential expression statistics on the 
+*WP5087: Pleural mesothelioma* pathway.
+If not specified otherwise, the pathway and legend image will be saved in 
+your working directory. The pathway image will be opened by default.
 ```{r, message = FALSE, warning = FALSE}
 # WP5087: Pleural mesothelioma
 pathway_id <- "WP5087"
@@ -88,10 +100,12 @@ pathVis <- PinPath::drawGPML(
 ```
 
 Pathway image:
-<img src="Pleural_mesothelioma_WP5087_r140461_Homo_sapiens.svg" width="1000">
+<img src="Pleural_mesothelioma_WP5087_r140461_Homo_sapiens.svg" 
+width="1000">
 
 Legend image:
-<img src="legend_Pleural_mesothelioma_WP5087_r140461_Homo_sapiens.svg" width="500">
+<img src="legend_Pleural_mesothelioma_WP5087_r140461_Homo_sapiens.svg" 
+width="500">
 
 # Session info
 

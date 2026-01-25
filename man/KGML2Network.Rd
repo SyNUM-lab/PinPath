@@ -27,11 +27,11 @@ KGML2Network(
 )
 }
 \arguments{
-\item{infile}{Input KGML file. This can be a character string of the KGML file 
-location (e.g., "Downloads/WP42500.KGML").}
+\item{infile}{Input KGML file. This can be a character string of the 
+KGML file location (e.g., "Downloads/WP42500.KGML").}
 
-\item{outdir}{(optional) Output directory. The pathway and legend images will be 
-saved in this directory.}
+\item{outdir}{(optional) Output directory. The pathway and legend images 
+will be saved in this directory.}
 
 \item{outname}{(optional) The file name of the output pathway image. 
 "svg","png",and "pdf" file extensions are accepted. If no file extension is 
@@ -40,49 +40,61 @@ The legend file gets the "legend_" prefix.}
 
 \item{geneIDs}{(optional) \code{character} vector of gene IDs.}
 
-\item{colorVar}{(optional) \code{vector} or \code{data.frame} for coloring the nodes in the pathway. 
-This can be for instance a \code{data.frame} with the log2FCs and significance in the columns.
-The (row) order should match \code{geneIDs}. 
-The color rules and palettes for the supplied values can be set in the colorList parameter.}
+\item{colorVar}{(optional) \code{vector} or \code{data.frame} for coloring 
+the nodes in the pathway. This can be for instance a \code{data.frame} with 
+the log2FCs and significance in the columns. The (row) order should match 
+\code{geneIDs}.  The color rules and palettes for the supplied values can 
+be set in the colorList parameter.}
 
-\item{annGenes}{(optional) \code{character} string of the Bioconductor annotation package (e.g., org.Hs.eg.db).}
+\item{annGenes}{(optional) \code{character} string of the Bioconductor 
+annotation package (e.g., org.Hs.eg.db).}
 
-\item{annMetabolites}{(optional) \code{tibble} or \code{data.frame} with metabolite mapping information (see metaboliteIDmapping package).}
+\item{annMetabolites}{(optional) \code{tibble} or \code{data.frame} with 
+metabolite mapping information (see metaboliteIDmapping package).}
 
-\item{inputDB}{(optional) Input gene ID type (SYMBOL, ENTREZID, ENSEMBL, UNIPROT).
-This can be a \code{character} vector of \code{length = 1} (if all gene IDs are of the same type) 
-or of \code{length = nrow(geneIDs)} (if you want to specify the type per gene ID).}
+\item{inputDB}{(optional) Input gene ID type 
+(SYMBOL, ENTREZID, ENSEMBL, UNIPROT). This can be a \code{character} 
+vector of \code{length = 1} (if all gene IDs are of the same type) or of 
+\code{length = nrow(geneIDs)} (if you want to specify the type per gene ID).}
 
-\item{colorNames}{(optional) \code{character} vector with names of the color variables. 
-If \code{colorNames} is NULL, the column names of the \code{colorVar} \code{data.frame} will be used.}
+\item{colorNames}{(optional) \code{character} vector with names of the 
+color variables. If \code{colorNames} is NULL, the column names of the 
+\code{colorVar} \code{data.frame} will be used.}
 
-\item{colorList}{(optional) A list with information about the coloring of the nodes.
-An example can be generated using the \link{defaultColorList} function.}
+\item{colorList}{(optional) A list with information about the coloring of 
+the nodes. An example can be generated using the \link{defaultColorList} 
+function.}
 
 \item{NAvalue}{(optional) Node color for \code{NA} values.}
 
 \item{layout}{(optional) Network layout from igraph.}
 
-\item{unconnectedNodes}{(optional) Logical (TRUE or FALSE). Should unconnected (isolated) nodes be shown in the network?}
+\item{unconnectedNodes}{(optional) Logical (TRUE or FALSE). 
+Should unconnected (isolated) nodes be shown in the network?}
 
 \item{alpha}{(optional) Transparency of the nodes.}
 
 \item{nodeSize}{(optional) Size of the nodes.}
 
-\item{legend}{(optional) Logical (TRUE or FALSE). Should the legend be plotted?}
+\item{legend}{(optional) Logical (TRUE or FALSE). 
+Should the legend be plotted?}
 
-\item{nodeTable}{(optional) Logical (TRUE or FALSE). Should a node table be returned?}
+\item{nodeTable}{(optional) Logical (TRUE or FALSE). 
+Should a node table be returned?}
 
-\item{pathInfo}{(optional) Logical (TRUE or FALSE). Should pathway information be returned?}
+\item{pathInfo}{(optional) Logical (TRUE or FALSE). 
+Should pathway information be returned?}
 
-\item{openFile}{(optional) Logical (TRUE or FALSE). Should the pathway file be opened after it has been saved?}
+\item{openFile}{(optional) Logical (TRUE or FALSE). 
+Should the pathway file be opened after it has been saved?}
 }
 \value{
-A \code{list} with the node table and the file location of the pathway and legend image.
+A \code{list} with the node table and the file location of the 
+pathway and legend image.
 }
 \description{
-This function draws a pathway from a KGML file with the option to map, e.g.,
-             expression data onto the pathway diagram.
+This function draws a pathway from a KGML file with the option 
+to map, e.g., expression data onto the pathway diagram.
 }
 \examples{
 
@@ -95,7 +107,8 @@ This function draws a pathway from a KGML file with the option to map, e.g.,
  # Select pathway
  pathway_id <- "hsa05223"
  bfc <- BiocFileCache::BiocFileCache()
- infile <- BiocFileCache::bfcrpath(bfc, paste0("https://rest.kegg.jp/get/",pathway_id,"/kgml"))
+ infile <- BiocFileCache::bfcrpath(bfc, 
+ paste0("https://rest.kegg.jp/get/",pathway_id,"/kgml"))
 
  # Draw pathway
  pathVis <- PinPath::KGML2Network(

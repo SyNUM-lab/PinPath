@@ -3,7 +3,8 @@
 #'
 #' @description This function makes a data frame for plotting groups.
 #' @param dataGroups A GPML list filtered for groups.
-#' @param nodes_df_groups A data frame with information about the nodes of the group.
+#' @param nodes_df_groups A data frame with information about the nodes of 
+#' the group.
 #' @return A data frame for plotting groups.
 #' @importFrom magrittr `%>%`
 #' @importFrom rlang .data

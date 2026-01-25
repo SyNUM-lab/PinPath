@@ -24,11 +24,11 @@ drawGPML(
 }
 \arguments{
 \item{infile}{Input GPML file. This can be a character string of the 
-GPML file location (e.g., "Downloads/WP42500.gpml") or a GPML string provided 
-by [rWikiPathways::getPathway].}
+GPML file location (e.g., "Downloads/WP42500.gpml") or a GPML string 
+provided by [rWikiPathways::getPathway].}
 
-\item{outdir}{(optional) Output directory. The pathway and legend images will 
-be saved in this directory.}
+\item{outdir}{(optional) Output directory. The pathway and legend images 
+will be saved in this directory.}
 
 \item{outname}{(optional) The file name of the output pathway image. 
 "svg","png",and "pdf" file extensions are accepted. If no file extension is 

@@ -22,7 +22,13 @@
   })
   
   # Prepare data frame
-  edges_df <- do.call(rbind, lapply(dataEdges, function(x) .edgeFUN(x, dataEdges_all, anchorIds)))
+  edges_df <- do.call(rbind, 
+                      lapply(dataEdges, 
+                             function(x){
+                               .edgeFUN(x, dataEdges_all, anchorIds)
+                             }
+                      )
+  )
   
   # Relative X and Y positions should be either 0 or 1
   # edges_df$Xrel1 <- sign(edges_df$Xrel1)*round(abs(edges_df$Xrel1)-0.01)
@@ -111,9 +117,9 @@
   # 1) Elbow edges that follow the default path.
   # 2) Elbow edges that follow a custom path set by the GPML creator.
   
-  #==========================================================================#
+  #======================================================================#
   # Custom elbow edges
-  #==========================================================================#
+  #======================================================================#
   # When there are more than two coordinates for an edge, we know it is a 
   # custom elbow edge
   if (sum(names(dataEdges$Graphics) == "Point") > 2){
@@ -275,7 +281,8 @@
           Force = TRUE
         )
         
-        # Combine data from the starting (temp_edges1) and ending point (temp_edges2) 
+        # Combine data from the starting (temp_edges1) 
+        # and ending point (temp_edges2) 
         temp_edges <- cbind.data.frame(temp_edges1, temp_edges2)
       }
       
@@ -363,8 +370,8 @@
     edges_df$Yrel1 <- sign(edges_df$Yrel1)*round(abs(edges_df$Yrel1)-0.01)
     edges_df$Yrel2 <- sign(edges_df$Yrel2)*round(abs(edges_df$Yrel2)-0.01)
     
-    # If the relative position of starting X (Xrel1) and Y (Yrel1) is both zero
-    # the edge is probably attached to another edge.
+    # If the relative position of starting X (Xrel1) and Y (Yrel1) are
+    # both zero the edge is probably attached to another edge.
     # So, we need to determine the relative X and Y position from 
     # the attached edge
     if ((edges_df$Xrel1 == 0) & (edges_df$Yrel1 == 0)){
@@ -655,8 +662,8 @@
     y1 <- plotDF_temp$Y1
     y2 <- plotDF_temp$Y2
     
-    # Offset is the distance at which the arrow head should be attached to the
-    # main body of the arrow
+    # Offset is the distance at which the arrow head should be attached to 
+    # the main body of the arrow
     offset <- 5
     
     plotDF <- NULL
@@ -936,8 +943,8 @@
     y1 <- plotDF_temp$Y1
     y2 <- plotDF_temp$Y2
     
-    # Offset is the distance at which the arrow head should be attached to the
-    # main body of the arrow
+    # Offset is the distance at which the arrow head should be attached to 
+    # the main body of the arrow
     offset <- 5
     
     plotDF <- NULL
@@ -1017,8 +1024,8 @@
     y1 <- plotDF_temp$Y1
     y2 <- plotDF_temp$Y2
     
-    # Offset is the distance at which the arrow head should be attached to the
-    # main body of the arrow
+    # Offset is the distance at which the arrow head should be attached to 
+    # the main body of the arrow
     offset <- 5
     
     plotDF <- NULL

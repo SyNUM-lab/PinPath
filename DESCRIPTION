@@ -1,6 +1,6 @@
 Package: PinPath
 Type: Package
-Title: PinPath - R package for pathway visualization
+Title: PinPath - R Package for Pathway Visualization
 Version: 0.1.0
 Date: 2026-01-20
 Authors@R: c(person("Jarno", "Koetsier", role = c("aut","cre"),
@@ -12,8 +12,6 @@ Authors@R: c(person("Jarno", "Koetsier", role = c("aut","cre"),
                      comment = c(ORCID = "0000-0001-7542-0286")),
              person("Stichting Terre - The Dutch Rett Syndrome Foundation", role="fnd")
            )
-Author: Jarno Koetsier <jarno.koetsier@maastrichtuniversity.nl>
-Maintainer: Jarno Koetsier <jarno.koetsier@maastrichtuniversity.nl>
 Imports: 
     grDevices, 
     graphics, 
@@ -43,9 +41,10 @@ Suggests:
     knitr,
     rmarkdown,
     rWikiPathways,
-    org.Hs.eg.db
+    org.Hs.eg.db,
+    metaboliteIDmapping
 Depends:
-    R (>= 4.1.0)
+    R (>= 4.5.0)
 Encoding: UTF-8
 Description: Visualize of omics data onto pathways from WikiPathways and KEGG.
 License: MIT + file LICENSE

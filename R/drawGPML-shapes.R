@@ -28,26 +28,56 @@
                Width = as.numeric(dataShapes$Graphics["Width"]),
                Height = as.numeric(dataShapes$Graphics["Height"]),
                ZOrder = as.numeric(dataShapes$Graphics["ZOrder"]),
-               FillColor = as.character(ifelse(is.na(dataShapes$Graphics["FillColor"]),
-                                               "white", paste0("#",dataShapes$Graphics["FillColor"]))),
-               Alpha = as.numeric(ifelse(is.na(dataShapes$Graphics["FillColor"]),
-                                         0, 1)),
-               Color = as.character(ifelse(is.na(dataShapes$Graphics["Color"]),
-                                           "#000000", paste0("#",dataShapes$Graphics["Color"]))),
-               Label = as.character(stringr::str_remove_all(dataShapes$.attrs["TextLabel"],"\\n+$")),
-               FontWeight = tolower(as.character(dataShapes$Graphics["FontWeight"])),
-               FontStyle = tolower(as.character(dataShapes$Graphics["FontStyle"])),
-               Valign = ifelse(as.character(dataShapes$Graphics["Valign"]) == "Middle", 0.5,
-                               ifelse(as.character(dataShapes$Graphics["Valign"]) == "Top", 1,0)), 
-               Align = ifelse(as.character(dataShapes$Graphics["Align"]) == "Middle", 0.5,
-                              ifelse(as.character(dataShapes$Graphics["Align"]) == "Top", 1,0)), 
+               FillColor = as.character(ifelse(
+                 is.na(dataShapes$Graphics["FillColor"]),
+                 "white", 
+                 paste0("#",dataShapes$Graphics["FillColor"])
+               )),
+               Alpha = as.numeric(ifelse(
+                 is.na(dataShapes$Graphics["FillColor"]),
+                 0, 1)),
+               Color = as.character(ifelse(
+                 is.na(dataShapes$Graphics["Color"]),
+                 "#000000", 
+                 paste0("#",dataShapes$Graphics["Color"])
+               )),
+               Label = as.character(
+                 stringr::str_remove_all(dataShapes$.attrs["TextLabel"],
+                                         "\\n+$")
+               ),
+               FontWeight = tolower(
+                 as.character(dataShapes$Graphics["FontWeight"])),
+               FontStyle = tolower(
+                 as.character(dataShapes$Graphics["FontStyle"])),
+               Valign = ifelse(
+                 as.character(dataShapes$Graphics["Valign"]) == "Middle", 
+                 0.5,
+                 ifelse(as.character(dataShapes$Graphics["Valign"]) == "Top", 
+                        1,0)
+               ), 
+               Align = ifelse(
+                 as.character(dataShapes$Graphics["Align"]) == "Middle", 
+                 0.5,
+                 ifelse(as.character(dataShapes$Graphics["Align"]) == "Top", 
+                        1,0)
+               ), 
                ShapeType = as.character(dataShapes$Graphics["ShapeType"]), 
                Rotation = as.numeric(dataShapes$Graphics["Rotation"]),
-               LineThickness = as.numeric(ifelse(is.na(dataShapes$Graphics["LineThickness"]),
-                                                 1, dataShapes$Graphics["LineThickness"]))/2,
-               LineStyle = as.character(ifelse(is.na(dataShapes$Graphics["LineStyle"]),
-                                               "solid", tolower(dataShapes$Graphics["LineStyle"]))),
-               nLine = ifelse(sum(stringr::str_detect(unlist(dataShapes[which(names(dataShapes) == "Attribute")]), "Double")) == 0, "Single", "Double"),
+               LineThickness = as.numeric(ifelse(
+                 is.na(dataShapes$Graphics["LineThickness"]),
+                 1, 
+                 dataShapes$Graphics["LineThickness"]
+               ))/2,
+               LineStyle = as.character(ifelse(
+                 is.na(dataShapes$Graphics["LineStyle"]),
+                 "solid", 
+                 tolower(dataShapes$Graphics["LineStyle"])
+               )),
+               nLine = ifelse(
+                 sum(stringr::str_detect(
+                   unlist(dataShapes[which(names(dataShapes) == "Attribute")]), 
+                   "Double")) == 0, 
+                 "Single", "Double"),
                GraphId = as.character(dataShapes$.attrs["GraphId"])
     )
   }
@@ -55,18 +85,29 @@
   
   # Change font face
   shapes_df$FontFace <- "plain"
-  shapes_df$FontFace[(!is.na(shapes_df$FontWeight) & is.na(shapes_df$FontStyle))] <- shapes_df$FontWeight[(!is.na(shapes_df$FontWeight) & is.na(shapes_df$FontStyle))]
-  shapes_df$FontFace[(is.na(shapes_df$FontWeight) & !is.na(shapes_df$FontStyle))] <- shapes_df$FontStyle[(is.na(shapes_df$FontWeight) & !is.na(shapes_df$FontStyle))]
-  shapes_df$FontFace[((shapes_df$FontWeight == "bold") & (shapes_df$FontStyle == "italic")) |
-                       ((shapes_df$FontWeight == "italic") & (shapes_df$FontStyle == "bold"))] <- "bold.italic"
+  shapes_df$FontFace[
+    (!is.na(shapes_df$FontWeight) & 
+       is.na(shapes_df$FontStyle))] <- shapes_df$FontWeight[
+         (!is.na(shapes_df$FontWeight) & is.na(shapes_df$FontStyle))]
+  shapes_df$FontFace[
+    (is.na(shapes_df$FontWeight) & 
+       !is.na(shapes_df$FontStyle))] <- shapes_df$FontStyle[
+         (is.na(shapes_df$FontWeight) & !is.na(shapes_df$FontStyle))]
+  shapes_df$FontFace[
+    ((shapes_df$FontWeight == "bold") & 
+       (shapes_df$FontStyle == "italic")) |
+      ((shapes_df$FontWeight == "italic") & 
+         (shapes_df$FontStyle == "bold"))] <- "bold.italic"
   
   
   # Change line style
   shapes_df$LineStyle <- ifelse(shapes_df$LineStyle == "broken",
                                 "dashed", "solid")
   
-  #shapes_df$Text <- iconv(shapes_df$Text, from = 'UTF-8', to = 'ASCII//TRANSLIT')
-  #shapes_df$Text[(grepl("[^ -~]", shapes_df$Text)) & (!grepl("\\n", shapes_df$Text))] <- NA
+  #shapes_df$Text <- iconv(shapes_df$Text, from = 'UTF-8', 
+  #to = 'ASCII//TRANSLIT')
+  #shapes_df$Text[(grepl("[^ -~]", shapes_df$Text)) & 
+  # (!grepl("\\n", shapes_df$Text))] <- NA
   return(shapes_df)
 }
 
@@ -75,17 +116,19 @@
 #' @title Draw shapes
 #'
 #' @description This function adds shapes to the pathway image.
-#' @param shapes_df A data frame with shape information, as generated by the .prepareShapes() function.
+#' @param shapes_df A data frame with shape information, as generated 
+#' by the .prepareShapes() function.
 #' @return A plot with shapes.
 #' @noRd
 
 .drawShapes <- function(shapes_df){
   
   # Filter for non-cell components
-  shapes_df <- shapes_df[!(shapes_df$ShapeType %in% c("Mitochondria",
-                                                      "Sarcoplasmic Reticulum",
-                                                      "Endoplasmic Reticulum",
-                                                      "Golgi Apparatus")),]
+  shapes_df <- shapes_df[!(shapes_df$ShapeType %in% 
+                             c("Mitochondria",
+                               "Sarcoplasmic Reticulum",
+                               "Endoplasmic Reticulum",
+                               "Golgi Apparatus")),]
   shapes_df$Rotation[is.na(shapes_df$Rotation)] <- 0
   polygon_df_plot <- NULL
   line_df_plot <- NULL
@@ -109,9 +152,9 @@
     valign <- shapes_df$Valign[i]
     align <- shapes_df$Align[i]
     
-    #==========================================================================#
+    #======================================================================#
     # Prepare polygons
-    #==========================================================================#
+    #======================================================================#
     if (type %in% c("Triangle", "RoundedRectangle", "Rectangle",
                     "Pentagon", "Hexagon", "Oval", "mim-degradation")){
       n_corners <- NULL
@@ -165,7 +208,8 @@
       if (!is.null(n_corners)){
         
         # Create angle offsets (no rotation yet)
-        angle <- seq(0, max_angle, length.out = n_corners + 1)[-1]  # remove duplicate 2pi
+        angle <- seq(0, max_angle, 
+                     length.out = n_corners + 1)[-1]  # remove duplicate 2pi
         x <- rep(NA, n_corners)
         y <- rep(NA, n_corners)
         corner_coords <- matrix(NA, nrow = n_corners, ncol = 2)
@@ -231,9 +275,9 @@
       
     }
     
-    #==========================================================================#
+    #======================================================================#
     # Prepare lines
-    #==========================================================================#
+    #======================================================================#
     if (type %in% c("mim-degradation", "Arc")){
       
       if (type == "mim-degradation"){
@@ -244,7 +288,8 @@
         
         # Apply rotation matrix
         rot_mat <- .rotation_matrix(-1*rotation)
-        rotated_coords <- t(rot_mat %*% t(matrix(c(xstart,xend,ystart,yend), nrow = 2)))
+        rotated_coords <- t(rot_mat %*% t(matrix(c(xstart,xend,ystart,yend), 
+                                                 nrow = 2)))
         
         # Translate to center
         x <- rotated_coords[,1] + centerX
@@ -275,7 +320,8 @@
         adj <- 1
         
         # Create angle offsets (no rotation yet)
-        angle <- seq(0, max_angle, length.out = n_corners + 1)[-1]  # remove duplicate 2pi
+        angle <- seq(0, max_angle, 
+                     length.out = n_corners + 1)[-1]  # remove duplicate 2pi
         x <- rep(NA, n_corners)
         y <- rep(NA, n_corners)
         corner_coords <- matrix(NA, nrow = n_corners, ncol = 2)
@@ -314,32 +360,35 @@
   }
   
   
-  #==========================================================================#
+  #======================================================================#
   # Plot Shapes
-  #==========================================================================#
+  #======================================================================#
   
   # Plot polygons
   if (length(polygon_df_plot) > 0){
     
     for (id in unique(polygon_df_plot$id)){
       polygon_df_plot1 <- polygon_df_plot[polygon_df_plot$id == id,]
-      graphics::polygon(x = polygon_df_plot1$x,
-                        y = -1 *polygon_df_plot1$y,
-                        col = grDevices::adjustcolor(polygon_df_plot1$FillColor[1], alpha.f = polygon_df_plot1$Alpha[1]),
-                        border = polygon_df_plot1$EdgeColor[1],
-                        lwd = polygon_df_plot1$LineThickness[1],
-                        lty =  polygon_df_plot1$LineStyle[1])
+      graphics::polygon(
+        x = polygon_df_plot1$x,
+        y = -1 *polygon_df_plot1$y,
+        col = grDevices::adjustcolor(polygon_df_plot1$FillColor[1], 
+                                     alpha.f = polygon_df_plot1$Alpha[1]),
+        border = polygon_df_plot1$EdgeColor[1],
+        lwd = polygon_df_plot1$LineThickness[1],
+        lty =  polygon_df_plot1$LineStyle[1])
     }
     
   }
   
   # Plot lines
   if  (length(line_df_plot) > 0){
-    graphics::arrows(x0 = line_df_plot$x1, x1 = line_df_plot$x2,
-                     y0 = -1*line_df_plot$y1, y1 = -1*line_df_plot$y2,
-                     lty = line_df_plot$LineStyle, code = 0,
-                     col = line_df_plot$EdgeColor,
-                     lwd = line_df_plot$LineThickness)
+    graphics::arrows(
+      x0 = line_df_plot$x1, x1 = line_df_plot$x2,
+      y0 = -1*line_df_plot$y1, y1 = -1*line_df_plot$y2,
+      lty = line_df_plot$LineStyle, code = 0,
+      col = line_df_plot$EdgeColor,
+      lwd = line_df_plot$LineThickness)
   }
   
   # Plot text labels
@@ -369,14 +418,17 @@
     labels_df$FontFace[labels_df$FontFace == "italic"] <- 3
     labels_df$FontFace[labels_df$FontFace== "bold.italic"] <- 4
     
-    graphics::text(x = labels_df$CenterX+(labels_df$Align-0.5)*labels_df$Width+(0.5-labels_df$Align)*x_offset,
-                   y = -1*(labels_df$CenterY-(labels_df$Valign-0.5)*labels_df$Height-(0.5-labels_df$Valign)*y_offset),
-                   adj = c(labels_df$Align, labels_df$Valign),
-                   labels = labels_df$Label,
-                   cex = labels_df$FontSize/12.5,
-                   col = labels_df$Color,
-                   #pos = position,
-                   font = as.numeric(labels_df$FontFace))
+    graphics::text(
+      x = labels_df$CenterX+(labels_df$Align-0.5)*
+        labels_df$Width+(0.5-labels_df$Align)*x_offset,
+      y = -1*(labels_df$CenterY-(labels_df$Valign-0.5)*
+                labels_df$Height-(0.5-labels_df$Valign)*y_offset),
+      adj = c(labels_df$Align, labels_df$Valign),
+      labels = labels_df$Label,
+      cex = labels_df$FontSize/12.5,
+      col = labels_df$Color,
+      #pos = position,
+      font = as.numeric(labels_df$FontFace))
   }
 }
 
@@ -385,7 +437,8 @@
 #' @title Draw braces
 #'
 #' @description This function adds braces to the pathway image.
-#' @param braces_df A data frame with shape information, as generated by the .prepareShapes() function.
+#' @param braces_df A data frame with shape information, 
+#' as generated by the .prepareShapes() function.
 #' @return A plot with braces.
 #' @importFrom rlang .data
 #' @noRd
@@ -417,17 +470,22 @@
     # Function to create a circle (of which only quarters will be used later)
     circle <- function(x, y){
       positions <- seq(0, 2*pi, length.out=npoints)
-      return( data.frame(x = x + xradius * cos(positions), y = y + yradius * sin(positions)) )
+      return( data.frame(x = x + xradius * cos(positions), 
+                         y = y + yradius * sin(positions)) )
     }
     
     # Create brace data points by calculating 4 quarter circles
     rounds <- list(
       data.frame(x=xstart,y=ystart),
-      leftQuartercircle = circle(xstart+xradius, ystart)[seq(npoints/4+1, npoints/2),],
-      leftmidQuartercircle = circle(xmid-xradius, yend)[seq(npoints/4*3+1, npoints),],
+      leftQuartercircle = circle(xstart+xradius, 
+                                 ystart)[seq(npoints/4+1, npoints/2),],
+      leftmidQuartercircle = circle(xmid-xradius, 
+                                    yend)[seq(npoints/4*3+1, npoints),],
       data.frame(x=xmid,y=yend),
-      rightmidQuartercircle = circle(xmid+xradius, yend)[seq(npoints/2+1, npoints/4*3),],
-      rightQuartercircle = circle(xend-xradius, ystart)[seq(1,npoints/4),],
+      rightmidQuartercircle = circle(xmid+xradius, 
+                                     yend)[seq(npoints/2+1, npoints/4*3),],
+      rightQuartercircle = circle(xend-xradius, 
+                                  ystart)[seq(1,npoints/4),],
       data.frame(x=xend,y=ystart)
     )
     
@@ -462,17 +520,19 @@
 #' @title Draw cell components
 #'
 #' @description This function adds cell components to the pathway image.
-#' @param shapes_df A data frame with shape information, as generated by the .prepareShapes() function.
+#' @param shapes_df A data frame with shape information, 
+#' as generated by the .prepareShapes() function.
 #' @return A plot with cell components.
 #' @noRd
 
 .drawCellComponents <- function(shapes_df){
   
   # Filter for cell components
-  shapes_df <- shapes_df[shapes_df$ShapeType %in% c("Mitochondria",
-                                                    "Sarcoplasmic Reticulum",
-                                                    "Endoplasmic Reticulum",
-                                                    "Golgi Apparatus"),]
+  shapes_df <- shapes_df[shapes_df$ShapeType %in% 
+                           c("Mitochondria",
+                             "Sarcoplasmic Reticulum",
+                             "Endoplasmic Reticulum",
+                             "Golgi Apparatus"),]
   
   # Plot component by component
   for (i in seq_len(nrow(shapes_df))){
@@ -500,8 +560,9 @@
       ymin <- centerY - 0.5*newHeight
       ymax <- centerY + 0.5*newHeight
       
-      img <- magick::image_read(system.file("pathwayElements","Mitochondria.png", package="rWikiPathways"))
-      #img <- magick::image_read("C:/Users/jarno/GitHub/ShinyPath/rWikiPathways-devel/inst/pathwayElements/Mitochondria.png")
+      img <- magick::image_read(system.file("pathwayElements",
+                                            "Mitochondria.png", 
+                                            package="rWikiPathways"))
       img <- magick::image_rotate(img, (rotation*180)/pi)
       img <-  magick::image_transparent(img, color = "white")
       graphics::rasterImage(img, xmin, -ymax, xmax, -ymin)
@@ -518,8 +579,9 @@
       ymin <- centerY - 0.5*newHeight
       ymax <- centerY + 0.5*newHeight
       
-      img <- magick::image_read(system.file("pathwayElements","SR.png", package="rWikiPathways"))
-      #img <- magick::image_read("C:/Users/jarno/GitHub/ShinyPath/rWikiPathways-devel/inst/pathwayElements/SR.png")
+      img <- magick::image_read(system.file("pathwayElements",
+                                            "SR.png", 
+                                            package="rWikiPathways"))
       img <- magick::image_rotate(img, (rotation*180)/pi)
       img <-  magick::image_transparent(img, color = "white")
       graphics::rasterImage(img, xmin, -ymax, xmax, -ymin)
@@ -534,8 +596,9 @@
       ymin <- centerY - 0.5*newHeight
       ymax <- centerY + 0.5*newHeight
       
-      img <- magick::image_read(system.file("pathwayElements","ER.png", package="rWikiPathways"))
-      #img <- magick::image_read("C:/Users/jarno/GitHub/ShinyPath/rWikiPathways-devel/inst/pathwayElements/ER.png")
+      img <- magick::image_read(system.file("pathwayElements",
+                                            "ER.png", 
+                                            package="rWikiPathways"))
       img <- magick::image_rotate(img, (rotation*180)/pi)
       img <-  magick::image_transparent(img, color = "white")
       graphics::rasterImage(img, xmin, -ymax, xmax, -ymin)
@@ -551,8 +614,9 @@
       ymin <- centerY - 0.5*newHeight
       ymax <- centerY + 0.5*newHeight
       
-      img <- magick::image_read(system.file("pathwayElements","Golgi.png", package="rWikiPathways"))
-      #img <- magick::image_read("C:/Users/jarno/GitHub/ShinyPath/rWikiPathways-devel/inst/pathwayElements/Golgi.png")
+      img <- magick::image_read(system.file("pathwayElements",
+                                            "Golgi.png", 
+                                            package="rWikiPathways"))
       img <- magick::image_rotate(img, (rotation*180)/pi)
       img <-  magick::image_transparent(img, color = "white")
       graphics::rasterImage(img, xmin, -ymax, xmax, -ymin)

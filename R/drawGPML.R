@@ -5,10 +5,10 @@
 #' to map, e.g., expression data onto the pathway diagram.
 #'
 #' @param infile Input GPML file. This can be a character string of the 
-#' GPML file location (e.g., "Downloads/WP42500.gpml") or a GPML string provided 
-#' by [rWikiPathways::getPathway].
-#' @param outdir (optional) Output directory. The pathway and legend images will 
-#' be saved in this directory.
+#' GPML file location (e.g., "Downloads/WP42500.gpml") or a GPML string 
+#' provided by [rWikiPathways::getPathway].
+#' @param outdir (optional) Output directory. The pathway and legend images 
+#' will be saved in this directory.
 #' @param outname (optional) The file name of the output pathway image. 
 #' "svg","png",and "pdf" file extensions are accepted. If no file extension is 
 #' specified, the pathway and legend image will be generated in .svg format.
@@ -542,9 +542,9 @@ drawGPML <- function(infile,
     shell(outfile)
   }
   
-  #==============================================================================#
+  #======================================================================#
   # Make and export legend
-  #==============================================================================#
+  #======================================================================#
   
   if (legend & !is.null(colors_df_all)){
     
@@ -602,7 +602,10 @@ drawGPML <- function(infile,
                                           "ScaleName", 
                                           "MapColor")])
     
-    colnames(outputTable) <- c("Node Label", "ID", "Scale Name", "Scale Value")
+    colnames(outputTable) <- c("Node Label", 
+                               "ID", 
+                               "Scale Name", 
+                               "Scale Value")
     outputTable <- outputTable |>
       tidyr::pivot_wider(
         names_from = "Scale Name",
@@ -615,9 +618,9 @@ drawGPML <- function(infile,
     outputList[["NodeTable"]] <- NA
   }
   
-  #==============================================================================#
+  #======================================================================#
   # Return pathway information
-  #==============================================================================#
+  #======================================================================#
   
   if (pathInfo){
     outputList[["Information"]] <- c(

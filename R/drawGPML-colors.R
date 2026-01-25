@@ -39,7 +39,8 @@
   #======================================================================#
   
   geneDBs <- c("Ensembl", "Entrez Gene", "Uniprot-TrEMBL", "HGNC")
-  geneDBs_name <- AnnotationDbi::columns(get(annGenes, envir = asNamespace(annGenes)))
+  geneDBs_name <- AnnotationDbi::columns(get(annGenes, 
+                                             envir = asNamespace(annGenes)))
   
   # Filter geneIDs
   geneIDs_fil <- geneIDs_nodes[geneIDs_nodes$Database %in% geneDBs,]
@@ -99,10 +100,11 @@
         temp <- tryCatch({
           temp <- geneIDs_fil[geneIDs_fil$Database == keytype, ]
           ann <- suppressMessages(
-            AnnotationDbi::select(BiocGenerics::get(annGenes, envir = asNamespace(annGenes)), 
-                                  columns = c(keytype, db), 
-                                  keys = temp$ID,
-                                  keytype = keytype))
+            AnnotationDbi::select(BiocGenerics::get(
+              annGenes, envir = asNamespace(annGenes)), 
+              columns = c(keytype, db), 
+              keys = temp$ID,
+              keytype = keytype))
           temp <- dplyr::left_join(temp, ann, by = c("ID" = keytype),
                                    relationship = "many-to-many")
           colnames(temp) <- c("Database", "ID", "GraphId1", "InputId")
@@ -250,10 +252,12 @@
                      colors_df$GraphId1[colors_df$GraphId1 %in% nonNA_nodes])
   
   # Node-id combinations with NA values
-  NAids <- node_ids[is.na(colors_df$MapColor[colors_df$GraphId1 %in% nonNA_nodes])]
+  NAids <- node_ids[
+    is.na(colors_df$MapColor[colors_df$GraphId1 %in% nonNA_nodes])]
   
   # Node-id combinations with non-NA values
-  nonNAids <- node_ids[!is.na(colors_df$MapColor[colors_df$GraphId1 %in% nonNA_nodes])]
+  nonNAids <- node_ids[
+    !is.na(colors_df$MapColor[colors_df$GraphId1 %in% nonNA_nodes])]
   
   # Remove Node-Ids with only NA values
   rmIds <- setdiff(NAids, nonNAids)
@@ -267,7 +271,8 @@
     for (d in seq_along(dupIds)){
       temp <- colors_df[colors_df$GraphId1 == dupIds[d],]
       newWidth <- temp$Width/nrow(temp)
-      newCenterX <- temp$CenterX - (0.5*(nrow(temp)-1))*newWidth + (0.5+seq(0,nrow(temp)-1,1)*newWidth)
+      newCenterX <- temp$CenterX - (0.5*(nrow(temp)-1))*newWidth + 
+        (0.5+seq(0,nrow(temp)-1,1)*newWidth)
       
       colors_df$Width[colors_df$GraphId1 == dupIds[d]] <- newWidth
       colors_df$CenterX[colors_df$GraphId1 == dupIds[d]] <- newCenterX
@@ -483,9 +488,10 @@
       minVal <- colorList[[s]]$ColorVal["MinVal"]
       midVal <- colorList[[s]]$ColorVal["MidVal"]
       maxVal <- colorList[[s]]$ColorVal["MaxVal"]
-      pal <- grDevices::colorRampPalette(colors = c(colorList[[s]]$Color["MinCol"], 
-                                                    colorList[[s]]$Color["MidCol"], 
-                                                    colorList[[s]]$Color["MaxCol"]))
+      pal <- grDevices::colorRampPalette(
+        colors = c(colorList[[s]]$Color["MinCol"], 
+                   colorList[[s]]$Color["MidCol"], 
+                   colorList[[s]]$Color["MaxCol"]))
       
       graphics::text(x = 1.5,
                      y = (s-1)-nScales + 0.5* height,

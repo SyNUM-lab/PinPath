@@ -6,8 +6,8 @@
 #' Should the app be opened the the browser?.
 #' @return This function will run the PinPath shiny app
 #' @examples 
-#' \dontrun{
-#' runPinPath()
+#' if (interactive()){
+#' #PinPath::runPinPath()
 #' }
 #' @export
 runPinPath <- function(force.browser = FALSE){

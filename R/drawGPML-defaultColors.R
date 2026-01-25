@@ -50,8 +50,8 @@ defaultColorList <- function(ColorVar, ColorNames = NULL){
       if ((min(ColorVar[,c], na.rm = TRUE) < 0) & 
           (max(ColorVar[,c], na.rm = TRUE) > 0)){
         
-        # Since we want to color scale to be symmetric, we set the absolute min 
-        # and max value to the same max absolute value
+        # Since we want to color scale to be symmetric, we set the absolute 
+        # min and max value to the same max absolute value
         max_absolute_value <- max(
           abs(as.numeric(stats::quantile(ColorVar[,c], 0.9, na.rm = TRUE))),
           abs(as.numeric(stats::quantile(ColorVar[,c], 0.1, na.rm = TRUE)))

@@ -17,5 +17,7 @@ This function will run the PinPath shiny app
 This function runs the PinPath shiny app.
 }
 \examples{
-runPinPath()
+if (interactive()){
+#PinPath::runPinPath()
+}
 }
