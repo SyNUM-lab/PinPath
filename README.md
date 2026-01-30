@@ -1,5 +1,4 @@
-# PinPath
-![PinPath](/docs/assets/img/logo.png)
+![PinPath](/docs/assets/img/logo_grey.png)
 
 PinPath is an R package for visualizing (omics) data onto pathway diagrams, and **pinpoint** where in the pathway the relevant changes occur.
 Results from (epi)genomics, transcriptomics, (phospho)proteomics, metabolomics and many more experiments can be visualized onto pathway diagrams from KEGG and WikiPathways. 
@@ -42,14 +41,14 @@ infile <- rWikiPathways::getPathway("WP4255")
 
 # Draw pathway
 pathVis <- PinPath::drawGPML(
-           infile = infile,
-           outdir = tempdir(),
-           annGenes = "org.Hs.eg.db",
-           inputDB = "ENSEMBL",
-           geneIDs = lung_expr$GeneID,
-           colorVar = lung_expr[,"log2FC"],
-           nodeTable = TRUE,
-           legend = TRUE) 
+  infile = infile,
+  annGenes = "org.Hs.eg.db",
+  inputDB = "ENSEMBL",
+  geneIDs = lung_expr$GeneID,
+  colorVar = lung_expr[,"log2FC"],
+  colorNames = "logFC",
+  nodeTable = TRUE,
+  legend = TRUE) 
 ```
 
 ![Pathway](/docs/assets/img/pathways/Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg)
@@ -57,14 +56,17 @@ pathVis <- PinPath::drawGPML(
 
 You can also plot it as a network:
 ```r
- pathVis <- GPML2Network(
-   infile = infile,
-   annGenes = "org.Hs.eg.db",
-   inputDB = "ENSEMBL",
-   geneIDs = lung_expr$GeneID,
-   colorVar = lung_expr[,"log2FC"],
-   nodeTable = TRUE,
-   legend = TRUE)
+pathVis <- PinPath::GPML2Network(
+  infile = infile,
+  annGenes = "org.Hs.eg.db",
+  inputDB = "ENSEMBL",
+  geneIDs = lung_expr$GeneID,
+  colorVar = lung_expr[,"log2FC"],
+  colorNames = "logFC",
+  nodeTable = TRUE,
+  legend = TRUE) 
+
 ```
 
-![Pathway](/docs/assets/img/pathways/network_Pleural_mesothelioma_WP5087_r140461_Homo_sapiens.svg)
+![Pathway](/docs/assets/img/pathways/network_Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg)
+![Legend](/docs/assets/img/pathways/legend_Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg)
