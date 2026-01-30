@@ -61,8 +61,24 @@
   
   # Prepare curved edges
   if (nrow(edges_df[edges_df$ConnectorType == "Curved",]) > 0){
-    edges_df_curved <- .prepareCurve(
-      edges_df[edges_df$ConnectorType == "Curved",])
+    if (sum((edges_df$X1 - edges_df$X2)==0 | (edges_df$Y1 - edges_df$Y2)==0)>0){
+      edges_df_straight <- edges_df[
+        (edges_df$ConnectorType == "Curved") &
+          ((edges_df$X1 - edges_df$X2)==0 | (edges_df$Y1 - edges_df$Y2)==0),]
+      edges_df_straight$LineStyle[
+        edges_df_straight$LineStyle == "broken"] <- "dashed"
+      
+      edges_df_curved <- .prepareCurve(
+        edges_df[
+          (edges_df$ConnectorType == "Curved") &
+            ((edges_df$X1 - edges_df$X2)!=0 & 
+               (edges_df$Y1 - edges_df$Y2)!=0),]
+        )
+      
+    }else{
+      edges_df_curved <- .prepareCurve(
+        edges_df[edges_df$ConnectorType == "Curved",])
+    }
   } else{
     edges_df_curved <- NULL
   }

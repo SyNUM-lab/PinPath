@@ -17,7 +17,7 @@
 #' # Load example data
 #' lung_expr <- read.csv(system.file("extdata",
 #'                                   "data-lung-cancer.csv", 
-#'                                    package="rWikiPathways"), 
+#'                                    package="PinPath"), 
 #'                       stringsAsFactors = FALSE)
 #' 
 #' # Set significance as a binary variable
@@ -25,7 +25,7 @@
 #'                                 "Yes", "No")
 #' 
 #' # Make default color list
-#' colorList <- rWikiPathways::defaultColorList(
+#' colorList <- PinPath::defaultColorList(
 #' lung_expr[,c("log2FC", "Significant")])
 #' 
 #' @export

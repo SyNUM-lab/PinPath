@@ -562,7 +562,7 @@
       
       img <- magick::image_read(system.file("pathwayElements",
                                             "Mitochondria.png", 
-                                            package="rWikiPathways"))
+                                            package="PinPath"))
       img <- magick::image_rotate(img, (rotation*180)/pi)
       img <-  magick::image_transparent(img, color = "white")
       graphics::rasterImage(img, xmin, -ymax, xmax, -ymin)
@@ -581,7 +581,7 @@
       
       img <- magick::image_read(system.file("pathwayElements",
                                             "SR.png", 
-                                            package="rWikiPathways"))
+                                            package="PinPath"))
       img <- magick::image_rotate(img, (rotation*180)/pi)
       img <-  magick::image_transparent(img, color = "white")
       graphics::rasterImage(img, xmin, -ymax, xmax, -ymin)
@@ -598,7 +598,7 @@
       
       img <- magick::image_read(system.file("pathwayElements",
                                             "ER.png", 
-                                            package="rWikiPathways"))
+                                            package="PinPath"))
       img <- magick::image_rotate(img, (rotation*180)/pi)
       img <-  magick::image_transparent(img, color = "white")
       graphics::rasterImage(img, xmin, -ymax, xmax, -ymin)
@@ -616,7 +616,7 @@
       
       img <- magick::image_read(system.file("pathwayElements",
                                             "Golgi.png", 
-                                            package="rWikiPathways"))
+                                            package="PinPath"))
       img <- magick::image_rotate(img, (rotation*180)/pi)
       img <-  magick::image_transparent(img, color = "white")
       graphics::rasterImage(img, xmin, -ymax, xmax, -ymin)

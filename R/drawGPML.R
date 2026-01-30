@@ -629,7 +629,10 @@ drawGPML <- function(infile,
       "Link" = paste0("https://www.wikipathways.org/pathways/",
                       stringr::str_split(gpml$.attrs["Version"], "_")[[1]][1],
                       ".html"),
-      "Description" = gpml$Comment$text)
+      "Description" = gpml[
+        which(names(gpml) == "Comment")][
+          which.max(nchar(gpml[which(names(gpml) == "Comment")]))][[1]][[1]]
+      )
   }else{
     outputList[["Information"]] <- NA
   }

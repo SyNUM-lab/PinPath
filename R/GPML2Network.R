@@ -34,7 +34,8 @@
 .prepareNodes_network <- function(dataNodes){
   nodeFUN <- function(dataNodes){
     data.frame(
-      GraphId = dataNodes$ID,#as.character(dataNodes$.attrs["GraphId"]),
+      GraphId = as.character(dataNodes$.attrs["GraphId"]),
+      GraphId1 = dataNodes$ID,
       Label = as.character(stringr::str_remove_all(
         dataNodes$.attrs["TextLabel"],"\\n+$")),
       NodeType = as.character(dataNodes$.attrs["Type"]),
@@ -45,7 +46,7 @@
     )
   }
   nodes_df <- do.call(rbind, lapply(dataNodes, nodeFUN))
-  nodes_df <- nodes_df[!is.na(nodes_df$GraphId),]
+  #nodes_df <- nodes_df[!is.na(nodes_df$GraphId),]
   return(nodes_df)
 }
 
@@ -293,7 +294,7 @@ GPML2Network <- function(infile,
                                  colors_df[, c("GraphId1", 
                                                "ColorValue", 
                                                "Scale")],
-                                 by = c("GraphId" = "GraphId1"))
+                                 by = c("GraphId1" = "GraphId1"))
   } else{
     nodes_df$ColorValue <- "white"
     nodes_df$Scale <- 1
@@ -325,16 +326,19 @@ GPML2Network <- function(infile,
   }
   
   # Combine groups with node information
-  nodes_df <- rbind.data.frame(nodes_df, 
-                               data.frame(name = group_names,
-                                          GraphId = graph_ids,
-                                          Label = group_names,
-                                          NodeType = "Group",
-                                          Database = NA,
-                                          GroupRef = NA,
-                                          ID = NA,
-                                          ColorValue = "black",
-                                          Scale = NA))
+  if (length(group_names) > 0){
+    nodes_df <- rbind.data.frame(nodes_df, 
+                                 data.frame(name = group_names,
+                                            GraphId = graph_ids,
+                                            GraphId1 = graph_ids,
+                                            Label = group_names,
+                                            NodeType = "Group",
+                                            Database = NA,
+                                            GroupRef = NA,
+                                            ID = NA,
+                                            ColorValue = "black",
+                                            Scale = NA))
+  }
   nodes_df$NodeType <- ifelse(nodes_df$NodeType  == "Group",
                               "Group", "nonGroup")
   
@@ -348,13 +352,19 @@ GPML2Network <- function(infile,
                                                "GraphicalLine")]
   edges_df_temp <- .prepareEdges_network(dataEdges)
   
-  group_edges_df <- node2group[,c("GraphId", "GroupRef")]
-  group_edges_df <- dplyr::inner_join(group_edges_df, groups_df, 
-                                      by = c("GroupRef" = "GroupId"))[c(1,3)]
-  colnames(group_edges_df) <- c("from", "to")
-  edges_df <- rbind.data.frame(edges_df_temp, group_edges_df)
-  edges_df$type <- c(rep("node_node", nrow(edges_df_temp)),
-                     rep("node_group", nrow(group_edges_df)))
+  if (length(group_names) > 0){
+    group_edges_df <- node2group[,c("GraphId", "GroupRef")]
+    group_edges_df <- dplyr::inner_join(group_edges_df, groups_df, 
+                                        by = c("GroupRef" = "GroupId"))[c(1,3)]
+    colnames(group_edges_df) <- c("from", "to")
+    edges_df <- rbind.data.frame(edges_df_temp, group_edges_df)
+    edges_df$type <- c(rep("node_node", nrow(edges_df_temp)),
+                       rep("node_group", nrow(group_edges_df)))
+  }else{
+    edges_df <- edges_df_temp
+    edges_df$type <- "node_node"
+  }
+
   
   # Filter edges for nodes
   edges_df$from <- replace(stats::setNames(edges_df$from,edges_df$from), 
@@ -380,8 +390,8 @@ GPML2Network <- function(infile,
     scales <- scales[!is.na(scales)]
     for (s in scales){
       if (s == 1){
-        nodes_df_split <- rbind.data.frame(nonNAdf[nonNAdf$Scale == s,-9], 
-                                           NAdf[,-9])
+        nodes_df_split <- rbind.data.frame(nonNAdf[nonNAdf$Scale == s,-10], 
+                                           NAdf[,-10])
         colnames(nodes_df_split)[ncol(nodes_df_split)] <- "ColorValue1"
       }else{
         fil <- rbind.data.frame(nonNAdf[nonNAdf$Scale == s,], NAdf)
@@ -416,11 +426,11 @@ GPML2Network <- function(infile,
     ggraph::geom_edge_link(ggplot2::aes(color = .data$type)) 
   
   # Add each scale to the network
-  for (g in seq_len(ncol(nodes_df_split)-7)){
+  for (g in seq_len(ncol(nodes_df_split)-8)){
     loop_input <- paste0(
       ".geom_node_split(ggplot2::aes(alpha = NodeType), 
                          fill = g_plot@data$ColorValue",g,
-      ",nCol = ",(ncol(nodes_df_split)-7),
+      ",nCol = ",(ncol(nodes_df_split)-8),
       ", iCol = ", g, 
       ", nodeSize = ", nodeSize, ")")
     g_plot <- g_plot + eval(parse(text=loop_input))  
@@ -568,7 +578,10 @@ GPML2Network <- function(infile,
       "Link" = paste0("https://www.wikipathways.org/pathways/",
                       stringr::str_split(gpml$.attrs["Version"], "_")[[1]][1],
                       ".html"),
-      "Description" = gpml$Comment$text)
+      "Description" = gpml[
+        which(names(gpml) == "Comment")][
+          which.max(nchar(gpml[which(names(gpml) == "Comment")]))][[1]][[1]]
+      )
   }else{
     outputList[["Information"]] <- NA
   }
