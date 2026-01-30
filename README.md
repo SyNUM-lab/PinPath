@@ -1,5 +1,6 @@
-![PinPath](/docs/assets/img/logo_grey.png)
+![PinPath](/docs/assets/img/logo_grey.png width = "50%")
 
+# About
 PinPath is an R package for visualizing (omics) data onto pathway diagrams, and **pinpoint** where in the pathway the relevant changes occur.
 Results from (epi)genomics, transcriptomics, (phospho)proteomics, metabolomics and many more experiments can be visualized onto pathway diagrams from KEGG and WikiPathways. 
 You can also use your own GPML and KGML files to visualize data onto custom pathways. 
@@ -34,7 +35,7 @@ system.file("extdata", "data-lung-cancer.csv",package="PinPath"),
                       stringsAsFactors = FALSE)
 ```
 
-Now, you can plot the data onto the *Non-small cell lung cancer (WP4255)*:
+Now, you can plot the data onto the *Non-small cell lung cancer (WP4255)* pathway:
 ```r
 # Select pathway
 infile <- rWikiPathways::getPathway("WP4255")
@@ -54,7 +55,7 @@ pathVis <- PinPath::drawGPML(
 ![Pathway](/docs/assets/img/pathways/Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg)
 ![Legend](/docs/assets/img/pathways/legend_Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg)
 
-You can also plot it as a network:
+You can also plot the pathway as a network:
 ```r
 pathVis <- PinPath::GPML2Network(
   infile = infile,
