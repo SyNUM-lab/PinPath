@@ -1,31 +1,31 @@
 
 html { overflow-y: scroll; }
 
-h2 { color: #0088cc }
-h1, h3, h4 { color: #133346; }
-
-/* keynote horizontal card pics */
-.card-img{
-  object-fit: contain; 
-  max-height: 200px;
+.header-grid {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
 }
 
-/* homepage card icon pics */
-.card-img-top{
-  object-fit: contain;
-  max-height: 100px;
-  border: 2px solid black;
-  border-radius: 3px 3px 0 0;
+/* Logo */
+.site-logo {
+  height: auto; 
+  width: 200px;
 }
 
-/* agenda table on program page */
-table{ min-width: 80% }
-th{ padding: 10px; }
-td{ padding: 10px; }
-
-* {
-  box-sizing: border-box;
+.header-logo {
+  justify-self: start;
 }
+
+.header-nav {
+  justify-self: right;
+}
+
+/* Make right column match logo width */
+.header-spacer {
+  width: 0px;
+}
+
 
 /* Base nav link style */
 .nav-underline {
@@ -61,6 +61,34 @@ td{ padding: 10px; }
   text-decoration: none;
 }
 
+
+
+
+h2 { color: #0088cc }
+h1, h3, h4 { color: #133346; }
+
+/* keynote horizontal card pics */
+.card-img{
+  object-fit: contain; 
+  max-height: 200px;
+}
+
+/* homepage card icon pics */
+.card-img-top{
+  object-fit: contain;
+  max-height: 100px;
+  border: 2px solid black;
+  border-radius: 3px 3px 0 0;
+}
+
+/* agenda table on program page */
+table{ min-width: 80% }
+th{ padding: 10px; }
+td{ padding: 10px; }
+
+* {
+  box-sizing: border-box;
+}
 /* Float three columns side by side */
 .column {
   object-fit: contain; 

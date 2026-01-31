@@ -15,34 +15,58 @@
 
 <body>
 <header class="site-header px-responsive">
-  <div style = "background-color:#084594; background-image:url('../assets/img/bg.png'); background-size: cover;">
-      <div class="text-center">
-      <a href="{{ "/" | relative_url}}"><img src="{{ "/assets/img/logo.png" | relative_url}}" alt="PinPath" class = "center" 
-		style="width:500px;max-width:80%;height:auto;margin-top:40px;margin-bottom:20px;">
-		<nav class="">
-        <ul style = " list-style: none; padding: 0; margin: 0 auto; justify-content: center;">
+ <div style="background-color:#084594; background-image:url('/assets/img/bg1.png'); background-size: cover;">
+  <div class="container">
+    <br><br>
+    <div class="header-grid">
+      
+      <!-- Logo (left) -->
+      <div class="header-logo">
+    	<a href="{{ "/" | relative_url }}">
+      		<img src="{{ "/assets/img/logo.png" | relative_url }}"
+           		alt="PinPath"
+           		class="site-logo">
+    	</a>
+ 	</div>
+
+      <!-- Navigation (centered) -->
+      <nav class="header-nav">
+        <ul style="list-style:none; padding:0; margin:0;">
           {% assign current = page.url | downcase | split: '/' %}
-          
-          <li class="text-center d-block d-sm-inline-block px-5 px-md-3">
-          	<a class="nav-underline {% if page.url == '/' %}current{% endif %}" href="{{ '/' | relative_url }}" style="color: white; font-size: 24px"><b>Home</b></a>
+
+          <li class="d-inline-block px-3">
+            <a class="nav-underline {% if page.url == '/' %}current{% endif %}"
+               href="{{ '/' | relative_url }}"
+               style="color:white; font-size:24px;"><b>Home</b></a>
           </li>
-          
-          <li class="text-center d-block d-sm-inline-block px-5 px-md-3">
-          	<a class="nav-underline {% if page.url contains '/about' %}current{% endif %}" href="{{ '/about/' | relative_url }}" style="color: white; font-size: 24px"><b>About</b></a>
+
+          <li class="d-inline-block px-3">
+            <a class="nav-underline {% if page.url contains '/about' %}current{% endif %}"
+               href="{{ '/about/' | relative_url }}"
+               style="color:white; font-size:24px;"><b>About</b></a>
           </li>
-          
-          <li class="text-center d-block d-sm-inline-block px-5 px-md-3">
-          	<a class="nav-underline Web app {% if page.url contains '/web-app' %}current{% endif %}" href="{{ '/web-app/' | relative_url }}" style="color: white; font-size: 24px"><b>Web app</b></a>
+
+          <li class="d-inline-block px-3">
+            <a class="nav-underline {% if page.url contains '/web-app' %}current{% endif %}"
+               href="{{ '/web-app/' | relative_url }}"
+               style="color:white; font-size:24px;"><b>Web app</b></a>
           </li>
-          
-          <li class="text-center d-block d-sm-inline-block px-5 px-md-3">
-          	 <a class="nav-underline Documentation {% if page.url contains '/documentation/' %}current{% endif %}" href="{{ '/documentation/' | relative_url }}" style="color: white; font-size: 24px"><b>Documentation</b></a>
+
+          <li class="d-inline-block px-3">
+            <a class="nav-underline {% if page.url contains '/documentation/' %}current{% endif %}"
+               href="{{ '/documentation/' | relative_url }}"
+               style="color:white; font-size:24px;"><b>Documentation</b></a>
           </li>
-          
         </ul>
-        </nav>
-        <br>
-      </div>
+      </nav>
+
+      <!-- Spacer (right, empty) -->
+      <div class="header-spacer"></div>
+
+    </div>
+
+    <br><br>
+  </div>
 </div>
 </header>
 </body>
