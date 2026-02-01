@@ -8,8 +8,15 @@
 	<!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
 	
+	<!-- Bootstrap JS -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 	<!-- link to main stylesheet -->
 	<link rel="stylesheet" type="text/css" href="/assets/css/main.css">
+	
+	<!-- icon -->
+	<link rel="shortcut icon" type="image/png" 
+      href="{{ "/assets/img/icon.png"  | absolute_url }}">
 
 </head>
 
@@ -27,9 +34,9 @@
            		alt="PinPath"
            		class="site-logo">
     	</a>
- 	</div>
+ 	  </div>
 
-      <!-- Navigation (centered) -->
+      <!-- Navigation -->
       <nav class="header-nav">
         <ul style="list-style:none; padding:0; margin:0;">
           {% assign current = page.url | downcase | split: '/' %}

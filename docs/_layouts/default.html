@@ -12,8 +12,10 @@
     <link rel="stylesheet" type="text/css" href="{{ "/assets/css/main.css" | relative_url}}">
 </head>
 
-<body>	
+<body>
+	{% include octocat_corner.html %}	
   	{% include header.html %}
   	{{ content }}
+  	{% include footer.html %}
 </body>
 </html>

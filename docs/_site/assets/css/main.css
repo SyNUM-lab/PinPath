@@ -61,74 +61,25 @@ html { overflow-y: scroll; }
   text-decoration: none;
 }
 
+h2 { color: black }
+h1, h3, h4 { color: black }
 
 
-
-h2 { color: #0088cc }
-h1, h3, h4 { color: #133346; }
-
-/* keynote horizontal card pics */
-.card-img{
-  object-fit: contain; 
-  max-height: 200px;
+.carousel-control-prev-icon {
+  width: 40px;
+  height: 40px;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23F16913' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath d='M5.25 0l-4 4 4 4 1.5-1.5L4.25 4l2.5-2.5L5.25 0z'/%3e%3c/svg%3e");
 }
 
-/* homepage card icon pics */
-.card-img-top{
-  object-fit: contain;
-  max-height: 100px;
-  border: 2px solid black;
-  border-radius: 3px 3px 0 0;
+.carousel-control-next-icon {
+  width: 40px;
+  height: 40px;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23F16913' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath d='M2.75 0l-1.5 1.5L3.75 4l-2.5 2.5L2.75 8l4-4-4-4z'/%3e%3c/svg%3e");
 }
-
-/* agenda table on program page */
-table{ min-width: 80% }
-th{ padding: 10px; }
-td{ padding: 10px; }
-
-* {
-  box-sizing: border-box;
+.carousel-indicators li {
+background-color: #cccccc;
+height: 6px;
 }
-/* Float three columns side by side */
-.column {
-  object-fit: contain; 
-  float: left;
-  width: 33%;
-  padding: 0 10px;
-}
-
-/* Remove extra left and right margins, due to padding in columns */
-.row {margin: 0 -5px;}
-
-/* Clear floats after the columns */
-.row:after {
-  content: "";
-  display: "inline";
-  clear: both;
-}
-
-/* Style the counter cards */
-.card-footer {
-  box-shadow: 0; /* this adds the "card" effect */
-  border: 0;
-  padding: 16px;
-  text-align: center;
-  background-color: #FFFFFF;
-}
-
-/* Responsive columns - one column layout (vertical) on small screens */
-@media screen and (max-width: 600px) {
-  .column {
-    width: 100%;
-    display: block;
-    margin-bottom: 20px;
-  }
-}
-
-/* page header */
-.page-header {
-  width: 100%;
-  background-color: $blue-500;
-  background-repeat: no-repeat;
-  background-position: center center;
+.carousel-indicators .active {
+  background-color: #F16913;
 }

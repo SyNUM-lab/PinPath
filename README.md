@@ -1,4 +1,4 @@
-![PinPath](/docs/assets/img/logo_grey.png width = "50%")
+![PinPath](/inst/img/logo_grey.png width = "50%")
 
 # About
 PinPath is an R package for visualizing (omics) data onto pathway diagrams, and **pinpoint** where in the pathway the relevant changes occur.
@@ -52,8 +52,8 @@ pathVis <- PinPath::drawGPML(
   legend = TRUE) 
 ```
 
-![Pathway](/docs/assets/img/pathways/Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg)
-![Legend](/docs/assets/img/pathways/legend_Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg)
+![Pathway](/inst/img/Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg)
+![Legend](/inst/img/legend_Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg)
 
 You can also plot the pathway as a network:
 ```r
