@@ -609,7 +609,8 @@ drawGPML <- function(infile,
     outputTable <- outputTable |>
       tidyr::pivot_wider(
         names_from = "Scale Name",
-        values_from = "Scale Value"
+        values_from = "Scale Value",
+        values_fn = list
       )
     
     # Save node table in output list

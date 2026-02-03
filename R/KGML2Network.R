@@ -224,7 +224,7 @@ KGML2Network <- function(infile,
   NAdf <- entries_df[is.na(entries_df$Scale),]
   nonNAdf <- entries_df[!is.na(entries_df$Scale),]
   
-  # Add each scale as a seperate column
+  # Add each scale as a separate column
   scales <- unique(entries_df$Scale)
   scales <- scales[!is.na(scales)]
   for (s in scales){
@@ -241,6 +241,13 @@ KGML2Network <- function(infile,
   }
   
   # Remove duplicated nodes
+  dupIds <- sum(duplicated(entries_df_split$name[!duplicated(
+    entries_df_split[,(ncol(entries_df_split)-1):ncol(entries_df_split)])]))
+  if (dupIds > 0){
+    warning("There duplicated feature IDs. The KGML2Network function only 
+              plots the values associated with the first feature ID.")
+  }
+  
   entries_df_split <- entries_df_split[!duplicated(entries_df_split$name),]
   
   #****************************************************************************#
@@ -383,7 +390,8 @@ KGML2Network <- function(infile,
     outputTable <- outputTable |>
       tidyr::pivot_wider(
         names_from = "Scale Name",
-        values_from = "Scale Value"
+        values_from = "Scale Value",
+        values_fn = list
       )
     
     # Save node table in output list

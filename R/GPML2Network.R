@@ -401,6 +401,13 @@ GPML2Network <- function(infile,
     }
     
     # Remove duplicated nodes
+    dupIds <- sum(duplicated(nodes_df_split$name[!duplicated(
+      nodes_df_split[,9:ncol(nodes_df_split)])]))
+    if (dupIds > 0){
+      warning("There duplicated feature IDs. The GPML2Network function only 
+              plots the values associated with the first feature ID.")
+    }
+    
     nodes_df_split <- nodes_df_split[!duplicated(nodes_df_split$name),]
   }
   
@@ -558,7 +565,8 @@ GPML2Network <- function(infile,
     outputTable <- outputTable |>
       tidyr::pivot_wider(
         names_from = "Scale Name",
-        values_from = "Scale Value"
+        values_from = "Scale Value",
+        values_fn = list
       )
     
     # Save node table in output list
