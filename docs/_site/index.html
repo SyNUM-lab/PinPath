@@ -10,6 +10,44 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
 	<!-- link to main stylesheet -->
     <link rel="stylesheet" type="text/css" href="/assets/css/main.css">
+    
+    <!-- copy button for code blocks -->
+    <script>
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll("pre > code").forEach((codeBlock) => {
+    const pre = codeBlock.parentNode;
+
+    // Wrap <pre> in a div
+    const wrapper = document.createElement("div");
+    wrapper.className = "code-block";
+    pre.parentNode.insertBefore(wrapper, pre);
+    wrapper.appendChild(pre);
+
+    // Create button
+    const button = document.createElement("button");
+    button.className = "copy-btn";
+    button.innerText = "Copy";
+
+    button.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(codeBlock.innerText);
+        button.innerText = "Copied!";
+        button.classList.add("copied");
+
+        setTimeout(() => {
+          button.innerText = "Copy";
+          button.classList.remove("copied");
+        }, 2000);
+      } catch (err) {
+        button.innerText = "Error";
+      }
+    });
+
+    wrapper.appendChild(button);
+  });
+});
+</script>
+
 </head>
 
 <body>
@@ -71,17 +109,23 @@
                href="/about/"
                style="color:white; font-size:24px;"><b>About</b></a>
           </li>
+          
+          <li class="d-inline-block px-3">
+            <a class="nav-underline "
+               href="/r-package/"
+               style="color:white; font-size:24px;"><b>R package</b></a>
+          </li>
 
           <li class="d-inline-block px-3">
             <a class="nav-underline "
-               href="/web-app/"
+               href="https://019c28d6-11da-6eb9-2aeb-d79ddc76e85a.share.connect.posit.cloud/" target="_blank"
                style="color:white; font-size:24px;"><b>Web app</b></a>
           </li>
 
           <li class="d-inline-block px-3">
             <a class="nav-underline "
-               href="/documentation/"
-               style="color:white; font-size:24px;"><b>Documentation</b></a>
+               href="/help/"
+               style="color:white; font-size:24px;"><b>Help</b></a>
           </li>
         </ul>
       </nav>
@@ -97,7 +141,7 @@
 </header>
 </body>
 
-  	<section id="section 1"> 
+    <section id="section 1"> 
 
       <div class="outer-container">
         <br>
@@ -110,8 +154,8 @@
                 <h2 style="font-family:Poppins; line-height:1.4; text-align: left">
                 With <b>PinPath</b> you can visualize your data onto pathways, and pinpoint where the relevant changes occur.
                 </h2>
-                <a class="btn btn-outline-dark btn-lg my-3" href="/about/" role="button">R package</a>
-                <a class="btn btn-outline-dark btn-lg my-3" href="https://github.com/SyNUM-lab/PinPath" role="button">Web app</a>
+                <a class="btn btn-outline-dark btn-lg my-3" href="/r-package/" role="button">R package</a>
+                <a class="btn btn-outline-dark btn-lg my-3" href="https://019c28d6-11da-6eb9-2aeb-d79ddc76e85a.share.connect.posit.cloud/" target="_blank" role="button">Web app</a>
                 <p style="color: #6c757d;text-align: left">
                 <a style="color: #6c757d" href="/about/" >Version 0.1.0</a> | 
                 <a style="color: #6c757d" href="https://github.com/SyNUM-lab/PinPath/blob/devel/LICENSE">MIT licence</a>
@@ -151,6 +195,8 @@
   						<ol class="carousel-indicators" style="margin-bottom:-25px;">
     						<li data-target="#carouselBrowse" data-bs-slide-to="0" class="active"></li>
     						<li data-target="#carouselBrowse" data-bs-slide-to="1"></li>
+    						<li data-target="#carouselBrowse" data-bs-slide-to="2"></li>
+    						<li data-target="#carouselBrowse" data-bs-slide-to="3"></li>
   						</ol>
   					
   						<div class="carousel-inner" style="width:76%; margin-left: 12%;">
@@ -160,6 +206,14 @@
     						</div>
     						<div class="carousel-item">
       							<img src="/assets/img/pathways/carousel2.svg"
+           							alt="Pathway" height = "500px">
+    						</div>
+    						<div class="carousel-item">
+      							<img src="/assets/img/pathways/carousel3.svg"
+           							alt="Pathway" height = "500px">
+    						</div>
+    						<div class="carousel-item">
+      							<img src="/assets/img/pathways/carousel4.svg"
            							alt="Pathway" height = "500px">
     						</div>
   						</div>

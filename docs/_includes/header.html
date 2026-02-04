@@ -52,17 +52,23 @@
                href="{{ '/about/' | relative_url }}"
                style="color:white; font-size:24px;"><b>About</b></a>
           </li>
+          
+          <li class="d-inline-block px-3">
+            <a class="nav-underline {% if page.url contains '/r-package' %}current{% endif %}"
+               href="{{ '/r-package/' | relative_url }}"
+               style="color:white; font-size:24px;"><b>R package</b></a>
+          </li>
 
           <li class="d-inline-block px-3">
             <a class="nav-underline {% if page.url contains '/web-app' %}current{% endif %}"
-               href="{{ '/web-app/' | relative_url }}"
+               href="https://019c28d6-11da-6eb9-2aeb-d79ddc76e85a.share.connect.posit.cloud/" target="_blank"
                style="color:white; font-size:24px;"><b>Web app</b></a>
           </li>
 
           <li class="d-inline-block px-3">
-            <a class="nav-underline {% if page.url contains '/documentation/' %}current{% endif %}"
-               href="{{ '/documentation/' | relative_url }}"
-               style="color:white; font-size:24px;"><b>Documentation</b></a>
+            <a class="nav-underline {% if page.url contains '/help/' %}current{% endif %}"
+               href="{{ '/help/' | relative_url }}"
+               style="color:white; font-size:24px;"><b>Help</b></a>
           </li>
         </ul>
       </nav>

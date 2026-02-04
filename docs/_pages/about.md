@@ -1,7 +1,7 @@
 ---
 title: "About PinPath"
 permalink: /about
-layout: default
+layout: pages
 ---
 <br>
 

@@ -1,14 +1,9 @@
-![PinPath](/inst/img/logo_grey.png)
-
-# About
-PinPath is an R package for visualizing (omics) data onto pathway diagrams, and **pinpoint** where in the pathway the relevant changes occur.
-Results from (epi)genomics, transcriptomics, (phospho)proteomics, metabolomics and many more experiments can be visualized onto pathway diagrams from KEGG and WikiPathways. 
-You can also use your own GPML and KGML files to visualize data onto custom pathways. 
-As long as your data can be linked to genes, proteins, or metabolites, you can visualize it using PinPath. 
-Do you want to get more information or run the PinPath web app? Please visit our website: [tba]
-
-## Publications
-No publications yet....
+---
+title: "R package"
+permalink: /r-package
+layout: pages
+---
+<br>
 
 ## Installation
 Use the following R code to install the development version of the PinPath package:
@@ -20,6 +15,7 @@ install.packages("remotes")
 # Install PinPath from GitHub
 remotes::install_github("SyNUM-lab/PinPath") 
 ```
+<br>
 
 ## Quick start
 First, load necessary packages and data:
@@ -52,8 +48,14 @@ pathVis <- PinPath::drawGPML(
   legend = TRUE) 
 ```
 
-![Pathway](/inst/img/Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg)
-![Legend](/inst/img/legend_Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg)
+<img
+  src="/assets/img/pathways/Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg"
+  alt="Pathway"
+  style="width: 70%; height: auto;">
+<img
+  src="/assets/img/pathways/legend_Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg"
+  alt="Legend"
+  style="width: 40%; height: auto;">
 
 You can also plot the pathway as a network:
 ```r
@@ -66,8 +68,16 @@ pathVis <- PinPath::GPML2Network(
   colorNames = "logFC",
   nodeTable = TRUE,
   legend = TRUE) 
-
 ```
 
-![Pathway](/inst/img/network_Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg)
-![Legend](/inst/img/legend_Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg)
+<img
+  src="/assets/img/pathways/network_Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg"
+  alt="Network"
+  style="width: 70%; height: auto;">
+<img
+  src="/assets/img/pathways/legend_Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg"
+  alt="Legend"
+  style="width: 40%; height: auto;">
+
+
+

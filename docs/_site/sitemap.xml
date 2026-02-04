@@ -4,6 +4,12 @@
 <loc>http://localhost:4000/about</loc>
 </url>
 <url>
+<loc>http://localhost:4000/help</loc>
+</url>
+<url>
 <loc>http://localhost:4000/</loc>
+</url>
+<url>
+<loc>http://localhost:4000/r-package</loc>
 </url>
 </urlset>
