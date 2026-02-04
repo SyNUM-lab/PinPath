@@ -216,10 +216,7 @@ KGML2Network <- function(infile,
   
   relations_df <- relations_df[(relations_df$from %in% entries_df$name) &
                                  (relations_df$to %in% entries_df$name),]
-  
-  if (!is.null(colors_df)){
     
-  }
   # Collect NA and non-NA scales
   NAdf <- entries_df[is.na(entries_df$Scale),]
   nonNAdf <- entries_df[!is.na(entries_df$Scale),]
@@ -227,28 +224,47 @@ KGML2Network <- function(infile,
   # Add each scale as a separate column
   scales <- unique(entries_df$Scale)
   scales <- scales[!is.na(scales)]
-  for (s in scales){
-    if (s == 1){
-      entries_df_split <- rbind.data.frame(nonNAdf[nonNAdf$Scale == s,-16], 
-                                           NAdf[,-16])
-      colnames(entries_df_split)[ncol(entries_df_split)] <- "ColorValue1"
-    }else{
-      fil <- rbind.data.frame(nonNAdf[nonNAdf$Scale == s,], NAdf)
-      entries_df_split <- cbind.data.frame(entries_df_split, fil$ColorValue)
-      colnames(entries_df_split)[
-        ncol(entries_df_split)] <- paste0("ColorValue",s)
+  
+  if (length(scales) > 0){
+    for (s in scales){
+      if (s == 1){
+        entries_df_split <- rbind.data.frame(nonNAdf[nonNAdf$Scale == s,-16], 
+                                             NAdf[,-16])
+        colnames(entries_df_split)[ncol(entries_df_split)] <- "ColorValue1"
+      }else{
+        fil <- rbind.data.frame(nonNAdf[nonNAdf$Scale == s,], NAdf)
+        entries_df_split <- cbind.data.frame(entries_df_split, fil$ColorValue)
+        colnames(entries_df_split)[
+          ncol(entries_df_split)] <- paste0("ColorValue",s)
+      }
+    }
+    
+    # Remove duplicated nodes
+    dupIds <- sum(
+      BiocGenerics::duplicated(
+        entries_df_split$name[
+          !BiocGenerics::duplicated(
+            entries_df_split[
+              ,(ncol(entries_df_split)-1):ncol(entries_df_split)
+              ]
+            )
+        ])
+    )
+    if (dupIds > 0){
+      warning("There duplicated feature IDs. The KGML2Network function only 
+              plots the values associated with the first feature ID.")
     }
   }
   
-  # Remove duplicated nodes
-  dupIds <- sum(duplicated(entries_df_split$name[!duplicated(
-    entries_df_split[,(ncol(entries_df_split)-1):ncol(entries_df_split)])]))
-  if (dupIds > 0){
-    warning("There duplicated feature IDs. The KGML2Network function only 
-              plots the values associated with the first feature ID.")
+  if (length(scales) == 0){
+    entries_df_split <- NAdf[-16]
+    colnames(entries_df_split)[ncol(entries_df_split)] <- "ColorValue1"
   }
   
-  entries_df_split <- entries_df_split[!duplicated(entries_df_split$name),]
+  entries_df_split <- entries_df_split[
+    !BiocGenerics::duplicated(entries_df_split$name),]
+  
+  
   
   #****************************************************************************#
   # Make network

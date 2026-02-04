@@ -45,100 +45,105 @@
   # Filter geneIDs
   geneIDs_fil <- geneIDs_nodes[geneIDs_nodes$Database %in% geneDBs,]
   
-  # Convert name of database
-  geneIDs_fil$Database <- replace(geneIDs_fil$Database,
-                                  geneIDs_fil$Database == "Ensembl",
-                                  "ENSEMBL")
-  geneIDs_fil$Database <- replace(geneIDs_fil$Database,
-                                  geneIDs_fil$Database == "Entrez Gene",
-                                  "ENTREZID")
-  geneIDs_fil$Database <- replace(geneIDs_fil$Database,
-                                  geneIDs_fil$Database == "Uniprot-TrEMBL",
-                                  "UNIPROT")
-  geneIDs_fil$Database <- replace(geneIDs_fil$Database,
-                                  geneIDs_fil$Database == "HGNC",
-                                  "SYMBOL")
-  
-  # Convert gene IDs of the nodes to the input IDs
-  databases <- unique(geneIDs_fil$Database)
-  nodeAnn_gene <- NULL
-  for (db in unique(inputDB[inputDB %in% geneDBs_name])){
+  if (nrow(geneIDs_fil) > 0){
+    # Convert name of database
+    geneIDs_fil$Database <- replace(geneIDs_fil$Database,
+                                    geneIDs_fil$Database == "Ensembl",
+                                    "ENSEMBL")
+    geneIDs_fil$Database <- replace(geneIDs_fil$Database,
+                                    geneIDs_fil$Database == "Entrez Gene",
+                                    "ENTREZID")
+    geneIDs_fil$Database <- replace(geneIDs_fil$Database,
+                                    geneIDs_fil$Database == "Uniprot-TrEMBL",
+                                    "UNIPROT")
+    geneIDs_fil$Database <- replace(geneIDs_fil$Database,
+                                    geneIDs_fil$Database == "HGNC",
+                                    "SYMBOL")
     
-    # Prepare input data:
-    # Combine all color variables into a single column
-    if (is.data.frame(colorVar)){
-      input <- NULL
-      for (i in seq_len(ncol(colorVar))){
-        input <- rbind(input,
-                       data.frame(GeneID = geneIDs[inputDB == db],
-                                  Col = colorVar[inputDB == db,i],
-                                  Scale = i,
-                                  ScaleName = colnames(colorVar)[i]
-                       ))
-      }
-    } else{
-      input <- data.frame(GeneID = geneIDs[inputDB == db],
-                          Col = colorVar[inputDB == db],
-                          Scale = 1,
-                          ScaleName = "Color"
-      )
-    }
-    
-    
-    nodeAnn <- NULL
-    for (i in seq_along(databases)){
-      keytype <- databases[i]
+    # Convert gene IDs of the nodes to the input IDs
+    databases <- unique(geneIDs_fil$Database)
+    nodeAnn_gene <- NULL
+    for (db in unique(inputDB[inputDB %in% geneDBs_name])){
       
-      # If gene IDs are already the same as the input IDs
-      if (keytype == db){
-        temp <- geneIDs_fil[geneIDs_fil$Database == keytype, ]
-        temp$InputId <- temp$ID
-        temp <- unique(temp[,c("GraphId1", "InputId")])
-        
-        # If gene IDs are different from input IDs
-      }else{
-        temp <- tryCatch({
-          temp <- geneIDs_fil[geneIDs_fil$Database == keytype, ]
-          ann <- suppressMessages(
-            AnnotationDbi::select(BiocGenerics::get(
-              annGenes, envir = asNamespace(annGenes)), 
-              columns = c(keytype, db), 
-              keys = temp$ID,
-              keytype = keytype))
-          temp <- dplyr::left_join(temp, ann, by = c("ID" = keytype),
-                                   relationship = "many-to-many")
-          colnames(temp) <- c("Database", "ID", "GraphId1", "InputId")
-          temp <- unique(temp[,c("GraphId1", "InputId")])
-          temp
-        }, error = function(cond){
-          NULL
-        })
-        
+      # Prepare input data:
+      # Combine all color variables into a single column
+      if (is.data.frame(colorVar)){
+        input <- NULL
+        for (i in seq_len(ncol(colorVar))){
+          input <- rbind(input,
+                         data.frame(GeneID = geneIDs[inputDB == db],
+                                    Col = colorVar[inputDB == db,i],
+                                    Scale = i,
+                                    ScaleName = colnames(colorVar)[i]
+                         ))
+        }
+      } else{
+        input <- data.frame(GeneID = geneIDs[inputDB == db],
+                            Col = colorVar[inputDB == db],
+                            Scale = 1,
+                            ScaleName = "Color"
+        )
       }
-      nodeAnn <- rbind.data.frame(nodeAnn, temp)
+      
+      
+      nodeAnn <- NULL
+      for (i in seq_along(databases)){
+        keytype <- databases[i]
+        
+        # If gene IDs are already the same as the input IDs
+        if (keytype == db){
+          temp <- geneIDs_fil[geneIDs_fil$Database == keytype, ]
+          temp$InputId <- temp$ID
+          temp <- unique(temp[,c("GraphId1", "InputId")])
+          
+          # If gene IDs are different from input IDs
+        }else{
+          temp <- tryCatch({
+            temp <- geneIDs_fil[geneIDs_fil$Database == keytype, ]
+            ann <- suppressMessages(
+              AnnotationDbi::select(BiocGenerics::get(
+                annGenes, envir = asNamespace(annGenes)), 
+                columns = c(keytype, db), 
+                keys = temp$ID,
+                keytype = keytype))
+            temp <- dplyr::left_join(temp, ann, by = c("ID" = keytype),
+                                     relationship = "many-to-many")
+            colnames(temp) <- c("Database", "ID", "GraphId1", "InputId")
+            temp <- unique(temp[,c("GraphId1", "InputId")])
+            temp
+          }, error = function(cond){
+            NULL
+          })
+          
+        }
+        nodeAnn <- rbind.data.frame(nodeAnn, temp)
+      }
+      
+      nodeAnn <- nodeAnn[!duplicated(nodeAnn),]
+      nodeAnn <- nodeAnn[!is.na(nodeAnn$InputId),]
+      
+      # Combine node annotation with input
+      nodeAnn <- dplyr::left_join(nodeAnn, input, by = c("InputId" = "GeneID"),
+                                  relationship = "many-to-many")
+      #nodeAnn <- unique(nodeAnn[,c("GraphId1", "Col", "Scale")])
+      nodeAnn <- nodeAnn[,c("GraphId1", 
+                            "InputId", 
+                            "Col", 
+                            "Scale", 
+                            "ScaleName")]
+      
+      colnames(nodeAnn) <- c("GraphId1", 
+                             "InputId",
+                             "MapColor", 
+                             "Scale", 
+                             "ScaleName")
+      
+      nodeAnn_gene <- rbind.data.frame(nodeAnn_gene, nodeAnn)
     }
-    
-    nodeAnn <- nodeAnn[!duplicated(nodeAnn),]
-    nodeAnn <- nodeAnn[!is.na(nodeAnn$InputId),]
-    
-    # Combine node annotation with input
-    nodeAnn <- dplyr::left_join(nodeAnn, input, by = c("InputId" = "GeneID"),
-                                relationship = "many-to-many")
-    #nodeAnn <- unique(nodeAnn[,c("GraphId1", "Col", "Scale")])
-    nodeAnn <- nodeAnn[,c("GraphId1", 
-                          "InputId", 
-                          "Col", 
-                          "Scale", 
-                          "ScaleName")]
-    
-    colnames(nodeAnn) <- c("GraphId1", 
-                           "InputId",
-                           "MapColor", 
-                           "Scale", 
-                           "ScaleName")
-    
-    nodeAnn_gene <- rbind.data.frame(nodeAnn_gene, nodeAnn)
+  }else{
+    nodeAnn_gene <- NULL
   }
+  
   
   
   #======================================================================#
@@ -151,84 +156,87 @@
   # Filter geneIDs
   geneIDs_fil <- geneIDs_nodes[geneIDs_nodes$Database %in% metaboliteDBs,]
   
-  # Convert gene IDs of the nodes to the input IDs
-  databases <- unique(geneIDs_fil$Database)
-  nodeAnn_metabolite <- NULL
-  for (db in unique(inputDB[inputDB %in% metaboliteDBs_name])){
-    
-    # Prepare input data:
-    # Combine all color variables into a single column
-    if (is.data.frame(colorVar)){
-      input <- NULL
-      for (i in seq_len(ncol(colorVar))){
-        input <- rbind(input,
-                       data.frame(GeneID = geneIDs[inputDB == db],
-                                  Col = colorVar[inputDB == db,i],
-                                  Scale = i,
-                                  ScaleName = colnames(colorVar)[i]
-                       ))
-      }
-    } else{
-      input <- data.frame(GeneID = geneIDs[inputDB == db],
-                          Col = colorVar[inputDB == db],
-                          Scale = 1,
-                          ScaleName = "Color"
-      )
-    }
-    
-    
-    nodeAnn <- NULL
-    for (i in seq_along(databases)){
-      keytype <- databases[i]
+  if (nrow(geneIDs_fil) > 0){
+    # Convert metabolite IDs of the nodes to the input IDs
+    databases <- unique(geneIDs_fil$Database)
+    nodeAnn_metabolite <- NULL
+    for (db in unique(inputDB[inputDB %in% metaboliteDBs_name])){
       
-      # If gene IDs are already the same as the input IDs
-      if (keytype == db){
-        temp <- geneIDs_fil[geneIDs_fil$Database == keytype, ]
-        temp$InputId <- temp$ID
-        temp <- unique(temp[,c("GraphId1", "InputId")])
-        
-        # If gene IDs are different from input IDs
-      }else{
-        temp <- tryCatch({
-          temp <- geneIDs_fil[geneIDs_fil$Database == keytype, ]
-          ann <- annMetabolites[annMetabolites[,keytype] %in% 
-                                  temp$ID,c(keytype, db)]
-          ann <- ann[!(is.na(ann[,1]) | is.na(ann[,2])),]
-          temp <- dplyr::left_join(temp, ann, by = c("ID" = keytype),
-                                   relationship = "many-to-many")
-          colnames(temp) <- c("Database", "ID", "GraphId1", "InputId")
-          temp <- unique(temp[,c("GraphId1", "InputId")])
-          temp
-        }, error = function(cond){
-          NULL
-        })
-        
+      # Prepare input data:
+      # Combine all color variables into a single column
+      if (is.data.frame(colorVar)){
+        input <- NULL
+        for (i in seq_len(ncol(colorVar))){
+          input <- rbind(input,
+                         data.frame(GeneID = geneIDs[inputDB == db],
+                                    Col = colorVar[inputDB == db,i],
+                                    Scale = i,
+                                    ScaleName = colnames(colorVar)[i]
+                         ))
+        }
+      } else{
+        input <- data.frame(GeneID = geneIDs[inputDB == db],
+                            Col = colorVar[inputDB == db],
+                            Scale = 1,
+                            ScaleName = "Color"
+        )
       }
-      nodeAnn <- rbind.data.frame(nodeAnn, temp)
+      
+      
+      nodeAnn <- NULL
+      for (i in seq_along(databases)){
+        keytype <- databases[i]
+        
+        # If gene IDs are already the same as the input IDs
+        if (keytype == db){
+          temp <- geneIDs_fil[geneIDs_fil$Database == keytype, ]
+          temp$InputId <- temp$ID
+          temp <- unique(temp[,c("GraphId1", "InputId")])
+          
+          # If gene IDs are different from input IDs
+        }else{
+          temp <- tryCatch({
+            temp <- geneIDs_fil[geneIDs_fil$Database == keytype, ]
+            ann <- annMetabolites[annMetabolites[,keytype] %in% 
+                                    temp$ID,c(keytype, db)]
+            ann <- ann[!(is.na(ann[,1]) | is.na(ann[,2])),]
+            temp <- dplyr::left_join(temp, ann, by = c("ID" = keytype),
+                                     relationship = "many-to-many")
+            colnames(temp) <- c("Database", "ID", "GraphId1", "InputId")
+            temp <- unique(temp[,c("GraphId1", "InputId")])
+            temp
+          }, error = function(cond){
+            NULL
+          })
+          
+        }
+        nodeAnn <- rbind.data.frame(nodeAnn, temp)
+      }
+      
+      nodeAnn <- nodeAnn[!duplicated(nodeAnn),]
+      nodeAnn <- nodeAnn[!is.na(nodeAnn$InputId),]
+      
+      # Combine node annotation with input
+      nodeAnn <- dplyr::left_join(nodeAnn, input, by = c("InputId" = "GeneID"),
+                                  relationship = "many-to-many")
+      #nodeAnn <- unique(nodeAnn[,c("GraphId1", "Col", "Scale")])
+      nodeAnn <- nodeAnn[,c("GraphId1", 
+                            "InputId", 
+                            "Col", 
+                            "Scale", 
+                            "ScaleName")]
+      
+      colnames(nodeAnn) <- c("GraphId1", 
+                             "InputId",
+                             "MapColor", 
+                             "Scale", 
+                             "ScaleName")
+      
+      nodeAnn_metabolite <- rbind.data.frame(nodeAnn_metabolite, nodeAnn)
     }
-    
-    nodeAnn <- nodeAnn[!duplicated(nodeAnn),]
-    nodeAnn <- nodeAnn[!is.na(nodeAnn$InputId),]
-    
-    # Combine node annotation with input
-    nodeAnn <- dplyr::left_join(nodeAnn, input, by = c("InputId" = "GeneID"),
-                                relationship = "many-to-many")
-    #nodeAnn <- unique(nodeAnn[,c("GraphId1", "Col", "Scale")])
-    nodeAnn <- nodeAnn[,c("GraphId1", 
-                          "InputId", 
-                          "Col", 
-                          "Scale", 
-                          "ScaleName")]
-    
-    colnames(nodeAnn) <- c("GraphId1", 
-                           "InputId",
-                           "MapColor", 
-                           "Scale", 
-                           "ScaleName")
-    
-    nodeAnn_metabolite <- rbind.data.frame(nodeAnn_metabolite, nodeAnn)
+  }else{
+    nodeAnn_metabolite <- NULL
   }
-  
   
   nodeAnn_all <- rbind.data.frame(nodeAnn_gene,
                                   nodeAnn_metabolite)
