@@ -31,83 +31,96 @@
 #' @export
 
 defaultColorList <- function(ColorVar, ColorNames = NULL){
-  colorList <- list()
-  if (!is.data.frame(ColorVar)){
-    ColorVar <- data.frame(Color = ColorVar)
-  }
-  
-  if ((!is.null(ColorNames)) & (ncol(ColorVar) == length(ColorNames))){
-    colnames(ColorVar) <- ColorNames
-  }
-  if ((!is.null(ColorNames)) & (ncol(ColorVar) != length(ColorNames))){
-    warning("The number of color names is different than the number of 
-    color variables. Default color names will be used instead.")
-  }
-  for (c in seq_len(ncol(ColorVar))){
-    if (is.numeric(ColorVar[,c])){
-      
-      # Divergent color scale
-      if ((min(ColorVar[,c], na.rm = TRUE) < 0) & 
-          (max(ColorVar[,c], na.rm = TRUE) > 0)){
-        
-        # Since we want to color scale to be symmetric, we set the absolute 
-        # min and max value to the same max absolute value
-        max_absolute_value <- max(
-          abs(as.numeric(stats::quantile(ColorVar[,c], 0.9, na.rm = TRUE))),
-          abs(as.numeric(stats::quantile(ColorVar[,c], 0.1, na.rm = TRUE)))
-        )
-        
-        colorList[[c]] <- list(
-          ScaleName = colnames(ColorVar)[c],
-          ScaleType = "Divergent",
-          ColorVal = c("MinVal" = -1*max_absolute_value,
-                       "MidVal" = 0,
-                       "MaxVal" = max_absolute_value),
-          Color = c( "MinCol" = "#5754FF",
-                     "MidCol" = "white",
-                     "MaxCol" = "#FF4845"))
-      } 
-      
-      # Sequential color scale
-      if ((min(ColorVar[,c], na.rm = TRUE) >= 0) | 
-          (max(ColorVar[,c], na.rm = TRUE) <= 0)){
-        
-        colorList[[c]] <- list(
-          ScaleName = colnames(ColorVar)[c],
-          ScaleType = "Sequential",
-          ColorVal = c("MinVal" = as.numeric(stats::quantile(ColorVar[,c],
-                                                             0.1, 
-                                                             na.rm = TRUE)),
-                       "MaxVal" = as.numeric(stats::quantile(ColorVar[,c],
-                                                             0.9, 
-                                                             na.rm = TRUE))),
-          Color = c("MinCol" = "#DADAEB",
-                    "MaxCol" = "#54278F"))
-      }
-    } 
-    
-    # Qualitative color scale
-    if (!is.numeric(ColorVar[,c])){
-      
-      if (length(unique(ColorVar[,c])) == 2){
-        colorList[[c]] <- list(
-          ScaleName = colnames(ColorVar)[c],
-          ScaleType = "Qualitative",
-          Color = stats::setNames(
-            c("green", "yellow"), 
-            unique(ColorVar[,c]))
-        )
-      } else{
-        colorList[[c]] <- list(
-          ScaleName = colnames(ColorVar)[c],
-          ScaleType = "Qualitative",
-          Color = stats::setNames(
-            grDevices::rainbow(length(unique(ColorVar[,c]))), 
-            unique(ColorVar[,c]))
-        )
-      }
+    colorList <- list()
+    if (!is.data.frame(ColorVar)){
+        ColorVar <- data.frame(Color = ColorVar)
     }
-  }
-  names(colorList) <- colnames(ColorVar)
-  return(colorList)
+    
+    if ((!is.null(ColorNames)) & (ncol(ColorVar) == length(ColorNames))){
+        colnames(ColorVar) <- ColorNames
+    }
+    if ((!is.null(ColorNames)) & (ncol(ColorVar) != length(ColorNames))){
+        warning(
+            "The number of color names is different than the number of 
+            color variables. Default color names will be used instead.")
+    }
+    for (c in seq_len(ncol(ColorVar))){
+        if (is.numeric(ColorVar[,c])){
+            
+            # Divergent color scale
+            if ((min(ColorVar[,c], na.rm = TRUE) < 0) & 
+                (max(ColorVar[,c], na.rm = TRUE) > 0)){
+                
+                # Since we want to color scale to be symmetric, we set the 
+                # absolute min and max value to the same max absolute value
+                max_absolute_value <- max(
+                    abs(as.numeric(stats::quantile(
+                        ColorVar[,c], 0.9, 
+                        na.rm = TRUE))),
+                    abs(as.numeric(stats::quantile(
+                        ColorVar[,c], 0.1, 
+                        na.rm = TRUE)))
+                )
+                
+                colorList[[c]] <- list(
+                    ScaleName = colnames(ColorVar)[c],
+                    ScaleType = "Divergent",
+                    ColorVal = c(
+                        "MinVal" = -1*max_absolute_value,
+                        "MidVal" = 0,
+                        "MaxVal" = max_absolute_value),
+                    Color = c(
+                        "MinCol" = "#5754FF",
+                        "MidCol" = "white",
+                        "MaxCol" = "#FF4845"))
+            } 
+            
+            # Sequential color scale
+            if ((min(ColorVar[,c], na.rm = TRUE) >= 0) | 
+                (max(ColorVar[,c], na.rm = TRUE) <= 0)){
+                
+                colorList[[c]] <- list(
+                    ScaleName = colnames(ColorVar)[c],
+                    ScaleType = "Sequential",
+                    ColorVal = c(
+                        "MinVal" = as.numeric(
+                            stats::quantile(
+                                ColorVar[,c],
+                                0.1, 
+                                na.rm = TRUE)),
+                        "MaxVal" = as.numeric(
+                            stats::quantile(
+                                ColorVar[,c],
+                                0.9, 
+                                na.rm = TRUE))),
+                    Color = c(
+                        "MinCol" = "#DADAEB",
+                        "MaxCol" = "#54278F"))
+            }
+        } 
+        
+        # Qualitative color scale
+        if (!is.numeric(ColorVar[,c])){
+            
+            if (length(unique(ColorVar[,c])) == 2){
+                colorList[[c]] <- list(
+                    ScaleName = colnames(ColorVar)[c],
+                    ScaleType = "Qualitative",
+                    Color = stats::setNames(
+                        c("green", "yellow"), 
+                        unique(ColorVar[,c]))
+                )
+            } else{
+                colorList[[c]] <- list(
+                    ScaleName = colnames(ColorVar)[c],
+                    ScaleType = "Qualitative",
+                    Color = stats::setNames(
+                        grDevices::rainbow(length(unique(ColorVar[,c]))), 
+                        unique(ColorVar[,c]))
+                )
+            }
+        }
+    }
+    names(colorList) <- colnames(ColorVar)
+    return(colorList)
 }

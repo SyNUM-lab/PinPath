@@ -8,18 +8,20 @@
 
 # Prepare edges for network
 .prepareEdges_network <- function(dataEdges){
-  edgeFUN <- function(dataEdges){
-    endPoint <- sum(names(dataEdges$Graphics) == "Point")
-    edges_df <- data.frame(
-      GraphRef1 = as.character(dataEdges$Graphics[[1]]["GraphRef"]),
-      GraphRef2 = as.character(dataEdges$Graphics[[endPoint]]["GraphRef"])
-    )
-  }
-  edges_df <- do.call(rbind, lapply(dataEdges, edgeFUN))
-  edges_df <- edges_df[!is.na(edges_df$GraphRef1) & 
-                         !is.na(edges_df$GraphRef2),]
-  colnames(edges_df) <- c("from", "to")
-  return(edges_df)
+    edgeFUN <- function(dataEdges){
+        endPoint <- sum(names(dataEdges$Graphics) == "Point")
+        edges_df <- data.frame(
+            GraphRef1 = as.character(
+                dataEdges$Graphics[[1]]["GraphRef"]),
+            GraphRef2 = as.character(
+                dataEdges$Graphics[[endPoint]]["GraphRef"])
+        )
+    }
+    edges_df <- do.call(rbind, lapply(dataEdges, edgeFUN))
+    edges_df <- edges_df[
+        !is.na(edges_df$GraphRef1) & !is.na(edges_df$GraphRef2),]
+    colnames(edges_df) <- c("from", "to")
+    return(edges_df)
 }
 
 # ------------------------------------------------------------------------------
@@ -32,22 +34,22 @@
 
 # Prepare nodes for network
 .prepareNodes_network <- function(dataNodes){
-  nodeFUN <- function(dataNodes){
-    data.frame(
-      GraphId = as.character(dataNodes$.attrs["GraphId"]),
-      GraphId1 = dataNodes$ID,
-      Label = as.character(stringr::str_remove_all(
-        dataNodes$.attrs["TextLabel"],"\\n+$")),
-      NodeType = as.character(dataNodes$.attrs["Type"]),
-      Database = as.character(dataNodes$Xref["Database"]),
-      GroupRef = as.character(dataNodes$.attrs["GroupRef"]),
-      ID = as.character(dataNodes$Xref["ID"])
-      
-    )
-  }
-  nodes_df <- do.call(rbind, lapply(dataNodes, nodeFUN))
-  #nodes_df <- nodes_df[!is.na(nodes_df$GraphId),]
-  return(nodes_df)
+    nodeFUN <- function(dataNodes){
+        data.frame(
+            GraphId = as.character(dataNodes$.attrs["GraphId"]),
+            GraphId1 = dataNodes$ID,
+            Label = as.character(stringr::str_remove_all(
+                dataNodes$.attrs["TextLabel"],"\\n+$")),
+            NodeType = as.character(dataNodes$.attrs["Type"]),
+            Database = as.character(dataNodes$Xref["Database"]),
+            GroupRef = as.character(dataNodes$.attrs["GroupRef"]),
+            ID = as.character(dataNodes$Xref["ID"])
+            
+        )
+    }
+    nodes_df <- do.call(rbind, lapply(dataNodes, nodeFUN))
+    #nodes_df <- nodes_df[!is.na(nodes_df$GraphId),]
+    return(nodes_df)
 }
 
 
@@ -61,14 +63,14 @@
 
 # Prepare groups for network
 .prepareGroups_network <- function(dataGroups){
-  groupFUN <- function(dataGroups){
-    data.frame(
-      GroupId = as.character(dataGroups["GroupId"]),
-      GraphId = as.character(dataGroups["GraphId"])
-    )
-  }
-  groups_df <- do.call(rbind, lapply(dataGroups, groupFUN))
-  return(groups_df)
+    groupFUN <- function(dataGroups){
+        data.frame(
+            GroupId = as.character(dataGroups["GroupId"]),
+            GraphId = as.character(dataGroups["GraphId"])
+        )
+    }
+    groups_df <- do.call(rbind, lapply(dataGroups, groupFUN))
+    return(groups_df)
 }
 # ------------------------------------------------------------------------------
 #' @title Show nodes as rectangles vertically splitted by color scale.
@@ -84,35 +86,37 @@
 #' @noRd
 
 # Plot nodes in network
-.geom_node_split <- function(mapping=NULL, data=NULL,
-                             position='identity',
-                             show.legend=NA, nCol = 1, 
-                             iCol = 1, nodeSize = 1, ...) {
-  mapping1 <- mapping
-  mapping_temp1 <- mapping
-  
-  raw_mapping1 <- ggplot2::aes(
-    xmin=.data$x-0.5*(0.06*nodeSize*(max(.data$x) - min(.data$x))) + 
-      ((0.06*nodeSize*(max(.data$x) - min(.data$x)))/nCol)*(iCol-1), 
-    ymin=.data$y-nodeSize*0.018*(max(.data$y) - min(.data$y)), 
-    xmax=.data$x-0.5*(0.06*nodeSize*(max(.data$x) - min(.data$x))) + 
-      ((0.06*nodeSize*(max(.data$x) - min(.data$x)))/nCol)*(iCol), 
-    ymax=.data$y+nodeSize*0.018*(max(.data$y) - min(.data$y)))
-  
-  mapping1 <- c(as.list(mapping_temp1), 
-                raw_mapping1[!names(raw_mapping1) %in% names(mapping_temp1)])
-  class(mapping1) <- "uneval"
-  
-  ggplot2::layer(
-    data=data, 
-    mapping=mapping1, 
-    stat=ggraph::StatFilter, 
-    geom=ggplot2::GeomRect,
-    position=position, 
-    show.legend=show.legend, 
-    inherit.aes=FALSE,
-    params=list(na.rm=FALSE, ...)
-  )
+.geom_node_split <- function(
+        mapping=NULL, data=NULL,
+        position='identity',
+        show.legend=NA, nCol = 1, 
+        iCol = 1, nodeSize = 1, ...) {
+    mapping1 <- mapping
+    mapping_temp1 <- mapping
+    
+    raw_mapping1 <- ggplot2::aes(
+        xmin=.data$x-0.5*(0.06*nodeSize*(max(.data$x) - min(.data$x))) + 
+            ((0.06*nodeSize*(max(.data$x) - min(.data$x)))/nCol)*(iCol-1), 
+        ymin=.data$y-nodeSize*0.018*(max(.data$y) - min(.data$y)), 
+        xmax=.data$x-0.5*(0.06*nodeSize*(max(.data$x) - min(.data$x))) + 
+            ((0.06*nodeSize*(max(.data$x) - min(.data$x)))/nCol)*(iCol), 
+        ymax=.data$y+nodeSize*0.018*(max(.data$y) - min(.data$y)))
+    
+    mapping1 <- c(
+        as.list(mapping_temp1), 
+        raw_mapping1[!names(raw_mapping1) %in% names(mapping_temp1)])
+    class(mapping1) <- "uneval"
+    
+    ggplot2::layer(
+        data=data, 
+        mapping=mapping1, 
+        stat=ggraph::StatFilter, 
+        geom=ggplot2::GeomRect,
+        position=position, 
+        show.legend=show.legend, 
+        inherit.aes=FALSE,
+        params=list(na.rm=FALSE, ...)
+    )
 }
 
 # ------------------------------------------------------------------------------
@@ -192,419 +196,445 @@
 #' @export
 
 
-GPML2Network <- function(infile,
-                         outdir = getwd(),
-                         outname = NULL,
-                         geneIDs = NULL,
-                         colorVar = NULL,
-                         annGenes = NULL,
-                         annMetabolites = NULL,
-                         inputDB = NULL,
-                         colorNames = NULL,
-                         colorList = NULL,
-                         NAvalue = "#F0F0F0",
-                         layout = "nicely",
-                         unconnectedNodes = FALSE,
-                         alpha = 0.9,
-                         nodeSize = 1,
-                         legend = FALSE,
-                         nodeTable = FALSE,
-                         pathInfo = FALSE,
-                         openFile = TRUE
+GPML2Network <- function(
+        infile,
+        outdir = getwd(),
+        outname = NULL,
+        geneIDs = NULL,
+        colorVar = NULL,
+        annGenes = NULL,
+        annMetabolites = NULL,
+        inputDB = NULL,
+        colorNames = NULL,
+        colorList = NULL,
+        NAvalue = "#F0F0F0",
+        layout = "nicely",
+        unconnectedNodes = FALSE,
+        alpha = 0.9,
+        nodeSize = 1,
+        legend = FALSE,
+        nodeTable = FALSE,
+        pathInfo = FALSE,
+        openFile = TRUE
 ){
-  #***********************************************************************#
-  # Read and extract info from GPML file
-  #***********************************************************************#
-  
-  outputList <- list()
-  
-  # Read GPML file
-  doc <- XML::xmlParse(xml2::read_xml(infile))
-  gpml <- XML::xmlToList(doc)
-  
-  # Extract the names (e.g., DataNode, Interaction, Group, Label, Shape)
-  nms <- names(gpml)
-  
-  # Get pathway name
-  PathwayName <- gpml$.attrs["Name"]
-  
-  # Get organism
-  Organism <- gpml$.attrs["Organism"]
-  
-  # Get pathway id
-  PathwayID <- gpml$.attrs["Version"]
-  
-  # Filter for graphical elements
-  nms <- names(gpml)
-  gpml_fil <- gpml[nms %in% c("DataNode", "Shape", "Label", "Interaction",
-                              "GraphicalLine", "State", "Group")]
-  
-  # Give each graphical element a unique ID
-  for (l in seq_along(gpml_fil)){
-    gpml_fil[[l]]["ID"] <-  paste0("id", l)
-  }
-  
-  #***********************************************************************#
-  # Set default values
-  #***********************************************************************#
-  
-  # If output name is not set, give it the name of the pathway
-  if (is.null(outname)){
-    outname <- paste0(PathwayName,"_",PathwayID, "_",Organism)
-    outname <- stringr::str_replace_all(outname, " ", "_")
-    outname <- make.names(outname)
-  }
-  outfile <-paste0(outdir,"/",outname)
-  
-  # Get file extension
-  file_extension <- tolower(tools::file_ext(outname))
-  
-  # If no color is set, use default color palette
-  if (is.null(colorList) & !is.null(colorVar)){
-    colorList <- defaultColorList(colorVar, ColorNames = colorNames)
-  }
-  
-  
-  #***********************************************************************#
-  # Set the color values of the nodes
-  #***********************************************************************#
-  
-  # Prepare nodes
-  dataNodes <- gpml_fil[names(gpml_fil) == "DataNode"]
-  nodes_df <- .prepareNodes_network(dataNodes)
-  
-  # Map colors to nodes
-  colors_df <- NULL
-  if (!(is.null(geneIDs) | 
+    #***********************************************************************#
+    # Read and extract info from GPML file
+    #***********************************************************************#
+    
+    outputList <- list()
+    
+    # Read GPML file
+    doc <- XML::xmlParse(xml2::read_xml(infile))
+    gpml <- XML::xmlToList(doc)
+    
+    # Extract the names (e.g., DataNode, Interaction, Group, Label, Shape)
+    nms <- names(gpml)
+    
+    # Get pathway name
+    PathwayName <- gpml$.attrs["Name"]
+    
+    # Get organism
+    Organism <- gpml$.attrs["Organism"]
+    
+    # Get pathway id
+    PathwayID <- gpml$.attrs["Version"]
+    
+    # Filter for graphical elements
+    nms <- names(gpml)
+    gpml_fil <- gpml[nms %in% c(
+        "DataNode", "Shape", "Label", "Interaction",
+        "GraphicalLine", "State", "Group")]
+    
+    # Give each graphical element a unique ID
+    for (l in seq_along(gpml_fil)){
+        gpml_fil[[l]]["ID"] <-  paste0("id", l)
+    }
+    
+    #***********************************************************************#
+    # Set default values
+    #***********************************************************************#
+    
+    # If output name is not set, give it the name of the pathway
+    if (is.null(outname)){
+        outname <- paste0(PathwayName,"_",PathwayID, "_",Organism)
+        outname <- stringr::str_replace_all(outname, " ", "_")
+        outname <- make.names(outname)
+    }
+    outfile <-paste0(outdir,"/",outname)
+    
+    # Get file extension
+    file_extension <- tolower(tools::file_ext(outname))
+    
+    # If no color is set, use default color palette
+    if (is.null(colorList) & !is.null(colorVar)){
+        colorList <- defaultColorList(colorVar, ColorNames = colorNames)
+    }
+    
+    
+    #***********************************************************************#
+    # Set the color values of the nodes
+    #***********************************************************************#
+    
+    # Prepare nodes
+    dataNodes <- gpml_fil[names(gpml_fil) == "DataNode"]
+    nodes_df <- .prepareNodes_network(dataNodes)
+    
+    # Map colors to nodes
+    colors_df <- NULL
+    if (!(
+        is.null(geneIDs) | 
         is.null(colorVar) | 
         (is.null(annGenes) & is.null(annMetabolites)) | 
         is.null(inputDB))){
+        
+        colors_df <- .mapColors(
+            nodes_df = .prepareNodes(dataNodes),
+            geneIDs = geneIDs,
+            colorVar = colorVar,
+            annGenes = annGenes,
+            annMetabolites = data.frame(annMetabolites),
+            inputDB = inputDB,
+            colorList = colorList,
+            NAvalue = NAvalue)
+        
+        # Add colors to nodes
+        nodes_df <- dplyr::left_join(
+            nodes_df, 
+            colors_df[, c("GraphId1", "ColorValue","Scale")],
+            by = c("GraphId1" = "GraphId1"))
+    } else{
+        nodes_df$ColorValue <- "white"
+        nodes_df$Scale <- 1
+    }
     
-    colors_df <- .mapColors(nodes_df = .prepareNodes(dataNodes),
-                            geneIDs = geneIDs,
-                            colorVar = colorVar,
-                            annGenes = annGenes,
-                            annMetabolites = data.frame(annMetabolites),
-                            inputDB = inputDB,
-                            colorList = colorList,
-                            NAvalue = NAvalue)
+    # Change name
+    nodes_df$name <- nodes_df$Label
+    nodes_df <- nodes_df[,c(
+        "name", 
+        colnames(nodes_df)[colnames(nodes_df) != "name"])]
     
-    # Add colors to nodes
-    nodes_df <- dplyr::left_join(nodes_df, 
-                                 colors_df[, c("GraphId1", 
-                                               "ColorValue", 
-                                               "Scale")],
-                                 by = c("GraphId1" = "GraphId1"))
-  } else{
-    nodes_df$ColorValue <- "white"
-    nodes_df$Scale <- 1
-  }
-  
-  # Change name
-  nodes_df$name <- nodes_df$Label
-  nodes_df <- nodes_df[,c("name", 
-                          colnames(nodes_df)[colnames(nodes_df) != "name"])]
-  
-  # Collect node-to-group link
-  node2group <- nodes_df[, c("GraphId", "name", "GroupRef")]
-  node2group <- node2group[!is.na(node2group$GroupRef),]
-  node2group <- node2group[!duplicated(node2group),]
-  
-  # Collect group information
-  dataGroups <- gpml_fil[names(gpml_fil) == "Group"]
-  groups_df <- .prepareGroups_network(dataGroups)
-  
-  # Give groups unique names
-  group_ids <- unique(node2group$GroupRef)
-  group_names <- rep(NA, length(group_ids))
-  graph_ids<- rep(NA, length(group_ids))
-  for (g in seq_along(group_ids)){
-    group_names[g] <- paste(
-      sort(node2group$name[node2group$GroupRef == group_ids[g]]), 
-      collapse = "_")
-    graph_ids[g] <- groups_df$GraphId[groups_df$GroupId == group_ids[g]][1]
-  }
-  
-  # Combine groups with node information
-  if (length(group_names) > 0){
-    nodes_df <- rbind.data.frame(nodes_df, 
-                                 data.frame(name = group_names,
-                                            GraphId = graph_ids,
-                                            GraphId1 = graph_ids,
-                                            Label = group_names,
-                                            NodeType = "Group",
-                                            Database = NA,
-                                            GroupRef = NA,
-                                            ID = NA,
-                                            ColorValue = "black",
-                                            Scale = NA))
-  }
-  nodes_df$NodeType <- ifelse(nodes_df$NodeType  == "Group",
-                              "Group", "nonGroup")
-  
-  
-  #***********************************************************************#
-  # Prepare data for plotting
-  #***********************************************************************#
-  
-  # Prepare edges
-  dataEdges <- gpml_fil[names(gpml_fil) %in% c("Interaction", 
-                                               "GraphicalLine")]
-  edges_df_temp <- .prepareEdges_network(dataEdges)
-  
-  if (length(group_names) > 0){
-    group_edges_df <- node2group[,c("GraphId", "GroupRef")]
-    group_edges_df <- dplyr::inner_join(group_edges_df, groups_df, 
-                                        by = c("GroupRef" = "GroupId"))[c(1,3)]
-    colnames(group_edges_df) <- c("from", "to")
-    edges_df <- rbind.data.frame(edges_df_temp, group_edges_df)
-    edges_df$type <- c(rep("node_node", nrow(edges_df_temp)),
-                       rep("node_group", nrow(group_edges_df)))
-  }else{
-    edges_df <- edges_df_temp
-    edges_df$type <- "node_node"
-  }
-  
-  
-  # Filter edges for nodes
-  edges_df$from <- replace(stats::setNames(edges_df$from,edges_df$from), 
-                           nodes_df$GraphId, nodes_df$Label)[edges_df$from]
-  edges_df$to <- replace(stats::setNames(edges_df$to,edges_df$to), 
-                         nodes_df$GraphId, nodes_df$Label)[edges_df$to]
-  
-  edges_df <- edges_df[(edges_df$from %in% nodes_df$name) &
-                         (edges_df$to %in% nodes_df$name),]
-  
-  
-  
-  #***********************************************************************#
-  # Prepare color values
-  #***********************************************************************#
-  
-  # Collect NA and non-NA scales
-  NAdf <- nodes_df[is.na(nodes_df$Scale),]
-  nonNAdf <- nodes_df[!is.na(nodes_df$Scale),]
-  
-  # Add each scale as a seperate column
-  scales <- unique(nodes_df$Scale)
-  scales <- scales[!is.na(scales)]
-  
-  if (length(scales) > 0){
-    for (s in scales){
-      if (s == 1){
-        nodes_df_split <- rbind.data.frame(nonNAdf[nonNAdf$Scale == s,-10], 
-                                           NAdf[,-10])
+    # Collect node-to-group link
+    node2group <- nodes_df[, c("GraphId", "name", "GroupRef")]
+    node2group <- node2group[!is.na(node2group$GroupRef),]
+    node2group <- node2group[!duplicated(node2group),]
+    
+    # Collect group information
+    dataGroups <- gpml_fil[names(gpml_fil) == "Group"]
+    groups_df <- .prepareGroups_network(dataGroups)
+    
+    # Give groups unique names
+    group_ids <- unique(node2group$GroupRef)
+    group_names <- rep(NA, length(group_ids))
+    graph_ids<- rep(NA, length(group_ids))
+    for (g in seq_along(group_ids)){
+        group_names[g] <- paste(
+            sort(node2group$name[node2group$GroupRef == group_ids[g]]), 
+            collapse = "_")
+        graph_ids[g] <- groups_df$GraphId[groups_df$GroupId == group_ids[g]][1]
+    }
+    
+    # Combine groups with node information
+    if (length(group_names) > 0){
+        nodes_df <- rbind.data.frame(
+            nodes_df, 
+            data.frame(
+                name = group_names,
+                GraphId = graph_ids,
+                GraphId1 = graph_ids,
+                Label = group_names,
+                NodeType = "Group",
+                Database = NA,
+                GroupRef = NA,
+                ID = NA,
+                ColorValue = "black",
+                Scale = NA))
+    }
+    nodes_df$NodeType <- ifelse(
+        nodes_df$NodeType  == "Group",
+        "Group", "nonGroup")
+    
+    
+    #***********************************************************************#
+    # Prepare data for plotting
+    #***********************************************************************#
+    
+    # Prepare edges
+    dataEdges <- gpml_fil[names(gpml_fil) %in% c(
+        "Interaction", 
+        "GraphicalLine")]
+    edges_df_temp <- .prepareEdges_network(dataEdges)
+    
+    if (length(group_names) > 0){
+        group_edges_df <- node2group[,c("GraphId", "GroupRef")]
+        group_edges_df <- dplyr::inner_join(
+            group_edges_df, groups_df, 
+            by = c("GroupRef" = "GroupId"))[c(1,3)]
+        colnames(group_edges_df) <- c("from", "to")
+        edges_df <- rbind.data.frame(edges_df_temp, group_edges_df)
+        edges_df$type <- c(
+            rep("node_node", nrow(edges_df_temp)),
+            rep("node_group", nrow(group_edges_df)))
+    }else{
+        edges_df <- edges_df_temp
+        edges_df$type <- "node_node"
+    }
+    
+    
+    # Filter edges for nodes
+    edges_df$from <- replace(
+        stats::setNames(edges_df$from,edges_df$from), 
+        nodes_df$GraphId, nodes_df$Label)[edges_df$from]
+    edges_df$to <- replace(
+        stats::setNames(edges_df$to,edges_df$to), 
+        nodes_df$GraphId, nodes_df$Label)[edges_df$to]
+    
+    edges_df <- edges_df[(
+        edges_df$from %in% nodes_df$name) & (edges_df$to %in% nodes_df$name),]
+    
+    #***********************************************************************#
+    # Prepare color values
+    #***********************************************************************#
+    
+    # Collect NA and non-NA scales
+    NAdf <- nodes_df[is.na(nodes_df$Scale),]
+    nonNAdf <- nodes_df[!is.na(nodes_df$Scale),]
+    
+    # Add each scale as a seperate column
+    scales <- unique(nodes_df$Scale)
+    scales <- scales[!is.na(scales)]
+    
+    if (length(scales) > 0){
+        for (s in scales){
+            if (s == 1){
+                nodes_df_split <- rbind.data.frame(
+                    nonNAdf[nonNAdf$Scale == s,-10], 
+                    NAdf[,-10])
+                colnames(nodes_df_split)[ncol(nodes_df_split)] <- "ColorValue1"
+            }else{
+                fil <- rbind.data.frame(nonNAdf[nonNAdf$Scale == s,], NAdf)
+                nodes_df_split <- cbind.data.frame(
+                    nodes_df_split, 
+                    fil$ColorValue)
+                colnames(nodes_df_split)[ncol(nodes_df_split)] <- paste0(
+                    "ColorValue",s)
+            }
+        }
+        
+        # Remove duplicated nodes
+        dupIds <- sum(
+            BiocGenerics::duplicated(nodes_df_split$name[
+                !BiocGenerics::duplicated(
+                    nodes_df_split[,9:ncol(nodes_df_split)])]))
+        if (dupIds > 0){
+            warning(
+                "There duplicated feature IDs. The GPML2Network function 
+                only plots the values associated with the first feature ID.")
+        }
+    }
+    
+    if (length(scales) == 0){
+        nodes_df_split <- NAdf[-10]
         colnames(nodes_df_split)[ncol(nodes_df_split)] <- "ColorValue1"
-      }else{
-        fil <- rbind.data.frame(nonNAdf[nonNAdf$Scale == s,], NAdf)
-        nodes_df_split <- cbind.data.frame(nodes_df_split, fil$ColorValue)
-        colnames(nodes_df_split)[ncol(nodes_df_split)] <- paste0(
-          "ColorValue",s)
-      }
     }
     
-    # Remove duplicated nodes
-    dupIds <- sum(
-      BiocGenerics::duplicated(nodes_df_split$name[
-        !BiocGenerics::duplicated(
-          nodes_df_split[,9:ncol(nodes_df_split)])]))
-    if (dupIds > 0){
-      warning("There duplicated feature IDs. The GPML2Network function only 
-              plots the values associated with the first feature ID.")
-    }
-  }
-  
-  if (length(scales) == 0){
-    nodes_df_split <- NAdf[-10]
-    colnames(nodes_df_split)[ncol(nodes_df_split)] <- "ColorValue1"
-  }
-  
-  nodes_df_split <- nodes_df_split[
-    !BiocGenerics::duplicated(nodes_df_split$name),]
-  
-  
-  #***********************************************************************#
-  # Make network
-  #***********************************************************************#
-  
-  # Make graph
-  graph_full <- igraph::graph_from_data_frame(edges_df, 
-                                              vertices = nodes_df_split)
-  
-  # Remove self loops
-  graph <- igraph::simplify(graph_full, remove.multiple = FALSE)
-  
-  # Remove unconnected nodes
-  if (!unconnectedNodes){
-    isolated <- which(igraph::degree(graph, mode = "total")==0)
-    graph <- igraph::delete_vertices(graph, isolated)
-  }
-  
-  # Make basis of network
-  g_plot <- ggraph::ggraph(graph, layout = layout) +
-    ggraph::geom_edge_link(ggplot2::aes(color = .data$type)) 
-  
-  # Add each scale to the network
-  for (g in seq_len(ncol(nodes_df_split)-8)){
-    loop_input <- paste0(
-      ".geom_node_split(ggplot2::aes(alpha = NodeType), 
-                         fill = g_plot@data$ColorValue",g,
-      ",nCol = ",(ncol(nodes_df_split)-8),
-      ", iCol = ", g, 
-      ", nodeSize = ", nodeSize, ")")
-    g_plot <- g_plot + eval(parse(text=loop_input))  
-  }
-  
-  # Finalize network
-  g_plot <- g_plot +
-    .geom_node_split(ggplot2::aes(linewidth = .data$NodeType), 
-                     alpha = 0, color = "lightgrey", 
-                     nCol = 1, iCol = 1, nodeSize = nodeSize) +
-    ggraph::geom_node_text(ggplot2::aes(label = .data$name, 
-                                        alpha = .data$NodeType), 
-                           size = 2) +
-    ggplot2::scale_alpha_manual(values = stats::setNames(
-      c(alpha,0), 
-      c("nonGroup", "Group"))) +
-    ggraph::scale_edge_color_manual(values = stats::setNames(
-      c("black", "lightgrey"), 
-      c("node_node", "node_group"))) +
-    ggplot2::scale_linewidth_manual(values = stats::setNames(
-      c(0.3,0), 
-      c("nonGroup", "Group"))) +
-    ggplot2::theme_void() +
-    ggplot2::theme(legend.position = "none")
-  
-  #***********************************************************************#
-  # Export plot
-  #***********************************************************************#
-  
-  # Get file extension
-  file_extension <- tolower(tools::file_ext(outname))
-  
-  # Export plot
-  if (file_extension == "svg"){
-    outfile <-  paste0(outdir,"/",outname)
-    svglite::svglite(outfile, 
-                     width = 13.3/nodeSize, 
-                     height = 8.3/nodeSize)
-    plot(g_plot)
-    grDevices::dev.off()
-  }else if (file_extension %in% c("png", "tiff", "pdf")){
-    outfile <-  paste0(outdir,"/",outname)
-    ggplot2::ggsave(g_plot, file = outfile,
-                    width = 13.3/nodeSize,
-                    height = 8.3/nodeSize,
-                    limitsize = FALSE)
-  }else{
-    if (file_extension != ""){
-      warning("The output file does not have a valid file extension. 
-              Generating .svg file instead.")
-    }
-    # Set output file
-    outfile <- paste0(outdir,"/",outname,".svg")
+    nodes_df_split <- nodes_df_split[
+        !BiocGenerics::duplicated(nodes_df_split$name),]
     
-    svglite::svglite(outfile, 
-                     width = 13.3/nodeSize, 
-                     height = 8.3/nodeSize)
-    plot(g_plot)
-    grDevices::dev.off()
-  }
-  
-  # Save file location in output list
-  outputList[["Pathway"]] <- outfile
-  
-  # Open file
-  if (openFile) {
-    shell(outfile)
-  }
-  
-  #***********************************************************************#
-  # Make and export legend
-  #***********************************************************************#
-  
-  if (legend & !is.null(colors_df)){
+    
+    #***********************************************************************#
+    # Make network
+    #***********************************************************************#
+    
+    # Make graph
+    graph_full <- igraph::graph_from_data_frame(
+        edges_df, 
+        vertices = nodes_df_split)
+    
+    # Remove self loops
+    graph <- igraph::simplify(graph_full, remove.multiple = FALSE)
+    
+    # Remove unconnected nodes
+    if (!unconnectedNodes){
+        isolated <- which(igraph::degree(graph, mode = "total")==0)
+        graph <- igraph::delete_vertices(graph, isolated)
+    }
+    
+    # Make basis of network
+    g_plot <- ggraph::ggraph(graph, layout = layout) +
+        ggraph::geom_edge_link(ggplot2::aes(color = .data$type)) 
+    
+    # Add each scale to the network
+    for (g in seq_len(ncol(nodes_df_split)-8)){
+        loop_input <- paste0(
+            ".geom_node_split(ggplot2::aes(alpha = NodeType), 
+            fill = g_plot@data$ColorValue",g,
+            ",nCol = ",(ncol(nodes_df_split)-8),
+            ", iCol = ", g, 
+            ", nodeSize = ", nodeSize, ")")
+        g_plot <- g_plot + eval(parse(text=loop_input))  
+    }
+    
+    # Finalize network
+    g_plot <- g_plot +
+        .geom_node_split(
+            ggplot2::aes(linewidth = .data$NodeType), 
+            alpha = 0, color = "lightgrey", 
+            nCol = 1, iCol = 1, nodeSize = nodeSize) +
+        ggraph::geom_node_text(
+            ggplot2::aes(
+                label = .data$name, 
+                alpha = .data$NodeType), 
+            size = 2) +
+        ggplot2::scale_alpha_manual(values = stats::setNames(
+            c(alpha,0), 
+            c("nonGroup", "Group"))) +
+        ggraph::scale_edge_color_manual(values = stats::setNames(
+            c("black", "lightgrey"), 
+            c("node_node", "node_group"))) +
+        ggplot2::scale_linewidth_manual(values = stats::setNames(
+            c(0.3,0), 
+            c("nonGroup", "Group"))) +
+        ggplot2::theme_void() +
+        ggplot2::theme(legend.position = "none")
+    
+    #***********************************************************************#
+    # Export plot
+    #***********************************************************************#
+    
+    # Get file extension
+    file_extension <- tolower(tools::file_ext(outname))
     
     # Export plot
     if (file_extension == "svg"){
-      outfile_legend <- paste0(outdir,"/legend_",outname)
-      svglite::svglite(outfile_legend ,
-                       width = 5,
-                       height = length(colorList) + 1.25)
-      .makeLegend(colorList)
-      grDevices::dev.off()
-    }
-    else if (file_extension %in% c("png", "tiff", "pdf")){
-      outfile_legend  <-  paste0(outdir,"/legend_",outname)
-      grDevices::png(file = outfile_legend,
-                     width = 5,
-                     height = length(colorList) + 1.25,
-                     units = "in",
-                     res = 1200,
-                     pointsize = 8)
-      .makeLegend(colorList)
-      grDevices::dev.off()
-    }
-    else{
-      outfile_legend <- paste0(outdir,"/legend_",outname, ".svg")
-      svglite::svglite(outfile_legend ,
-                       width = 5,
-                       height = length(colorList) + 1.25)
-      .makeLegend(colorList)
-      grDevices::dev.off()
+        outfile <-  paste0(outdir,"/",outname)
+        svglite::svglite(
+            outfile, 
+            width = 13.3/nodeSize, 
+            height = 8.3/nodeSize)
+        plot(g_plot)
+        grDevices::dev.off()
+    }else if (file_extension %in% c("png", "tiff", "pdf")){
+        outfile <-  paste0(outdir,"/",outname)
+        ggplot2::ggsave(
+            g_plot, file = outfile,
+            width = 13.3/nodeSize,
+            height = 8.3/nodeSize,
+            limitsize = FALSE)
+    }else{
+        if (file_extension != ""){
+            warning(
+                "The output file does not have a valid file extension. 
+                Generating .svg file instead.")
+        }
+        # Set output file
+        outfile <- paste0(outdir,"/",outname,".svg")
+        
+        svglite::svglite(
+            outfile, 
+            width = 13.3/nodeSize, 
+            height = 8.3/nodeSize)
+        plot(g_plot)
+        grDevices::dev.off()
     }
     
     # Save file location in output list
-    outputList[["Legend"]] <- outfile_legend
-  } else{
-    outputList[["Legend"]] <- NA
-  }
-  
-  #=======================================================================#
-  # Return node table
-  #=======================================================================#
-  
-  if (nodeTable & !is.null(colors_df)){
-    outputTable <- unique(colors_df[!is.na(colors_df$ScaleName),
-                                    c("Label", 
-                                      "InputId", 
-                                      "ScaleName", 
-                                      "MapColor")])
-    colnames(outputTable) <- c("Node Label", 
-                               "ID", 
-                               "Scale Name", 
-                               "Scale Value")
-    outputTable <- outputTable |>
-      tidyr::pivot_wider(
-        names_from = "Scale Name",
-        values_from = "Scale Value",
-        values_fn = list
-      )
+    outputList[["Pathway"]] <- outfile
     
-    # Save node table in output list
-    outputList[["NodeTable"]] <- outputTable
-  } else{
-    outputList[["NodeTable"]] <- NA
-  }
-  
-  #=======================================================================#
-  # Return pathway information
-  #=======================================================================#
-  
-  if (pathInfo){
-    outputList[["Information"]] <- c(
-      "Name" = as.character(gpml$.attrs["Name"]),
-      "ID" = as.character(gpml$.attrs["Version"]),
-      "Link" = paste0("https://www.wikipathways.org/pathways/",
-                      stringr::str_split(gpml$.attrs["Version"], "_")[[1]][1],
-                      ".html"),
-      "Description" = gpml[
-        which(names(gpml) == "Comment")][
-          which.max(nchar(gpml[which(names(gpml) == "Comment")]))][[1]][[1]]
-    )
-  }else{
-    outputList[["Information"]] <- NA
-  }
-  
-  return(outputList)
+    # Open file
+    if (openFile) {
+        shell(outfile)
+    }
+    
+    #***********************************************************************#
+    # Make and export legend
+    #***********************************************************************#
+    
+    if (legend & !is.null(colors_df)){
+        
+        # Export plot
+        if (file_extension == "svg"){
+            outfile_legend <- paste0(outdir,"/legend_",outname)
+            svglite::svglite(
+                outfile_legend ,
+                width = 5,
+                height = length(colorList) + 1.25)
+            .makeLegend(colorList)
+            grDevices::dev.off()
+        }
+        else if (file_extension %in% c("png", "tiff", "pdf")){
+            outfile_legend  <-  paste0(outdir,"/legend_",outname)
+            grDevices::png(
+                file = outfile_legend,
+                width = 5,
+                height = length(colorList) + 1.25,
+                units = "in",
+                res = 1200,
+                pointsize = 8)
+            .makeLegend(colorList)
+            grDevices::dev.off()
+        }
+        else{
+            outfile_legend <- paste0(outdir,"/legend_",outname, ".svg")
+            svglite::svglite(
+                outfile_legend ,
+                width = 5,
+                height = length(colorList) + 1.25)
+            .makeLegend(colorList)
+            grDevices::dev.off()
+        }
+        
+        # Save file location in output list
+        outputList[["Legend"]] <- outfile_legend
+    } else{
+        outputList[["Legend"]] <- NA
+    }
+    
+    #=======================================================================#
+    # Return node table
+    #=======================================================================#
+    
+    if (nodeTable & !is.null(colors_df)){
+        outputTable <- unique(colors_df[
+            !is.na(colors_df$ScaleName),
+            c("Label", "InputId", "ScaleName", "MapColor")])
+        colnames(outputTable) <- c(
+            "Node Label", 
+            "ID", 
+            "Scale Name", 
+            "Scale Value")
+        outputTable <- outputTable |>
+            tidyr::pivot_wider(
+                names_from = "Scale Name",
+                values_from = "Scale Value",
+                values_fn = list
+            )
+        
+        # Save node table in output list
+        outputList[["NodeTable"]] <- outputTable
+    } else{
+        outputList[["NodeTable"]] <- NA
+    }
+    
+    #=======================================================================#
+    # Return pathway information
+    #=======================================================================#
+    
+    if (pathInfo){
+        outputList[["Information"]] <- c(
+            "Name" = as.character(gpml$.attrs["Name"]),
+            "ID" = as.character(gpml$.attrs["Version"]),
+            "Link" = paste0(
+                "https://www.wikipathways.org/pathways/",
+                stringr::str_split(gpml$.attrs["Version"], "_")[[1]][1],
+                ".html"),
+            "Description" = gpml[
+                which(names(gpml) == "Comment")][
+                    which.max(nchar(gpml[which(names(gpml) == "Comment")]))
+                ][[1]][[1]]
+        )
+    }else{
+        outputList[["Information"]] <- NA
+    }
+    
+    return(outputList)
 }

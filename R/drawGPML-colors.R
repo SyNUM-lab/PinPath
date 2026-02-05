@@ -19,283 +19,324 @@
 #' @return A data frame used for plotting colored nodes.
 #' @noRd
 
-.mapColors <- function(nodes_df,
-                       annGenes,
-                       annMetabolites,
-                       inputDB,
-                       geneIDs,
-                       colorVar,
-                       colorList,
-                       NAvalue){
-  
-  # Make sure that each node has an unique ID
-  #nodes_df$GraphId1 <- paste0("id",seq(1,nrow(nodes_df)))
-  
-  # Get gene/protein/metabolite IDs of all nodes
-  geneIDs_nodes <- nodes_df[,c("Database", "ID", "GraphId1")]
-  
-  #======================================================================#
-  # Perform gene mapping
-  #======================================================================#
-  
-  geneDBs <- c("Ensembl", "Entrez Gene", "Uniprot-TrEMBL", "HGNC")
-  geneDBs_name <- AnnotationDbi::columns(get(annGenes, 
-                                             envir = asNamespace(annGenes)))
-  
-  # Filter geneIDs
-  geneIDs_fil <- geneIDs_nodes[geneIDs_nodes$Database %in% geneDBs,]
-  
-  if (nrow(geneIDs_fil) > 0){
-    # Convert name of database
-    geneIDs_fil$Database <- replace(geneIDs_fil$Database,
-                                    geneIDs_fil$Database == "Ensembl",
-                                    "ENSEMBL")
-    geneIDs_fil$Database <- replace(geneIDs_fil$Database,
-                                    geneIDs_fil$Database == "Entrez Gene",
-                                    "ENTREZID")
-    geneIDs_fil$Database <- replace(geneIDs_fil$Database,
-                                    geneIDs_fil$Database == "Uniprot-TrEMBL",
-                                    "UNIPROT")
-    geneIDs_fil$Database <- replace(geneIDs_fil$Database,
-                                    geneIDs_fil$Database == "HGNC",
-                                    "SYMBOL")
+.mapColors <- function(
+        nodes_df,
+        annGenes,
+        annMetabolites,
+        inputDB,
+        geneIDs,
+        colorVar,
+        colorList,
+        NAvalue){
     
-    # Convert gene IDs of the nodes to the input IDs
-    databases <- unique(geneIDs_fil$Database)
-    nodeAnn_gene <- NULL
-    for (db in unique(inputDB[inputDB %in% geneDBs_name])){
-      
-      # Prepare input data:
-      # Combine all color variables into a single column
-      if (is.data.frame(colorVar)){
-        input <- NULL
-        for (i in seq_len(ncol(colorVar))){
-          input <- rbind(input,
-                         data.frame(GeneID = geneIDs[inputDB == db],
-                                    Col = colorVar[inputDB == db,i],
-                                    Scale = i,
-                                    ScaleName = colnames(colorVar)[i]
-                         ))
-        }
-      } else{
-        input <- data.frame(GeneID = geneIDs[inputDB == db],
-                            Col = colorVar[inputDB == db],
-                            Scale = 1,
-                            ScaleName = "Color"
-        )
-      }
-      
-      
-      nodeAnn <- NULL
-      for (i in seq_along(databases)){
-        keytype <- databases[i]
+    # Make sure that each node has an unique ID
+    #nodes_df$GraphId1 <- paste0("id",seq(1,nrow(nodes_df)))
+    
+    # Get gene/protein/metabolite IDs of all nodes
+    geneIDs_nodes <- nodes_df[,c("Database", "ID", "GraphId1")]
+    
+    #======================================================================#
+    # Perform gene mapping
+    #======================================================================#
+    
+    geneDBs <- c("Ensembl", "Entrez Gene", "Uniprot-TrEMBL", "HGNC")
+    geneDBs_name <- AnnotationDbi::columns(
+        get(annGenes, 
+            envir = asNamespace(annGenes)))
+    
+    # Filter geneIDs
+    geneIDs_fil <- geneIDs_nodes[geneIDs_nodes$Database %in% geneDBs,]
+    
+    if (nrow(geneIDs_fil) > 0){
+        # Convert name of database
+        geneIDs_fil$Database <- replace(
+            geneIDs_fil$Database,
+            geneIDs_fil$Database == "Ensembl",
+            "ENSEMBL")
+        geneIDs_fil$Database <- replace(
+            geneIDs_fil$Database,
+            geneIDs_fil$Database == "Entrez Gene",
+            "ENTREZID")
+        geneIDs_fil$Database <- replace(
+            geneIDs_fil$Database,
+            geneIDs_fil$Database == "Uniprot-TrEMBL",
+            "UNIPROT")
+        geneIDs_fil$Database <- replace(
+            geneIDs_fil$Database,
+            geneIDs_fil$Database == "HGNC",
+            "SYMBOL")
         
-        # If gene IDs are already the same as the input IDs
-        if (keytype == db){
-          temp <- geneIDs_fil[geneIDs_fil$Database == keytype, ]
-          temp$InputId <- temp$ID
-          temp <- unique(temp[,c("GraphId1", "InputId")])
-          
-          # If gene IDs are different from input IDs
-        }else{
-          temp <- tryCatch({
-            temp <- geneIDs_fil[geneIDs_fil$Database == keytype, ]
-            ann <- suppressMessages(
-              AnnotationDbi::select(BiocGenerics::get(
-                annGenes, envir = asNamespace(annGenes)), 
-                columns = c(keytype, db), 
-                keys = temp$ID,
-                keytype = keytype))
-            temp <- dplyr::left_join(temp, ann, by = c("ID" = keytype),
-                                     relationship = "many-to-many")
-            colnames(temp) <- c("Database", "ID", "GraphId1", "InputId")
-            temp <- unique(temp[,c("GraphId1", "InputId")])
-            temp
-          }, error = function(cond){
-            NULL
-          })
-          
+        # Convert gene IDs of the nodes to the input IDs
+        databases <- unique(geneIDs_fil$Database)
+        nodeAnn_gene <- NULL
+        for (db in unique(inputDB[inputDB %in% geneDBs_name])){
+            
+            # Prepare input data:
+            # Combine all color variables into a single column
+            if (is.data.frame(colorVar)){
+                input <- NULL
+                for (i in seq_len(ncol(colorVar))){
+                    input <- rbind(
+                        input,
+                        data.frame(
+                            GeneID = geneIDs[inputDB == db],
+                            Col = colorVar[inputDB == db,i],
+                            Scale = i,
+                            ScaleName = colnames(colorVar)[i]))
+                }
+            } else{
+                input <- data.frame(
+                    GeneID = geneIDs[inputDB == db],
+                    Col = colorVar[inputDB == db],
+                    Scale = 1,
+                    ScaleName = "Color"
+                )
+            }
+            
+            
+            nodeAnn <- NULL
+            for (i in seq_along(databases)){
+                keytype <- databases[i]
+                
+                # If gene IDs are already the same as the input IDs
+                if (keytype == db){
+                    temp <- geneIDs_fil[geneIDs_fil$Database == keytype, ]
+                    temp$InputId <- temp$ID
+                    temp <- unique(temp[,c("GraphId1", "InputId")])
+                    
+                    # If gene IDs are different from input IDs
+                }else{
+                    temp <- tryCatch({
+                        temp <- geneIDs_fil[geneIDs_fil$Database == keytype, ]
+                        ann <- withCallingHandlers(
+                            AnnotationDbi::select(BiocGenerics::get(
+                                annGenes, envir = asNamespace(annGenes)), 
+                                columns = c(keytype, db), 
+                                keys = temp$ID,
+                                keytype = keytype),
+                            message = function(m){
+                                if (grepl("many mapping",conditionMessage(m))){
+                                    invokeRestart("muffleMessage")
+                                }
+                            }
+                        )
+                        temp <- dplyr::left_join(
+                            temp, ann, 
+                            by = c("ID" = keytype),
+                            relationship = "many-to-many")
+                        colnames(temp) <- c(
+                            "Database", 
+                            "ID", 
+                            "GraphId1",
+                            "InputId")
+                        temp <- unique(temp[,c("GraphId1", "InputId")])
+                        temp
+                    }, error = function(cond){
+                        NULL
+                    })
+                    
+                }
+                nodeAnn <- rbind.data.frame(nodeAnn, temp)
+            }
+            
+            nodeAnn <- nodeAnn[!duplicated(nodeAnn),]
+            nodeAnn <- nodeAnn[!is.na(nodeAnn$InputId),]
+            
+            # Combine node annotation with input
+            nodeAnn <- dplyr::left_join(nodeAnn, input, 
+                                        by = c("InputId" = "GeneID"),
+                                        relationship = "many-to-many")
+            #nodeAnn <- unique(nodeAnn[,c("GraphId1", "Col", "Scale")])
+            nodeAnn <- nodeAnn[,c(
+                "GraphId1", 
+                "InputId", 
+                "Col", 
+                "Scale", 
+                "ScaleName")]
+            
+            colnames(nodeAnn) <- c(
+                "GraphId1", 
+                "InputId",
+                "MapColor", 
+                "Scale", 
+                "ScaleName")
+            
+            nodeAnn_gene <- rbind.data.frame(nodeAnn_gene, nodeAnn)
         }
-        nodeAnn <- rbind.data.frame(nodeAnn, temp)
-      }
-      
-      nodeAnn <- nodeAnn[!duplicated(nodeAnn),]
-      nodeAnn <- nodeAnn[!is.na(nodeAnn$InputId),]
-      
-      # Combine node annotation with input
-      nodeAnn <- dplyr::left_join(nodeAnn, input, by = c("InputId" = "GeneID"),
-                                  relationship = "many-to-many")
-      #nodeAnn <- unique(nodeAnn[,c("GraphId1", "Col", "Scale")])
-      nodeAnn <- nodeAnn[,c("GraphId1", 
-                            "InputId", 
-                            "Col", 
-                            "Scale", 
-                            "ScaleName")]
-      
-      colnames(nodeAnn) <- c("GraphId1", 
-                             "InputId",
-                             "MapColor", 
-                             "Scale", 
-                             "ScaleName")
-      
-      nodeAnn_gene <- rbind.data.frame(nodeAnn_gene, nodeAnn)
+    }else{
+        nodeAnn_gene <- NULL
     }
-  }else{
-    nodeAnn_gene <- NULL
-  }
-  
-  
-  
-  #======================================================================#
-  # Perform metabolite mapping
-  #======================================================================#
-  
-  metaboliteDBs <- c("HMDB", "CAS", "ChEBI")
-  metaboliteDBs_name <- colnames(annMetabolites)
-  
-  # Filter geneIDs
-  geneIDs_fil <- geneIDs_nodes[geneIDs_nodes$Database %in% metaboliteDBs,]
-  
-  if (nrow(geneIDs_fil) > 0){
-    # Convert metabolite IDs of the nodes to the input IDs
-    databases <- unique(geneIDs_fil$Database)
-    nodeAnn_metabolite <- NULL
-    for (db in unique(inputDB[inputDB %in% metaboliteDBs_name])){
-      
-      # Prepare input data:
-      # Combine all color variables into a single column
-      if (is.data.frame(colorVar)){
-        input <- NULL
-        for (i in seq_len(ncol(colorVar))){
-          input <- rbind(input,
-                         data.frame(GeneID = geneIDs[inputDB == db],
-                                    Col = colorVar[inputDB == db,i],
-                                    Scale = i,
-                                    ScaleName = colnames(colorVar)[i]
-                         ))
+    
+    
+    
+    #======================================================================#
+    # Perform metabolite mapping
+    #======================================================================#
+    
+    metaboliteDBs <- c("HMDB", "CAS", "ChEBI")
+    metaboliteDBs_name <- colnames(annMetabolites)
+    
+    # Filter geneIDs
+    geneIDs_fil <- geneIDs_nodes[geneIDs_nodes$Database %in% metaboliteDBs,]
+    
+    if (nrow(geneIDs_fil) > 0){
+        # Convert metabolite IDs of the nodes to the input IDs
+        databases <- unique(geneIDs_fil$Database)
+        nodeAnn_metabolite <- NULL
+        for (db in unique(inputDB[inputDB %in% metaboliteDBs_name])){
+            
+            # Prepare input data:
+            # Combine all color variables into a single column
+            if (is.data.frame(colorVar)){
+                input <- NULL
+                for (i in seq_len(ncol(colorVar))){
+                    input <- rbind(
+                        input,
+                        data.frame(
+                            GeneID = geneIDs[inputDB == db],
+                            Col = colorVar[inputDB == db,i],
+                            Scale = i,
+                            ScaleName = colnames(colorVar)[i]
+                        ))
+                }
+            } else{
+                input <- data.frame(
+                    GeneID = geneIDs[inputDB == db],
+                    Col = colorVar[inputDB == db],
+                    Scale = 1,
+                    ScaleName = "Color"
+                )
+            }
+            
+            
+            nodeAnn <- NULL
+            for (i in seq_along(databases)){
+                keytype <- databases[i]
+                
+                # If gene IDs are already the same as the input IDs
+                if (keytype == db){
+                    temp <- geneIDs_fil[geneIDs_fil$Database == keytype, ]
+                    temp$InputId <- temp$ID
+                    temp <- unique(temp[,c("GraphId1", "InputId")])
+                    
+                    # If gene IDs are different from input IDs
+                }else{
+                    temp <- tryCatch({
+                        temp <- geneIDs_fil[geneIDs_fil$Database == keytype, ]
+                        ann <- annMetabolites[
+                            annMetabolites[,keytype] %in% 
+                                temp$ID,c(keytype, db)]
+                        ann <- ann[!(is.na(ann[,1]) | is.na(ann[,2])),]
+                        temp <- dplyr::left_join(
+                            temp, ann, 
+                            by = c("ID" = keytype),
+                            relationship = "many-to-many")
+                        colnames(temp) <- c(
+                            "Database", 
+                            "ID", 
+                            "GraphId1", 
+                            "InputId")
+                        temp <- unique(temp[,c("GraphId1", "InputId")])
+                        temp
+                    }, error = function(cond){
+                        NULL
+                    })
+                    
+                }
+                nodeAnn <- rbind.data.frame(nodeAnn, temp)
+            }
+            
+            nodeAnn <- nodeAnn[!duplicated(nodeAnn),]
+            nodeAnn <- nodeAnn[!is.na(nodeAnn$InputId),]
+            
+            # Combine node annotation with input
+            nodeAnn <- dplyr::left_join(
+                nodeAnn, input, 
+                by = c("InputId" = "GeneID"),
+                relationship = "many-to-many")
+            #nodeAnn <- unique(nodeAnn[,c("GraphId1", "Col", "Scale")])
+            nodeAnn <- nodeAnn[,c(
+                "GraphId1", 
+                "InputId", 
+                "Col", 
+                "Scale", 
+                "ScaleName")]
+            
+            colnames(nodeAnn) <- c(
+                "GraphId1", 
+                "InputId",
+                "MapColor", 
+                "Scale", 
+                "ScaleName")
+            
+            nodeAnn_metabolite <- rbind.data.frame(
+                nodeAnn_metabolite, 
+                nodeAnn)
         }
-      } else{
-        input <- data.frame(GeneID = geneIDs[inputDB == db],
-                            Col = colorVar[inputDB == db],
-                            Scale = 1,
-                            ScaleName = "Color"
-        )
-      }
-      
-      
-      nodeAnn <- NULL
-      for (i in seq_along(databases)){
-        keytype <- databases[i]
-        
-        # If gene IDs are already the same as the input IDs
-        if (keytype == db){
-          temp <- geneIDs_fil[geneIDs_fil$Database == keytype, ]
-          temp$InputId <- temp$ID
-          temp <- unique(temp[,c("GraphId1", "InputId")])
-          
-          # If gene IDs are different from input IDs
-        }else{
-          temp <- tryCatch({
-            temp <- geneIDs_fil[geneIDs_fil$Database == keytype, ]
-            ann <- annMetabolites[annMetabolites[,keytype] %in% 
-                                    temp$ID,c(keytype, db)]
-            ann <- ann[!(is.na(ann[,1]) | is.na(ann[,2])),]
-            temp <- dplyr::left_join(temp, ann, by = c("ID" = keytype),
-                                     relationship = "many-to-many")
-            colnames(temp) <- c("Database", "ID", "GraphId1", "InputId")
-            temp <- unique(temp[,c("GraphId1", "InputId")])
-            temp
-          }, error = function(cond){
-            NULL
-          })
-          
+    }else{
+        nodeAnn_metabolite <- NULL
+    }
+    
+    nodeAnn_all <- rbind.data.frame(nodeAnn_gene,
+                                    nodeAnn_metabolite)
+    
+    #======================================================================#
+    # Prepare data for plotting
+    #======================================================================#
+    
+    # Add node annotation to the node graphical elements
+    colors_df <- dplyr::left_join(nodes_df, nodeAnn_all, by = "GraphId1")
+    
+    # If one node has at least 1 non-NA color value, 
+    # remove the NA values from different inputIds:
+    
+    # Nodes with non-NA values
+    nonNA_nodes <- colors_df$GraphId1[!is.na(colors_df$MapColor)] 
+    
+    # all node-id combinations
+    node_ids <- paste0(
+        colors_df$InputId[colors_df$GraphId1 %in% nonNA_nodes], 
+        "_",
+        colors_df$GraphId1[colors_df$GraphId1 %in% nonNA_nodes])
+    
+    # Node-id combinations with NA values
+    NAids <- node_ids[
+        is.na(colors_df$MapColor[colors_df$GraphId1 %in% nonNA_nodes])]
+    
+    # Node-id combinations with non-NA values
+    nonNAids <- node_ids[
+        !is.na(colors_df$MapColor[colors_df$GraphId1 %in% nonNA_nodes])]
+    
+    # Remove Node-Ids with only NA values
+    rmIds <- setdiff(NAids, nonNAids)
+    colors_df <- colors_df[!(paste0(
+        colors_df$InputId, 
+        "_", 
+        colors_df$GraphId1) %in% rmIds),]
+    
+    # If there are duplicated IDs, split the node into two parts for coloring
+    dupIds <- unique(colors_df$GraphId1[(duplicated(colors_df$GraphId1))])
+    if (length(dupIds) > 0){
+        for (d in seq_along(dupIds)){
+            temp <- colors_df[colors_df$GraphId1 == dupIds[d],]
+            newWidth <- temp$Width/nrow(temp)
+            newCenterX <- temp$CenterX - (0.5*(nrow(temp)-1))*newWidth + 
+                (0.5+seq(0,nrow(temp)-1,1)*newWidth)
+            
+            colors_df$Width[colors_df$GraphId1 == dupIds[d]] <- newWidth
+            colors_df$CenterX[colors_df$GraphId1 == dupIds[d]] <- newCenterX
+            
         }
-        nodeAnn <- rbind.data.frame(nodeAnn, temp)
-      }
-      
-      nodeAnn <- nodeAnn[!duplicated(nodeAnn),]
-      nodeAnn <- nodeAnn[!is.na(nodeAnn$InputId),]
-      
-      # Combine node annotation with input
-      nodeAnn <- dplyr::left_join(nodeAnn, input, by = c("InputId" = "GeneID"),
-                                  relationship = "many-to-many")
-      #nodeAnn <- unique(nodeAnn[,c("GraphId1", "Col", "Scale")])
-      nodeAnn <- nodeAnn[,c("GraphId1", 
-                            "InputId", 
-                            "Col", 
-                            "Scale", 
-                            "ScaleName")]
-      
-      colnames(nodeAnn) <- c("GraphId1", 
-                             "InputId",
-                             "MapColor", 
-                             "Scale", 
-                             "ScaleName")
-      
-      nodeAnn_metabolite <- rbind.data.frame(nodeAnn_metabolite, nodeAnn)
     }
-  }else{
-    nodeAnn_metabolite <- NULL
-  }
-  
-  nodeAnn_all <- rbind.data.frame(nodeAnn_gene,
-                                  nodeAnn_metabolite)
-  
-  #======================================================================#
-  # Prepare data for plotting
-  #======================================================================#
-  
-  # Add node annotation to the node graphical elements
-  colors_df <- dplyr::left_join(nodes_df, nodeAnn_all, by = "GraphId1")
-  
-  # If one node has at least 1 non-NA color value, 
-  # remove the NA values from different inputIds:
-  
-  # Nodes with non-NA values
-  nonNA_nodes <- colors_df$GraphId1[!is.na(colors_df$MapColor)] 
-  
-  # all node-id combinations
-  node_ids <- paste0(colors_df$InputId[colors_df$GraphId1 %in% nonNA_nodes], 
-                     "_",
-                     colors_df$GraphId1[colors_df$GraphId1 %in% nonNA_nodes])
-  
-  # Node-id combinations with NA values
-  NAids <- node_ids[
-    is.na(colors_df$MapColor[colors_df$GraphId1 %in% nonNA_nodes])]
-  
-  # Node-id combinations with non-NA values
-  nonNAids <- node_ids[
-    !is.na(colors_df$MapColor[colors_df$GraphId1 %in% nonNA_nodes])]
-  
-  # Remove Node-Ids with only NA values
-  rmIds <- setdiff(NAids, nonNAids)
-  colors_df <- colors_df[!(paste0(colors_df$InputId, 
-                                  "_", 
-                                  colors_df$GraphId1) %in% rmIds),]
-  
-  # If there are duplicated IDs, split the node into two parts for coloring
-  dupIds <- unique(colors_df$GraphId1[(duplicated(colors_df$GraphId1))])
-  if (length(dupIds) > 0){
-    for (d in seq_along(dupIds)){
-      temp <- colors_df[colors_df$GraphId1 == dupIds[d],]
-      newWidth <- temp$Width/nrow(temp)
-      newCenterX <- temp$CenterX - (0.5*(nrow(temp)-1))*newWidth + 
-        (0.5+seq(0,nrow(temp)-1,1)*newWidth)
-      
-      colors_df$Width[colors_df$GraphId1 == dupIds[d]] <- newWidth
-      colors_df$CenterX[colors_df$GraphId1 == dupIds[d]] <- newCenterX
-      
-    }
-  }
-  
-  # Remove duplicated scales
-  #colors_df <- colors_df[!duplicated(colors_df[,c("GraphId1", "Scale")]),]
-  
-  # Add color values to data frame
-  colors_df <- .addColor(colors_df, colorList, NAvalue)
-  
-  # Return data frame
-  return(colors_df)
+    
+    # Remove duplicated scales
+    #colors_df <- colors_df[!duplicated(colors_df[,c("GraphId1", "Scale")]),]
+    
+    # Add color values to data frame
+    colors_df <- .addColor(colors_df, colorList, NAvalue)
+    
+    # Return data frame
+    return(colors_df)
 }
 
 
@@ -311,119 +352,125 @@
 #' @noRd
 
 .addColor <- function(colors_df, colorList, NAvalue = "#F0F0F0"){
-  
-  # Add NA as default color value
-  colors_df$ColorValue <- NA
-  
-  # Set NA scales to NA color
-  plot_df_NA <- NULL
-  if (sum(is.na(colors_df$Scale)) > 0){
-    plot_df_NA <- colors_df[is.na(colors_df$Scale),]
-    plot_df_NA$ColorValue <- NAvalue
-  }  
-  
-  # Get the unique color scales
-  scales <- unique(colors_df$Scale)
-  scales <- scales[!is.na(scales)]
-  
-  # For each scale, we are going to add the color
-  plot_df_scale <- NULL
-  if (length(scales) > 0){
-    for (s in seq_along(scales)){
-      
-      # Get scale type
-      ScaleType <- colorList[[s]]$ScaleType
-      
-      # Add divergent color scale
-      if (ScaleType == "Divergent"){
-        
-        # Make map color numeric
-        plot_df <- colors_df[colors_df$Scale == scales[s],]
-        plot_df <- plot_df[!is.na(plot_df$Scale),]
-        plot_df$MapColor <- as.numeric(plot_df$MapColor)
-        
-        # Make color gradient from middle to max value
-        pal_up <- grDevices::colorRampPalette(
-          colors = c(colorList[[s]]$Color["MidCol"],
-                     colorList[[s]]$Color["MaxCol"]))(101)
-        
-        # Make color gradient from min to middle value
-        pal_down <- grDevices::colorRampPalette(
-          colors = c(colorList[[s]]$Color["MidCol"], 
-                     colorList[[s]]$Color["MinCol"]))(101)
-        
-        # Get color scale values
-        midvalue <- as.numeric(colorList[[s]]$ColorVal["MidVal"])
-        minvalue <-  as.numeric(colorList[[s]]$ColorVal["MinVal"])
-        maxvalue <-  as.numeric(colorList[[s]]$ColorVal["MaxVal"])
-        
-        
-        # Set up values
-        plot_df_up <- plot_df[plot_df$MapColor >= midvalue,]
-        col_index <- round(
-          (plot_df_up$MapColor - midvalue)/(maxvalue - midvalue)*100,0
-        ) + 1
-        col_index[col_index>100] <- 100
-        plot_df_up$ColorValue <- pal_up[col_index]
-        
-        
-        # Set down values
-        plot_df_down <- plot_df[plot_df$MapColor < midvalue,]
-        col_index <- round(
-          (plot_df_down$MapColor - midvalue)/(minvalue - midvalue)*100,0
-        ) + 1
-        col_index[col_index>100] <- 100
-        plot_df_down$ColorValue <- pal_down[col_index]
-        
-        
-        # combine up and down values
-        plot_df <- rbind.data.frame(plot_df_up, plot_df_down)
-      }
-      
-      # Add sequential color scale
-      if (ScaleType == "Sequential"){
-        
-        # Make map color numeric
-        plot_df <- colors_df[colors_df$Scale == scales[s],]
-        plot_df <- plot_df[!is.na(plot_df$Scale),]
-        plot_df$MapColor <- as.numeric(plot_df$MapColor)
-        
-        # Make color gradient from middle to max value
-        pal <- grDevices::colorRampPalette(
-          colors = c(colorList[[s]]$Color["MinCol"],
-                     colorList[[s]]$Color["MaxCol"]))(101)
-        
-        
-        # Get color scale values
-        minvalue <-  as.numeric(colorList[[s]]$ColorVal["MinVal"])
-        maxvalue <-  as.numeric(colorList[[s]]$ColorVal["MaxVal"])
-        
-        # Set color values
-        col_index <- round(
-          (plot_df$MapColor - minvalue)/(maxvalue - minvalue)*100,0
-        ) + 1
-        col_index[col_index>100] <- 100
-        col_index[col_index<1] <- 1
-        plot_df$ColorValue <- pal[col_index]
-      }
-      
-      # Add qualitative color scale
-      if (ScaleType == "Qualitative"){
-        
-        plot_df <- colors_df[colors_df$Scale == scales[s],]
-        plot_df <- plot_df[!is.na(plot_df$Scale),]
-        plot_df$ColorValue <- colorList[[s]]$Color[plot_df$MapColor]
-      }
-      
-      
-      # Combine the data from different scales
-      plot_df_scale <- rbind.data.frame(plot_df_scale, plot_df)
-      
+    
+    # Add NA as default color value
+    colors_df$ColorValue <- NA
+    
+    # Set NA scales to NA color
+    plot_df_NA <- NULL
+    if (sum(is.na(colors_df$Scale)) > 0){
+        plot_df_NA <- colors_df[is.na(colors_df$Scale),]
+        plot_df_NA$ColorValue <- NAvalue
+    }  
+    
+    # Get the unique color scales
+    scales <- unique(colors_df$Scale)
+    scales <- scales[!is.na(scales)]
+    
+    # For each scale, we are going to add the color
+    plot_df_scale <- NULL
+    if (length(scales) > 0){
+        for (s in seq_along(scales)){
+            
+            # Get scale type
+            ScaleType <- colorList[[s]]$ScaleType
+            
+            # Add divergent color scale
+            if (ScaleType == "Divergent"){
+                
+                # Make map color numeric
+                plot_df <- colors_df[colors_df$Scale == scales[s],]
+                plot_df <- plot_df[!is.na(plot_df$Scale),]
+                plot_df$MapColor <- as.numeric(plot_df$MapColor)
+                
+                # Make color gradient from middle to max value
+                pal_up <- grDevices::colorRampPalette(
+                    colors = c(
+                        colorList[[s]]$Color["MidCol"],
+                        colorList[[s]]$Color["MaxCol"]))(101)
+                
+                # Make color gradient from min to middle value
+                pal_down <- grDevices::colorRampPalette(
+                    colors = c(
+                        colorList[[s]]$Color["MidCol"], 
+                        colorList[[s]]$Color["MinCol"]))(101)
+                
+                # Get color scale values
+                midvalue <- as.numeric(colorList[[s]]$ColorVal["MidVal"])
+                minvalue <-  as.numeric(colorList[[s]]$ColorVal["MinVal"])
+                maxvalue <-  as.numeric(colorList[[s]]$ColorVal["MaxVal"])
+                
+                
+                # Set up values
+                plot_df_up <- plot_df[plot_df$MapColor >= midvalue,]
+                col_index <- round(
+                    (plot_df_up$MapColor - midvalue)/
+                        (maxvalue - midvalue)*100,0
+                ) + 1
+                col_index[col_index>100] <- 100
+                plot_df_up$ColorValue <- pal_up[col_index]
+                
+                
+                # Set down values
+                plot_df_down <- plot_df[plot_df$MapColor < midvalue,]
+                col_index <- round(
+                    (plot_df_down$MapColor - midvalue)/
+                        (minvalue - midvalue)*100,0
+                ) + 1
+                col_index[col_index>100] <- 100
+                plot_df_down$ColorValue <- pal_down[col_index]
+                
+                
+                # combine up and down values
+                plot_df <- rbind.data.frame(plot_df_up, plot_df_down)
+            }
+            
+            # Add sequential color scale
+            if (ScaleType == "Sequential"){
+                
+                # Make map color numeric
+                plot_df <- colors_df[colors_df$Scale == scales[s],]
+                plot_df <- plot_df[!is.na(plot_df$Scale),]
+                plot_df$MapColor <- as.numeric(plot_df$MapColor)
+                
+                # Make color gradient from middle to max value
+                pal <- grDevices::colorRampPalette(
+                    colors = c(
+                        colorList[[s]]$Color["MinCol"],
+                        colorList[[s]]$Color["MaxCol"]))(101)
+                
+                
+                # Get color scale values
+                minvalue <-  as.numeric(colorList[[s]]$ColorVal["MinVal"])
+                maxvalue <-  as.numeric(colorList[[s]]$ColorVal["MaxVal"])
+                
+                # Set color values
+                col_index <- round(
+                    (plot_df$MapColor - minvalue)/
+                        (maxvalue - minvalue)*100,0
+                ) + 1
+                col_index[col_index>100] <- 100
+                col_index[col_index<1] <- 1
+                plot_df$ColorValue <- pal[col_index]
+            }
+            
+            # Add qualitative color scale
+            if (ScaleType == "Qualitative"){
+                
+                plot_df <- colors_df[colors_df$Scale == scales[s],]
+                plot_df <- plot_df[!is.na(plot_df$Scale),]
+                plot_df$ColorValue <- colorList[[s]]$Color[plot_df$MapColor]
+            }
+            
+            
+            # Combine the data from different scales
+            plot_df_scale <- rbind.data.frame(plot_df_scale, plot_df)
+            
+        }
     }
-  }
-  
-  # Combine the data from the scales with the NA values
-  plot_df_all <- rbind.data.frame(plot_df_scale, plot_df_NA)
+    
+    # Combine the data from the scales with the NA values
+    plot_df_all <- rbind.data.frame(plot_df_scale, plot_df_NA)
 }
 
 
@@ -437,18 +484,18 @@
 #' @noRd
 
 .drawColors <- function(colors_df) {
-  
-  graphics::rect(
-    xleft = colors_df$CenterX - 0.5 * colors_df$Width,
-    ybottom = -1 * (colors_df$CenterY - 0.5 * colors_df$Height),
-    xright =  colors_df$CenterX + 0.5 * colors_df$Width,
-    ytop =  -1 * (colors_df$CenterY + 0.5 * colors_df$Height),
-    col = colors_df$ColorValue,
-    border = NA,
-    lty = colors_df$LineStyle,
-    lwd = colors_df$LineThickness
-  )
-  
+    
+    graphics::rect(
+        xleft = colors_df$CenterX - 0.5 * colors_df$Width,
+        ybottom = -1 * (colors_df$CenterY - 0.5 * colors_df$Height),
+        xright =  colors_df$CenterX + 0.5 * colors_df$Width,
+        ytop =  -1 * (colors_df$CenterY + 0.5 * colors_df$Height),
+        col = colors_df$ColorValue,
+        border = NA,
+        lty = colors_df$LineStyle,
+        lwd = colors_df$LineThickness
+    )
+    
 }
 
 
@@ -462,162 +509,183 @@
 #' @noRd
 
 .makeLegend <- function(colorList){
-  nScales <- length(colorList)
-  
-  graphics::par(mar = c(1,1,1,1))
-  
-  # Make empty canvas
-  plot(c(0,2),
-       c(-nScales-0.25,1),
-       col = "white", axes = FALSE, ann = FALSE)
-  vps <- gridBase::baseViewports()
-  grid::pushViewport(vps$inner, vps$figure, vps$plot)
-  
-  
-  width <- 1
-  height <- 0.5
-  
-  
-  grid::grid.rect(x = seq(1/(2*nScales),1-(1/(2*nScales)),1/nScales),
-                  y = 0.5,
-                  width = width/nScales,
-                  height = height,
-                  default.units = "native",
-                  gp = grid::gpar(col = "black"))
-  
-  
-  for (s in seq_len(nScales)){
+    nScales <- length(colorList)
     
-    # Get scale type
-    ScaleType <- colorList[[s]]$ScaleType
+    graphics::par(mar = c(1,1,1,1))
     
-    # Divergent scale type
-    if (ScaleType == "Divergent"){
-      minVal <- colorList[[s]]$ColorVal["MinVal"]
-      midVal <- colorList[[s]]$ColorVal["MidVal"]
-      maxVal <- colorList[[s]]$ColorVal["MaxVal"]
-      pal <- grDevices::colorRampPalette(
-        colors = c(colorList[[s]]$Color["MinCol"], 
-                   colorList[[s]]$Color["MidCol"], 
-                   colorList[[s]]$Color["MaxCol"]))
-      
-      graphics::text(x = 1.5,
-                     y = (s-1)-nScales + 0.5* height,
-                     labels = colorList[[s]]$ScaleName,
-                     pos = 3,
-                     font = 2)
-      grid::grid.rect(x = seq(0.1,0.9,length = 81*2) + 1,
-                      y = (s-1)-nScales,
-                      width = 0.01/2,
-                      height = height,
-                      default.units = "native",
-                      gp = grid::gpar(col = NA,
-                                      fill = pal(81*2)))
-      graphics::arrows(x0 = 1/(2*nScales) + (s-1)*1/nScales, 
-                       x1 =1/(2*nScales) + (s-1)*1/nScales,
-                       y0 = 0.25, 
-                       y1 = (s-1)-nScales, 
-                       code = 0)
-      graphics::arrows(x0 = 1/(2*nScales) + (s-1)*1/nScales, 
-                       x1 = 1.1,
-                       y0 = (s-1)-nScales, 
-                       y1 = (s-1)-nScales, 
-                       code = 0)
-      graphics::text(x = 1.1,
-                     y = (s-1)-nScales-0.25,
-                     labels = signif(minVal,2),
-                     adj = c(1,1),
-                     cex = 0.7)
-      graphics::text(x = 1.5,
-                     y = (s-1)-nScales-0.25,
-                     labels = signif(midVal,2),
-                     adj = c(0.5,1),
-                     cex = 0.7)
-      graphics::text(x = 1.9,
-                     y = (s-1)-nScales-0.25,
-                     labels = signif(maxVal,2),
-                     adj = c(0,1),
-                     cex = 0.7)
+    # Make empty canvas
+    plot(
+        c(0,2),
+        c(-nScales-0.25,1),
+        col = "white", axes = FALSE, ann = FALSE)
+    vps <- gridBase::baseViewports()
+    grid::pushViewport(vps$inner, vps$figure, vps$plot)
+    
+    
+    width <- 1
+    height <- 0.5
+    
+    
+    grid::grid.rect(
+        x = seq(1/(2*nScales),1-(1/(2*nScales)),1/nScales),
+        y = 0.5,
+        width = width/nScales,
+        height = height,
+        default.units = "native",
+        gp = grid::gpar(col = "black"))
+    
+    
+    for (s in seq_len(nScales)){
+        
+        # Get scale type
+        ScaleType <- colorList[[s]]$ScaleType
+        
+        # Divergent scale type
+        if (ScaleType == "Divergent"){
+            minVal <- colorList[[s]]$ColorVal["MinVal"]
+            midVal <- colorList[[s]]$ColorVal["MidVal"]
+            maxVal <- colorList[[s]]$ColorVal["MaxVal"]
+            pal <- grDevices::colorRampPalette(
+                colors = c(
+                    colorList[[s]]$Color["MinCol"], 
+                    colorList[[s]]$Color["MidCol"], 
+                    colorList[[s]]$Color["MaxCol"]))
+            
+            graphics::text(
+                x = 1.5,
+                y = (s-1)-nScales + 0.5* height,
+                labels = colorList[[s]]$ScaleName,
+                pos = 3,
+                font = 2)
+            grid::grid.rect(
+                x = seq(0.1,0.9,length = 81*2) + 1,
+                y = (s-1)-nScales,
+                width = 0.01/2,
+                height = height,
+                default.units = "native",
+                gp = grid::gpar(col = NA,
+                                fill = pal(81*2)))
+            graphics::arrows(
+                x0 = 1/(2*nScales) + (s-1)*1/nScales, 
+                x1 =1/(2*nScales) + (s-1)*1/nScales,
+                y0 = 0.25, 
+                y1 = (s-1)-nScales, 
+                code = 0)
+            graphics::arrows(
+                x0 = 1/(2*nScales) + (s-1)*1/nScales, 
+                x1 = 1.1,
+                y0 = (s-1)-nScales, 
+                y1 = (s-1)-nScales, 
+                code = 0)
+            graphics::text(
+                x = 1.1,
+                y = (s-1)-nScales-0.25,
+                labels = signif(minVal,2),
+                adj = c(1,1),
+                cex = 0.7)
+            graphics::text(
+                x = 1.5,
+                y = (s-1)-nScales-0.25,
+                labels = signif(midVal,2),
+                adj = c(0.5,1),
+                cex = 0.7)
+            graphics::text(
+                x = 1.9,
+                y = (s-1)-nScales-0.25,
+                labels = signif(maxVal,2),
+                adj = c(0,1),
+                cex = 0.7)
+        }
+        
+        # Sequential scale type
+        if (ScaleType == "Sequential"){
+            minVal <- colorList[[s]]$ColorVal["MinVal"]
+            maxVal <- colorList[[s]]$ColorVal["MaxVal"]
+            pal <- grDevices::colorRampPalette(
+                colors = c(
+                    colorList[[s]]$Color["MinCol"], 
+                    colorList[[s]]$Color["MaxCol"]))
+            
+            graphics::text(
+                x = 1.5,
+                y = (s-1)-nScales + 0.5* height,
+                labels = colorList[[s]]$ScaleName,
+                pos = 3,
+                font = 2)
+            grid::grid.rect(
+                x = seq(0.1,0.9,length = 81*2) + 1,
+                y = (s-1)-nScales,
+                width = 0.01/2,
+                height = height,
+                default.units = "native",
+                gp = grid::gpar(col = NA,
+                                fill = pal(81*2)))
+            graphics::arrows(
+                x0 = 1/(2*nScales) + (s-1)*1/nScales, 
+                x1 = 1/(2*nScales) + (s-1)*1/nScales,
+                y0 = 0.25, 
+                y1 = (s-1)-nScales, 
+                code = 0)
+            graphics::arrows(
+                x0 = 1/(2*nScales) + (s-1)*1/nScales, 
+                x1 = 1.1,
+                y0 = (s-1)-nScales, 
+                y1 = (s-1)-nScales, 
+                code = 0)
+            graphics::text(
+                x = 1.1,
+                y = (s-1)-nScales-0.25,
+                labels = signif(minVal,2),
+                adj = c(1,1),
+                cex = 0.7)
+            graphics::text(
+                x = 1.9,
+                y = (s-1)-nScales-0.25,
+                labels = signif(maxVal,2),
+                adj = c(0,1),
+                cex = 0.7)
+        }
+        
+        # Qualitative scale type
+        if (ScaleType == "Qualitative"){
+            
+            legend_text <- names(colorList[[s]]$Color)
+            legend_col <- as.character(colorList[[s]]$Color)
+            ncol <- length(legend_text)
+            
+            graphics::text(
+                x = 1.5,
+                y = (s-1)-nScales + 0.5* height,
+                labels = colorList[[s]]$ScaleName,
+                pos = 3,
+                font = 2)
+            graphics::legend(
+                x = 1.1,
+                y = (s-1)-nScales,
+                adj = c(0,0.4),
+                legend = legend_text, 
+                fill = legend_col,
+                yjust = 0.5,
+                bty = "n", 
+                pt.cex = min(c(3/(max(nchar(legend_text))/3), 2)), 
+                cex = min(c(2/(max(nchar(legend_text))/3),1)),
+                ncol = 2,
+                text.col = "black", 
+                horiz = FALSE)
+            graphics::arrows(
+                x0 = 1/(2*nScales) + (s-1)*1/nScales, 
+                x1 =1/(2*nScales) + (s-1)*1/nScales,
+                y0 = 0.25, 
+                y1 = (s-1)-nScales, 
+                code = 0)
+            graphics::arrows(
+                x0 = 1/(2*nScales) + (s-1)*1/nScales, 
+                x1 = 1.1,
+                y0 = (s-1)-nScales, 
+                y1 = (s-1)-nScales, 
+                code = 0)
+            
+        }
     }
-    
-    # Sequential scale type
-    if (ScaleType == "Sequential"){
-      minVal <- colorList[[s]]$ColorVal["MinVal"]
-      maxVal <- colorList[[s]]$ColorVal["MaxVal"]
-      pal <- grDevices::colorRampPalette(
-        colors = c(colorList[[s]]$Color["MinCol"], 
-                   colorList[[s]]$Color["MaxCol"]))
-      
-      graphics::text(x = 1.5,
-                     y = (s-1)-nScales + 0.5* height,
-                     labels = colorList[[s]]$ScaleName,
-                     pos = 3,
-                     font = 2)
-      grid::grid.rect(x = seq(0.1,0.9,length = 81*2) + 1,
-                      y = (s-1)-nScales,
-                      width = 0.01/2,
-                      height = height,
-                      default.units = "native",
-                      gp = grid::gpar(col = NA,
-                                      fill = pal(81*2)))
-      graphics::arrows(x0 = 1/(2*nScales) + (s-1)*1/nScales, 
-                       x1 =1/(2*nScales) + (s-1)*1/nScales,
-                       y0 = 0.25, 
-                       y1 = (s-1)-nScales, 
-                       code = 0)
-      graphics::arrows(x0 = 1/(2*nScales) + (s-1)*1/nScales, 
-                       x1 = 1.1,
-                       y0 = (s-1)-nScales, 
-                       y1 = (s-1)-nScales, 
-                       code = 0)
-      graphics::text(x = 1.1,
-                     y = (s-1)-nScales-0.25,
-                     labels = signif(minVal,2),
-                     adj = c(1,1),
-                     cex = 0.7)
-      graphics::text(x = 1.9,
-                     y = (s-1)-nScales-0.25,
-                     labels = signif(maxVal,2),
-                     adj = c(0,1),
-                     cex = 0.7)
-    }
-    
-    # Qualitative scale type
-    if (ScaleType == "Qualitative"){
-      
-      legend_text <- names(colorList[[s]]$Color)
-      legend_col <- as.character(colorList[[s]]$Color)
-      ncol <- length(legend_text)
-      
-      graphics::text(x = 1.5,
-                     y = (s-1)-nScales + 0.5* height,
-                     labels = colorList[[s]]$ScaleName,
-                     pos = 3,
-                     font = 2)
-      graphics::legend(x = 1.1,
-                       y = (s-1)-nScales,
-                       adj = c(0,0.4),
-                       legend = legend_text, 
-                       fill = legend_col,
-                       yjust = 0.5,
-                       bty = "n", 
-                       pt.cex = min(c(3/(max(nchar(legend_text))/3), 2)), 
-                       cex = min(c(2/(max(nchar(legend_text))/3),1)),
-                       ncol = 2,
-                       text.col = "black", 
-                       horiz = FALSE)
-      graphics::arrows(x0 = 1/(2*nScales) + (s-1)*1/nScales, 
-                       x1 =1/(2*nScales) + (s-1)*1/nScales,
-                       y0 = 0.25, 
-                       y1 = (s-1)-nScales, 
-                       code = 0)
-      graphics::arrows(x0 = 1/(2*nScales) + (s-1)*1/nScales, 
-                       x1 = 1.1,
-                       y0 = (s-1)-nScales, 
-                       y1 = (s-1)-nScales, 
-                       code = 0)
-      
-    }
-  }
 }
 

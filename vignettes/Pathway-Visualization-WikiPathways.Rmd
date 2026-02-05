@@ -11,16 +11,17 @@ output:
 # pdf_document:
 #   toc: true
 vignette: >
-  %\VignetteIndexEntry{Pathway Visualization}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+    %\VignetteIndexEntry{Pathway Visualization}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, echo=FALSE, results="hide"}
-knitr::opts_chunk$set(tidy = FALSE,
-                      cache = FALSE,
-                      dev = "png",
-                      message = FALSE, error = FALSE, warning = TRUE)
+knitr::opts_chunk$set(
+    tidy = FALSE,
+    cache = FALSE,
+    dev = "png",
+    message = FALSE, error = FALSE, warning = TRUE)
 ```
 
 This vignette will cover visualizing differential expression analysis results 
@@ -40,9 +41,9 @@ The example dataset we will use compares the expression of transcripts in
 lung cancer biopsies versus normal tissue. Differential expression analysis 
 has already been performed, generating log2FCs and p-values for each gene. 
 ```{r dataset, message = FALSE, warning = FALSE}
-lung_expr <- read.csv(system.file("extdata","data-lung-cancer.csv", 
-                                  package="PinPath"), 
-                      stringsAsFactors = FALSE)
+lung_expr <- read.csv(
+    system.file("extdata","data-lung-cancer.csv", package ="PinPath"), 
+    stringsAsFactors = FALSE)
 ```
 
 In the pathway, we want to show which gene is significantly differentially 
@@ -64,16 +65,18 @@ In the next step, we can adjust the default color palette to the desired color
 values. For instance, we want to display a green color when a gene is 
 differentially expressed  and a white color when it is not.
 ```{r modify-significant-color}
-colorList[["Significant"]]$Color <- c("Yes" = "green",
-                                      "No" = "white")
+colorList[["Significant"]]$Color <- c(
+    "Yes" = "green",
+    "No" = "white")
 ```
 
 Furthermore, we can set the minimum and maximum value  of the log2FC color
 gradient to -1.5 and 1.5, respectively.
 ```{r modify-log2FC-color}
-colorList[["log2FC"]]$ColorVal <- c("MinVal" = -1.5,
-                                    "MidVal" = 0,
-                                    "MaxVal" = 1.5)
+colorList[["log2FC"]]$ColorVal <- c(
+    "MinVal" = -1.5,
+    "MidVal" = 0,
+    "MaxVal" = 1.5)
 ```
 
 # Plot pathway
@@ -88,14 +91,14 @@ infile <- rWikiPathways::getPathway(pathway_id)
 
 # Draw pathway
 pathVis <- PinPath::drawGPML(
-  infile = infile,
-  annGenes = "org.Hs.eg.db",
-  inputDB = "ENSEMBL",
-  geneIDs = lung_expr$GeneID,
-  colorVar = lung_expr[,c("log2FC", "Significant")],
-  colorList = colorList,
-  nodeTable = TRUE,
-  legend = TRUE,
+    infile = infile,
+    annGenes = "org.Hs.eg.db",
+    inputDB = "ENSEMBL",
+    geneIDs = lung_expr$GeneID,
+    colorVar = lung_expr[,c("log2FC", "Significant")],
+    colorList = colorList,
+    nodeTable = TRUE,
+    legend = TRUE,
 )
 ```
 

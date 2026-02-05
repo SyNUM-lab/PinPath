@@ -1,7 +1,7 @@
 Package: PinPath
 Type: Package
 Title: PinPath - R Package for Pathway Visualization
-Version: 0.1.0
+Version: 0.99.0
 Date: 2026-01-20
 Authors@R: c(person("Jarno", "Koetsier", role = c("aut","cre"),
                      email = "jarno.koetsier@gmail.com",
@@ -28,7 +28,6 @@ Imports:
     gridBase, 
     svglite, 
     AnnotationDbi, 
-    shiny, 
     igraph, 
     ggraph, 
     ggplot2, 
