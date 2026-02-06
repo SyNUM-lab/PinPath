@@ -86,72 +86,94 @@ drawGPML <- function(
         pathInfo = FALSE,
         openFile = TRUE
 ){
-    
-    # Start with empty output list
-    outputList <- list()
-    
-    #************************************************************************#
-    # Read and extract info from GPML file
-    #************************************************************************#
-    
-    # Read GPML file
-    doc <- XML::xmlParse(xml2::read_xml(infile))
-    gpml <- XML::xmlToList(doc)
-    
-    # Extract the names (e.g., DataNode, Interaction, Group, Label, Shape)
-    nms <- names(gpml)
-    
-    # Get pathway name
-    PathwayName <- gpml$.attrs["Name"]
-    
-    # Get organism
-    Organism <- gpml$.attrs["Organism"]
-    
-    # Get pathway id
-    PathwayID <- gpml$.attrs["Version"]
-    
-    # Get Canvas size
-    CanvasSize <- gpml$Graphics
-    
-    # Filter for graphical elements
-    gpml_fil <- gpml[nms %in% c("DataNode", "Shape", "Label", "Interaction",
-                                "GraphicalLine", "State", "Group")]
-    
-    # Give each graphical element a unique ID
-    for (l in seq_along(gpml_fil)){
-        gpml_fil[[l]]["ID"] <-  paste0("id", l)
-    }
-    
-    #************************************************************************#
-    # Set default values
-    #************************************************************************#
+    # Read and prepare GPML file
+    gpml <- XML::xmlToList(XML::xmlParse(xml2::read_xml(infile)))
+    gpml_fil <- .prepareGPML(gpml)
     
     # If output name is not set, give it the name of the pathway
-    if (is.null(outname)){
-        outname <- paste0(PathwayName,"_",PathwayID, "_",Organism)
-        outname <- stringr::str_replace_all(outname, " ", "_")
-        outname <- make.names(outname)
-    }
-    outfile <-paste0(outdir,"/",outname)
-    
-    # Get file extension
-    file_extension <- tolower(tools::file_ext(outname))
+    if (is.null(outname)){ outname <- .makeOutName(gpml)}
     
     # If no color is set, use default color palette
     if (is.null(colorList) & !is.null(colorVar)){
         colorList <- defaultColorList(colorVar, ColorNames = colorNames)
     }
     
-    #************************************************************************#
     # Set order of plotting based on the Z-value
-    #************************************************************************#
+    ZOrder_df <- .setZorder_GPML(gpml_fil)
     
-    # For each element in the GPML file, we are going the extract three things:
-    # - Element type: Node, interaction, etc.
-    # - Z-order
-    # - Group reference: the ID of the group element linked to the node
-    # - State reference: the ID of the nodes that are linked to a state
+    # Get all elements that could be part of a group
+    groupElements_df <- .prepareLabels(
+        gpml_fil[names(gpml_fil) %in% c("DataNode", "Label")])
     
+    # Prepare nodes
+    nodes_df_all <- .prepareNodes(gpml_fil[names(gpml_fil) == "DataNode"])
+    
+    # Map colors to nodes
+    plotColor <- !(
+        is.null(geneIDs) | is.null(colorVar) | 
+            (is.null(annGenes) & is.null(annMetabolites)) | is.null(inputDB))
+    
+    colors_df_all <- NULL
+    if (plotColor){
+        colors_df_all <- .mapColors(
+            nodes_df = nodes_df_all, geneIDs = geneIDs, colorVar = colorVar,
+            annGenes = annGenes, annMetabolites = data.frame(annMetabolites),
+            inputDB = inputDB, colorList = colorList, NAvalue = NAvalue)
+    }
+    
+    # Open file for plotting
+    outfile <- .openFile(
+        width = gpml$Graphics["BoardWidth"], 
+        height = gpml$Graphics["BoardHeight"], 
+        outfile = paste0(outdir,"/",outname))
+    
+    # Plot each element in GPML file
+    for (i in ZOrder_df$Index){
+        .drawElement(
+            gpml_fil[i], plotColor, gpml_fil,
+            groupElements_df, nodes_df_all, colors_df_all)
+    }
+    
+    # Close file for plotting
+    grDevices::dev.off()
+    
+    # Provide location of pathway figure (and open file if necessary)
+    outputList <- list()
+    outputList[["Pathway"]] <- outfile
+    if (openFile) {shell(outputList[["Pathway"]])}
+    
+    # Return legend, node table, pathway information
+    if (legend & !is.null(colors_df_all)){
+        outputList[["Legend"]] <- .exportLegend(outdir, outname, colorList)
+    } else{ outputList[["Legend"]] <- NA }
+    
+    if (nodeTable & !is.null(colors_df_all)){
+        outputList[["NodeTable"]] <- .returnNodeTable(colors_df_all)
+    } else{ outputList[["NodeTable"]] <- NA }
+    
+    if (pathInfo){
+        outputList[["Information"]] <- .returnInformation(gpml)
+    }else{ outputList[["Information"]] <- NA }
+    
+    return(outputList)
+}
+
+
+.prepareGPML <- function(gpml){
+    # Filter for graphical elements
+    gpml_fil <- gpml[names(gpml) %in% c(
+        "DataNode", "Shape", "Label", "Interaction", "GraphicalLine", "State", 
+        "Group")]
+    
+    # Give each graphical element a unique ID
+    for (l in seq_along(gpml_fil)){
+        gpml_fil[[l]]["ID"] <-  paste0("id", l)
+    }
+    return(gpml_fil)
+}
+
+
+.setZorder_GPML <- function(gpml_fil){
     ZOrder <- rep(NA, length(gpml_fil))
     Type <- rep(NA, length(gpml_fil))
     GroupRef <- rep(NA, length(gpml_fil))
@@ -159,50 +181,109 @@ drawGPML <- function(
     for (i in seq_along(gpml_fil)){
         
         # Extract element type
+        # Element type: Node, interaction, etc.
         Type[i] <- names(gpml_fil[i])
         
         # Extract Z-order
-        if ("Graphics" %in% names(gpml_fil[[i]])){
-            if ("ZOrder" %in% names(gpml_fil[[i]][["Graphics"]])){
-                ZOrder[i] <- gpml_fil[[i]][["Graphics"]]["ZOrder"]
-            }
-            if (".attrs" %in% names(gpml_fil[[i]][["Graphics"]])){
-                ZOrder[i] <- gpml_fil[[i]][["Graphics"]][[".attrs"]]["ZOrder"]
-            }
-        }
+        ZOrder[i] <- .extractZorder(gpml_fil[i])
         
         # Extract group reference
-        if(names(gpml_fil[i]) %in% c("DataNode", "Label")){
-            GroupRef[i] <- gpml_fil[[i]][[".attrs"]]["GroupRef"]
-        }
-        if(names(gpml_fil[i]) == "Group"){
-            if (".attrs" %in% names(gpml_fil[[i]])){
-                GroupRef[i] <- gpml_fil[[i]][[".attrs"]]["GroupId"]
-            }else{
-                GroupRef[i] <- gpml_fil[[i]][["GroupId"]]
-            }
-        }
-        
+        # Group reference: the ID of the group element linked to the node
+        GroupRef[i] <- .extractGroupRef(gpml_fil[i])
         
         # Extract state reference
-        if(names(gpml_fil[i]) %in% c("DataNode", "Label")){
-            StateRef[i] <- gpml_fil[[i]][[".attrs"]]["GraphId"]
-        }
-        if(names(gpml_fil[i]) == "State"){
-            if (".attrs" %in% names(gpml_fil[[i]])){
-                StateRef[i] <- gpml_fil[[i]][[".attrs"]]["GraphRef"]
-            }else{
-                StateRef[i] <- gpml_fil[[i]][["GraphRef"]]
-            }
-        }
+        # State reference: the ID of the nodes that are linked to a state
+        StateRef[i] <- .extractStateRef(gpml_fil[i])
     }
     
     # Combine extracted values into a data frame
-    ZOrder_df <- data.frame(Index = seq_along(gpml_fil),
-                            ZOrder = as.numeric(ZOrder),
-                            GroupRef = GroupRef,
-                            StateRef = StateRef,
-                            Type = Type)
+    ZOrder_df <- data.frame(
+        Index = seq_along(gpml_fil),
+        ZOrder = as.numeric(ZOrder),
+        GroupRef = GroupRef,
+        StateRef = StateRef,
+        Type = Type)
+    
+    # The state elements do not have a defined Z-order.
+    # So, we set the order to be before the node
+    ZOrder_df <- .setStateZ(ZOrder_df)
+    
+    # The Z-order of the groups is minimal, so they will be drawn first
+    ZOrder_df <- .setGroupZ(ZOrder_df)
+    
+    # Sort data frame by Z-order
+    ZOrder_df <- dplyr::arrange(ZOrder_df, by = ZOrder) 
+    return(ZOrder_df)
+}
+
+
+.extractZorder <- function(gpml_element){
+    ZOrder_i <- NA
+    if ("Graphics" %in% names(gpml_element)){
+        if ("ZOrder" %in% names(gpml_element[[1]][["Graphics"]])){
+            ZOrder_i <- gpml_element[[1]][["Graphics"]]["ZOrder"]
+        }
+        if (".attrs" %in% names(gpml_element[[1]][["Graphics"]])){
+            ZOrder_i <- gpml_element[[1]][["Graphics"]][[".attrs"]]["ZOrder"]
+        }
+    }
+    
+    return(ZOrder_i)
+}
+
+
+.extractGroupRef <- function(gpml_element){
+    GroupRef_i <- NA
+    if(names(gpml_element) %in% c("DataNode", "Label")){
+        GroupRef_i <- gpml_element[[1]][[".attrs"]]["GroupRef"]
+    }
+    if(names(gpml_element) == "Group"){
+        if (".attrs" %in% names(gpml_element[[1]])){
+            GroupRef_i <- gpml_element[[1]][[".attrs"]]["GroupId"]
+        }else{
+            GroupRef_i <- gpml_element[[1]][["GroupId"]]
+        }
+    }
+    return(GroupRef_i)
+}
+
+
+.extractStateRef <- function(gpml_element){
+    StateRef_i <- NA
+    if(names(gpml_element) %in% c("DataNode", "Label")){
+        StateRef_i <- gpml_element[[1]][[".attrs"]]["GraphId"]
+    }
+    if(names(gpml_element) == "State"){
+        if (".attrs" %in% names(gpml_element[[1]])){
+            StateRef_i <- gpml_element[[1]][[".attrs"]]["GraphRef"]
+        }else{
+            StateRef_i <- gpml_element[[1]][["GraphRef"]]
+        }
+    }
+    return(StateRef_i)
+}
+
+
+.setStateZ <- function(ZOrder_df){
+    for (i in seq_len(nrow(ZOrder_df))){
+        if ((is.na(ZOrder_df$ZOrder[i])) & (!is.na(ZOrder_df$StateRef[i]))){
+            
+            nodeZs <- ZOrder_df$ZOrder[
+                ZOrder_df$StateRef == ZOrder_df$StateRef[i]]
+            nodeZs <- nodeZs[!is.na(nodeZs)]
+            
+            if (length(nodeZs) > 0){
+                ZOrder_df$ZOrder[i] <- max(nodeZs, na.rm = TRUE) + 0.5
+            } else{
+                ZOrder_df$ZOrder[i] <- Inf
+            }
+        }
+    }
+    return(ZOrder_df)
+}
+
+
+.setGroupZ <- function(ZOrder_df){
     
     # The group elements do not have a defined Z-order.
     # So, we set the order to be before the first node of the group
@@ -221,447 +302,291 @@ drawGPML <- function(
     # 
     #   }
     # }
-    
-    # The state elements do not have a defined Z-order.
-    # So, we set the order to be before the first node of the group
-    for (i in seq_len(nrow(ZOrder_df))){
-        if ((is.na(ZOrder_df$ZOrder[i])) & (!is.na(ZOrder_df$StateRef[i]))){
-            
-            nodeZs <- ZOrder_df$ZOrder[
-                ZOrder_df$StateRef == ZOrder_df$StateRef[i]]
-            nodeZs <- nodeZs[!is.na(nodeZs)]
-            
-            if (length(nodeZs) > 0){
-                ZOrder_df$ZOrder[i] <- max(nodeZs, na.rm = TRUE) + 0.5
-            } else{
-                ZOrder_df$ZOrder[i] <- Inf
-            }
-        }
-    }
-    
-    # The Z-order of the groups is minimal, so they will be drawn first
     ZOrder_df$ZOrder[is.na(ZOrder_df$ZOrder)] <- -Inf
-    
-    # Sort data frame by Z-order
-    ZOrder_df <- dplyr::arrange(ZOrder_df, by = ZOrder)
-    
-    # Get all elements that could be part of a group
-    groupElements_df <- .prepareLabels(gpml_fil[names(gpml_fil) %in% 
-                                                    c("DataNode", "Label")])
-    
-    #************************************************************************#
-    # Set the color values of the nodes
-    #************************************************************************#
-    
-    # Prepare nodes
-    nodes_df_all <- .prepareNodes(gpml_fil[names(gpml_fil) == "DataNode"])
-    
-    # Map colors to nodes
-    colors_df_all <- NULL
-    if (!(
-        is.null(geneIDs) | 
-        is.null(colorVar) | 
-        (is.null(annGenes) & is.null(annMetabolites)) | 
-        is.null(inputDB))){
-        
-        colors_df_all <- .mapColors(
-            nodes_df = nodes_df_all,
-            geneIDs = geneIDs,
-            colorVar = colorVar,
-            annGenes = annGenes,
-            annMetabolites = data.frame(annMetabolites),
-            inputDB = inputDB,
-            colorList = colorList,
-            NAvalue = NAvalue)
-    }
-    
-    #************************************************************************#
-    # Open file for plotting
-    #************************************************************************#
-    
+    return(ZOrder_df)
+}
+
+
+.openFile <- function(width, height, CanvasSize, outfile){
+    file_extension <- tolower(tools::file_ext(outfile))
     if (file_extension == "svg"){
         svglite::svglite(
             outfile, 
-            width = as.numeric(CanvasSize["BoardWidth"])*0.015, 
-            height = as.numeric(CanvasSize["BoardHeight"])*0.015)
+            width = as.numeric(width)*0.015, height = as.numeric(height)*0.015)
     }else if (file_extension == "png"){
-        
-        w <- as.numeric(CanvasSize["BoardWidth"])*18
-        h <- as.numeric(CanvasSize["BoardHeight"])*18
-        
-        if ((h <= 20000) | (w <= 20000)){
+        if ((height <= 1100) | (width <= 1100)){
             grDevices::png(
                 file = outfile,
-                width = as.numeric(CanvasSize["BoardWidth"])*18,
-                height = as.numeric(CanvasSize["BoardHeight"])*18,
-                units = "px",
-                res = 1200,
-                pointsize = 12)
+                width = as.numeric(width)*18, height = as.numeric(height)*18,
+                units = "px", res = 1200, pointsize = 12)
         }else{
-            
-            if (h >= w){
+            if (height >= width){
                 grDevices::png(
                     file = outfile,
-                    width = w * (20000/h),
-                    height = 20000,
-                    units = "px",
-                    res = 1200 * (20000/h),
-                    pointsize = 12)
-            }
-            if (h < w){
+                    width = w * (1100/height), height = 1100,
+                    units = "px", res = 1200 * (1100/height), pointsize = 12)
+            }else {
                 grDevices::png(
                     file = outfile,
-                    width = 20000,
-                    height = h* (20000/w),
-                    units = "px",
-                    res = 1200 * (20000/w),
-                    pointsize = 12)
+                    width = 1100, height = h* (1100/width),
+                    units = "px", res = 1200 * (1100/width), pointsize = 12)
             }
-            
         }
-        
-        
-        
-        
     }else if (file_extension == "pdf"){
         grDevices::pdf(
             outfile, 
-            width = as.numeric(CanvasSize["BoardWidth"])*0.015, 
-            height = as.numeric(CanvasSize["BoardHeight"])*0.015)
+            width = as.numeric(width)*0.015,
+            height = as.numeric(height)*0.015)
     }else{
         outfile <- paste0(outfile, ".svg")
         if (file_extension != ""){
             warning(
                 "The output file does not have a valid file extension. 
-            Generating .svg file instead.")
+                Generating .svg file instead.")
         }
         svglite::svglite(
             outfile, 
-            width = as.numeric(CanvasSize["BoardWidth"])*0.015, 
-            height = as.numeric(CanvasSize["BoardHeight"])*0.015)
+            width = as.numeric(width)*0.015, 
+            height = as.numeric(height)*0.015)
     }
-    
-    #************************************************************************#
-    # Make pathway diagram
-    #************************************************************************#
-    
-    # Set margins and line spacing
-    graphics::par(
-        mar = c(0,0,0,0), 
-        lheight=0.9)
-    
-    # Make empty canvas
+    graphics::par(mar = c(0,0,0,0), lheight=0.9)
     plot(
-        c(0, as.numeric(CanvasSize["BoardWidth"])),
-        c(-1*as.numeric(CanvasSize["BoardHeight"]),0),
+        c(0, as.numeric(width)), c(-1*as.numeric(height),0),
         col = "white", axes = FALSE, ann = FALSE)
     vps <- gridBase::baseViewports()
     grid::pushViewport(vps$inner, vps$figure, vps$plot)
+    return(outfile)
+}
+
+
+.drawElement <- function(
+        pathwayElement, plotColor, gpml_fil,
+        groupElements_df, nodes_df_all, colors_df_all){
     
-    # Plot each element in GPML file
-    for (i in ZOrder_df$Index){
+    if (names(pathwayElement) == "DataNode"){
+        .plotNodes(pathwayElement, plotColor, colors_df_all)
+    }
+    
+    if (names(pathwayElement) == "Shape"){
+        .plotShapes(pathwayElement)
+    }
+    
+    if (names(pathwayElement) == "Label"){
+        .plotLabels(pathwayElement)
+    }
+    
+    if (names(pathwayElement) == "Group"){
+        .plotGroups(pathwayElement, groupElements_df)
+    }
+    
+    if (names(pathwayElement) %in% c("Interaction", "GraphicalLine")){
+        .plotInteractions(pathwayElement, gpml_fil)
+    }
+    
+    if (names(pathwayElement) == "State"){
+        .plotStates(pathwayElement, nodes_df_all)
+    }
+}
+
+
+.plotNodes <- function(pathwayElement, plotColor, colors_df_all){
+    
+    # Prepare nodes
+    nodes_df <- .prepareNodes(pathwayElement)
+    
+    # Plot colored node
+    if (plotColor){
+        colors_df <- colors_df_all[
+            colors_df_all$GraphId1 == pathwayElement[[1]]$ID,]
+        if (nrow(colors_df) > 0){.drawColors(colors_df)}
+        .drawNodes(nodes_df, colors_df_all)
         
-        # Select pathway element
-        pathwayElement <- gpml_fil[i]
+        # Plot uncolored node
+    } else{
+        .drawShapes(nodes_df)
+    }
+}
+
+
+.plotShapes <- function(pathwayElement){
+    shapes_df <- .prepareShapes(pathwayElement)
+    
+    # Split shapes in cell and non-cell components
+    cellcomp <- c(
+        "Mitochondria", "Sarcoplasmic Reticulum", "Endoplasmic Reticulum",
+        "Golgi Apparatus", "Brace")
+    non_cellcomp_df <- shapes_df[!(shapes_df$ShapeType %in% cellcomp),]
+    cellcomp_df <- shapes_df[shapes_df$ShapeType %in% cellcomp,]
+    
+    # Draw non-cell components
+    if (nrow(non_cellcomp_df) > 0){
+        .drawShapes(non_cellcomp_df)
+    }
+    
+    # Draw cell components
+    if (nrow(cellcomp_df) > 0){
+        .drawCellComponents(cellcomp_df)
+    }
+    
+    # Draw braces
+    braces_df <- shapes_df[shapes_df$ShapeType == "Brace",]
+    if (nrow(braces_df) > 0){.drawBraces(braces_df)}
+}
+
+
+.plotLabels <- function(pathwayElement){
+    
+    # Prepare labels
+    labels_df <- .prepareLabels(pathwayElement)
+    
+    # Draw labels
+    .drawShapes(labels_df)
+}
+
+
+.plotGroups <- function(pathwayElement, groupElements_df){
+    # Get group reference
+    if (!is.null(pathwayElement[[1]][["GroupId"]])){
+        groupref <- pathwayElement[[1]][["GroupId"]]
+    } else{
+        groupref <- pathwayElement[[1]]$.attrs["GroupId"]
+    }
+    
+    # Select nodes that are part of the group
+    selNodes <- which(groupElements_df$GroupRef == groupref)
+    
+    # Plot group
+    if (length(selNodes) > 0){
+        nodes_df_groups <- groupElements_df[selNodes,]
+        groups_df <- .prepareGroups(pathwayElement, nodes_df_groups)
         
-        #====================================================================#
-        # Draw nodes
-        #====================================================================#
-        
-        if (names(pathwayElement) == "DataNode"){
-            
-            if (!(
-                is.null(geneIDs) | 
-                is.null(colorVar) | 
-                (is.null(annGenes) & is.null(annMetabolites)) | 
-                is.null(inputDB))){
-                
-                # Select color values of pathway element
-                colors_df <- colors_df_all[
-                    colors_df_all$GraphId1 == pathwayElement[[1]]$ID,]
-                
-                # Draw colors
-                if (nrow(colors_df) > 0){
-                    .drawColors(colors_df)
-                }
-                
-                # Prepare nodes
-                nodes_df <- .prepareNodes(pathwayElement)
-                
-                # Plot nodes
-                .drawNodes(nodes_df, colors_df_all)
-            } else{
-                
-                # Prepare nodes
-                nodes_df <- .prepareNodes(pathwayElement)
-                
-                # Plot nodes
-                .drawShapes(nodes_df)
-            }
+        # draw groups
+        .drawGroups(groups_df)
+    }
+}
+
+
+.plotInteractions <- function(pathwayElement, gpml_fil){
+    # Prepare edges
+    edges_df <- .prepareEdges(
+        pathwayElement, 
+        gpml_fil[names(gpml_fil) %in% c(
+            "Interaction", "GraphicalLine")])
+    
+    # draw edges
+    if (length(edges_df$lines) > 0){
+        for (l in seq_len(nrow(edges_df$lines))){
+            .drawEdges(edges_df$lines[l,])
         }
-        
-        #====================================================================#
-        # Draw shapes
-        #====================================================================#
-        
-        if (names(pathwayElement) == "Shape"){
-            
-            # Prepare shapes (non-cell components)
-            shapes_df <- .prepareShapes(pathwayElement)
-            
-            non_cellcomp_df <- shapes_df[!(shapes_df$ShapeType %in% c(
-                "Mitochondria",
-                "Sarcoplasmic Reticulum",
-                "Endoplasmic Reticulum",
-                "Golgi Apparatus",
-                "Brace")),]
-            
-            # Draw shapes (non-cell components)
-            if (nrow(non_cellcomp_df) > 0){
-                .drawShapes(non_cellcomp_df)
-            }
-            
-            
-            # Prepare cell components
-            cellcomp_df <- shapes_df[shapes_df$ShapeType %in% c(
-                "Mitochondria",
-                "Sarcoplasmic Reticulum",
-                "Endoplasmic Reticulum",
-                "Golgi Apparatus"),]
-            
-            # Draw cell components
-            if (nrow(cellcomp_df) > 0){
-                .drawCellComponents(cellcomp_df)
-            }
-            
-            # Prepare braces
-            braces_df <- shapes_df[shapes_df$ShapeType == "Brace",]
-            
-            # Draw braces
-            if (nrow(braces_df) > 0){
-                .drawBraces(braces_df)
-            }
-        }
-        
-        #====================================================================#
-        # Draw labels
-        #====================================================================#
-        
-        if (names(pathwayElement) == "Label"){
-            
-            # Prepare labels
-            labels_df <- .prepareLabels(pathwayElement)
-            
-            # Plot labels
-            .drawShapes(labels_df)
-        }
-        
-        #====================================================================#
-        # Draw groups
-        #====================================================================#
-        
-        if (names(pathwayElement) == "Group"){
-            
-            # Get group reference
-            if (!is.null(pathwayElement[[1]][["GroupId"]])){
-                groupref <- pathwayElement[[1]][["GroupId"]]
-            } else{
-                groupref <- pathwayElement[[1]]$.attrs["GroupId"]
-            }
-            
-            # Select nodes that are part of the group
-            selNodes <- which(groupElements_df$GroupRef == groupref)
-            
-            # Plot group
-            if (length(selNodes) > 0){
-                nodes_df_groups <- groupElements_df[selNodes,]
-                groups_df <- .prepareGroups(pathwayElement, nodes_df_groups)
-                
-                # draw groups
-                .drawGroups(groups_df)
-            }
-        }
-        
-        #====================================================================#
-        # Edges
-        #====================================================================#
-        
-        if (names(pathwayElement) == "Interaction" ){
-            
-            # Prepare edges
-            edges_df <- .prepareEdges(
-                pathwayElement, 
-                gpml_fil[names(gpml_fil) %in% c(
-                    "Interaction", "GraphicalLine")])
-            
-            # draw edges
-            if (length(edges_df$lines) > 0){
-                for (l in seq_len(nrow(edges_df$lines))){
-                    .drawEdges(edges_df$lines[l,])
-                }
-            }
-            
-            # draw curves
-            if (length(edges_df$curves) > 0){
-                for (g in unique(edges_df$curves$group)){
-                    .drawCurves(edges_df$curves[edges_df$curves$group == g,])
-                }
-            }
-        }
-        
-        #====================================================================#
-        # Graphical Line
-        #====================================================================#
-        
-        if (names(pathwayElement) == "GraphicalLine"){
-            
-            # Prepare edges
-            edges_df <- .prepareEdges(pathwayElement)
-            
-            # draw edges
-            if (length(edges_df$lines) > 0){
-                for (l in seq_len(nrow(edges_df$lines))){
-                    .drawEdges(edges_df$lines[l,])
-                }
-            }
-            
-            # draw curves
-            if (length(edges_df$curves) > 0){
-                for (g in unique(edges_df$curves$group)){
-                    .drawCurves(edges_df$curves[edges_df$curves$group == g,])
-                }
-            }
-        }
-        
-        #====================================================================#
-        # States
-        #====================================================================#
-        if (names(pathwayElement) == "State"){
-            
-            # Prepare states
-            states_df <- .prepareStates(pathwayElement, nodes_df_all)
-            
-            # Draw states
-            .drawStates(states_df)
-            
+    }
+    
+    # draw curves
+    if (length(edges_df$curves) > 0){
+        for (g in unique(edges_df$curves$group)){
+            .drawCurves(edges_df$curves[edges_df$curves$group == g,])
         }
     } 
+}
+
+
+.plotStates <- function(pathwayElement, nodes_df_all){
     
-    #======================================================================#
-    # Export and open plot
-    #======================================================================#
+    # Prepare states
+    states_df <- .prepareStates(pathwayElement, nodes_df_all)
     
-    grDevices::dev.off()
+    # Draw states
+    .drawStates(states_df)
+}
+
+
+.exportLegend <- function(outdir, outname, colorList){
+    file_extension <- tolower(tools::file_ext(outname))
     
-    # Save file location in output list
-    outputList[["Pathway"]] <- outfile
-    
-    # Open file
-    if (openFile) {
-        shell(outfile)
+    # Export plot
+    if (file_extension == "svg"){
+        outfile_legend <- paste0(outdir,"/legend_",outname)
+        svglite::svglite(
+            outfile_legend,
+            width = 5, height = length(colorList) + 1.25)
+        .makeLegend(colorList)
+        grDevices::dev.off()
     }
-    
-    #======================================================================#
-    # Make and export legend
-    #======================================================================#
-    
-    if (legend & !is.null(colors_df_all)){
-        
-        # Export plot
-        if (file_extension == "svg"){
-            outfile_legend <- paste0(outdir,"/legend_",outname)
-            svglite::svglite(
-                outfile_legend ,
-                width = 5,
-                height = length(colorList) + 1.25)
-            .makeLegend(colorList)
-            grDevices::dev.off()
-        }
-        else if (file_extension == "pdf"){
-            outfile_legend <- paste0(outdir,"/legend_",outname)
-            grDevices::pdf(
-                outfile_legend ,
-                width = 5,
-                height = length(colorList) + 1.25)
-            .makeLegend(colorList)
-            grDevices::dev.off()
-        }
-        else if (file_extension == "png"){
-            outfile_legend  <-  paste0(outdir,"/legend_",outname)
-            grDevices::png(
-                file = outfile_legend,
-                width = 5,
-                height = length(colorList) + 1.25,
-                units = "in",
-                res = 1200,
-                pointsize = 12)
-            .makeLegend(colorList)
-            grDevices::dev.off()
-        }
-        else{
-            outfile_legend <- paste0(outdir,"/legend_",outname, ".svg")
-            svglite::svglite(
-                outfile_legend ,
-                width = 5,
-                height = length(colorList) + 1.25)
-            .makeLegend(colorList)
-            grDevices::dev.off()
-        }
-        
-        # Save file location in output list
-        outputList[["Legend"]] <- outfile_legend
-    } else{
-        outputList[["Legend"]] <- NA
+    else if (file_extension == "pdf"){
+        outfile_legend <- paste0(outdir,"/legend_",outname)
+        grDevices::pdf(
+            outfile_legend ,
+            width = 5, height = length(colorList) + 1.25)
+        .makeLegend(colorList)
+        grDevices::dev.off()
     }
-    
-    #======================================================================#
-    # Return node table
-    #======================================================================#
-    
-    if (nodeTable & !is.null(colors_df_all)){
-        outputTable <- unique(colors_df_all[
-            !is.na(colors_df_all$ScaleName),
-            c("Label", "InputId", "ScaleName", "MapColor")])
-        
-        colnames(outputTable) <- c(
-            "Node Label", 
-            "ID", 
-            "Scale Name", 
-            "Scale Value")
-        outputTable <- outputTable |>
-            tidyr::pivot_wider(
-                names_from = "Scale Name",
-                values_from = "Scale Value",
-                values_fn = list
-            )
-        
-        # Save node table in output list
-        outputList[["NodeTable"]] <- outputTable
-    } else{
-        outputList[["NodeTable"]] <- NA
+    else if (file_extension == "png"){
+        outfile_legend <- paste0(outdir,"/legend_",outname)
+        grDevices::png(
+            file = outfile_legend,
+            width = 5, height = length(colorList) + 1.25,
+            units = "in", res = 1200, pointsize = 12)
+        .makeLegend(colorList)
+        grDevices::dev.off()
     }
+    else{
+        outfile_legend <- paste0(outdir,"/legend_",outname, ".svg")
+        svglite::svglite(
+            outfile_legend ,
+            width = 5, height = length(colorList) + 1.25)
+        .makeLegend(colorList)
+        grDevices::dev.off()
+    }
+    return(outfile_legend)
+}
+
+
+.returnNodeTable <- function(colors_df_all){
     
-    #======================================================================#
-    # Return pathway information
-    #======================================================================#
+    outputTable <- unique(colors_df_all[
+        !is.na(colors_df_all$ScaleName),
+        c("Label", "InputId", "ScaleName", "MapColor")])
     
-    if (pathInfo){
-        outputList[["Information"]] <- c(
-            "Name" = as.character(gpml$.attrs["Name"]),
-            "ID" = as.character(gpml$.attrs["Version"]),
-            "Link" = paste0(
-                "https://www.wikipathways.org/pathways/",
-                stringr::str_split(gpml$.attrs["Version"], "_")[[1]][1],
-                ".html"),
-            "Description" = gpml[
-                which(names(gpml) == "Comment")][
-                    which.max(
-                        nchar(gpml[which(names(gpml) == "Comment")])
-                    )][[1]][[1]]
+    colnames(outputTable) <- c(
+        "Node Label", 
+        "ID", 
+        "Scale Name", 
+        "Scale Value")
+    outputTable <- outputTable |>
+        tidyr::pivot_wider(
+            names_from = "Scale Name",
+            values_from = "Scale Value",
+            values_fn = list
         )
-    }else{
-        outputList[["Information"]] <- NA
-    }
+}
+
+
+.makeOutName <- function(gpml){
     
-    return(outputList)
+    # Extract information from GPML file
+    PathwayName <- gpml$.attrs["Name"]
+    Organism <- gpml$.attrs["Organism"]
+    PathwayID <- gpml$.attrs["Version"]
+    
+    # Combine information into name
+    outname <- paste0(PathwayName,"_",PathwayID, "_",Organism)
+    outname <- stringr::str_replace_all(outname, " ", "_")
+    outname <- make.names(outname)  
+}
+
+
+.returnInformation <- function(gpml){
+    info <-  c(
+        "Name" = as.character(gpml$.attrs["Name"]),
+        "ID" = as.character(gpml$.attrs["Version"]),
+        "Link" = paste0(
+            "https://www.wikipathways.org/pathways/",
+            stringr::str_split(gpml$.attrs["Version"], "_")[[1]][1],
+            ".html"),
+        "Description" = gpml[
+            which(names(gpml) == "Comment")][
+                which.max(
+                    nchar(gpml[which(names(gpml) == "Comment")])
+                )][[1]][[1]])
+    
+    return(info)
 }
