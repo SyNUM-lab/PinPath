@@ -8,7 +8,7 @@ GPML2Network(
   infile,
   outdir = getwd(),
   outname = NULL,
-  geneIDs = NULL,
+  featureIDs = NULL,
   colorVar = NULL,
   annGenes = NULL,
   annMetabolites = NULL,
@@ -39,12 +39,12 @@ will be saved in this directory.}
 specified, the pathway and legend image will be generated in .svg format.
 The legend file gets the "legend_" prefix.}
 
-\item{geneIDs}{(optional) \code{character} vector of gene IDs.}
+\item{featureIDs}{(optional) \code{character} vector of gene IDs.}
 
 \item{colorVar}{(optional) \code{vector} or \code{data.frame} for 
 coloring the nodes in the pathway. This can be for instance a 
 \code{data.frame} with the log2FCs and significance in the columns.
-The (row) order should match \code{geneIDs}. The color rules and palettes 
+The (row) order should match \code{featureIDs}. The color rules and palettes 
 for the supplied values can be set in the colorList parameter.}
 
 \item{annGenes}{(optional) \code{character} string of the Bioconductor 
@@ -56,7 +56,8 @@ metabolite mapping information (see metaboliteIDmapping package).}
 \item{inputDB}{(optional) Input gene ID type 
 (SYMBOL, ENTREZID, ENSEMBL, UNIPROT).
 This can be a \code{character} vector of \code{length = 1} 
-(if all gene IDs are of the same type) or of \code{length = nrow(geneIDs)} 
+(if all gene IDs are of the same type) or of 
+\code{length = nrow(featureIDs)} 
 (if you want to specify the type per gene ID).}
 
 \item{colorNames}{(optional) \code{character} vector with names of the 
@@ -115,7 +116,7 @@ to map, e.g., expression data onto the network diagram.
             outdir = tempdir(),
             annGenes = "org.Hs.eg.db",
             inputDB = "ENSEMBL",
-            geneIDs = lung_expr$GeneID,
+            featureIDs = lung_expr$GeneID,
             colorVar = lung_expr[,"log2FC"],
             nodeTable = TRUE,
             legend = TRUE)

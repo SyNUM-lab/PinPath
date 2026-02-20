@@ -133,11 +133,11 @@
 #' "svg","png",and "pdf" file extensions are accepted. If no file extension is 
 #' specified, the pathway and legend image will be generated in .svg format.
 #' The legend file gets the "legend_" prefix.
-#' @param geneIDs (optional) \code{character} vector of gene IDs.
+#' @param featureIDs (optional) \code{character} vector of gene IDs.
 #' @param colorVar (optional) \code{vector} or \code{data.frame} for 
 #' coloring the nodes in the pathway. This can be for instance a 
 #' \code{data.frame} with the log2FCs and significance in the columns.
-#' The (row) order should match \code{geneIDs}. The color rules and palettes 
+#' The (row) order should match \code{featureIDs}. The color rules and palettes 
 #' for the supplied values can be set in the colorList parameter.
 #' @param annGenes (optional) \code{character} string of the Bioconductor 
 #' annotation package (e.g., org.Hs.eg.db).
@@ -146,7 +146,8 @@
 #' @param inputDB (optional) Input gene ID type 
 #' (SYMBOL, ENTREZID, ENSEMBL, UNIPROT).
 #' This can be a \code{character} vector of \code{length = 1} 
-#' (if all gene IDs are of the same type) or of \code{length = nrow(geneIDs)} 
+#' (if all gene IDs are of the same type) or of 
+#' \code{length = nrow(featureIDs)} 
 #' (if you want to specify the type per gene ID).
 #' @param colorNames (optional) \code{character} vector with names of the 
 #' color variables. If \code{colorNames} is NULL, the column names of the 
@@ -188,7 +189,7 @@
 #'             outdir = tempdir(),
 #'             annGenes = "org.Hs.eg.db",
 #'             inputDB = "ENSEMBL",
-#'             geneIDs = lung_expr$GeneID,
+#'             featureIDs = lung_expr$GeneID,
 #'             colorVar = lung_expr[,"log2FC"],
 #'             nodeTable = TRUE,
 #'             legend = TRUE)
@@ -200,7 +201,7 @@ GPML2Network <- function(
         infile,
         outdir = getwd(),
         outname = NULL,
-        geneIDs = NULL,
+        featureIDs = NULL,
         colorVar = NULL,
         annGenes = NULL,
         annMetabolites = NULL,
@@ -226,8 +227,7 @@ GPML2Network <- function(
     
     # If no color is set, use default color palette
     if (is.null(colorList) & !is.null(colorVar)){
-        colorList <- defaultColorList(colorVar, ColorNames = colorNames)
-    }
+        colorList <- defaultColorList(colorVar, ColorNames = colorNames)}
     
     # Extract nodes
     dataNodes <- gpml_fil[names(gpml_fil) == "DataNode"]
@@ -239,10 +239,9 @@ GPML2Network <- function(
     
     # Prepare nodes for plotting
     df <- .allNodes_network(
-        dataNodes, nodes_df_temp, groups_df, geneIDs, colorVar, annGenes, 
+        dataNodes, nodes_df_temp, groups_df, featureIDs, colorVar, annGenes, 
         annMetabolites, inputDB, colorList, NAvalue)
-    nodes_df <- df[[1]]
-    colors_df <- df[[2]]
+    nodes_df <- df[[1]]; colors_df <- df[[2]]
     
     # Prepare edges for plotting
     edges_df <- .allEdges_network(gpml_fil, nodes_df, groups_df)
@@ -258,19 +257,16 @@ GPML2Network <- function(
     outfile <- .exportNetwork(g_plot, outdir, outname, nodeSize)
     
     # Provide location of pathway figure (and open file if necessary)
-    outputList <- list()
-    outputList[["Pathway"]] <- outfile
+    outputList <- list(); outputList[["Pathway"]] <- outfile
     if (openFile) {shell(outputList[["Pathway"]])}
     
     # Return legend, node table, pathway information
     if (legend & !is.null(colorList)){
         outputList[["Legend"]] <- .exportLegend(outdir, outname, colorList)
     } else{ outputList[["Legend"]] <- NA }
-    
     if (nodeTable & !is.null(colors_df)){
         outputList[["NodeTable"]] <- .returnNodeTable(colors_df)
     } else{ outputList[["NodeTable"]] <- NA }
-    
     if (pathInfo){
         outputList[["Information"]] <- .returnInformation(gpml)
     }else{ outputList[["Information"]] <- NA }
@@ -378,18 +374,18 @@ GPML2Network <- function(
 
 .allNodes_network <- function(
         dataNodes, nodes_df_temp, groups_df,
-        geneIDs, colorVar, annGenes, annMetabolites, 
+        featureIDs, colorVar, annGenes, annMetabolites, 
         inputDB, colorList, NAvalue){
     
     # Map colors to nodes
     colors_df <- NULL
     if (!(
-        is.null(geneIDs) | is.null(colorVar) | 
+        is.null(featureIDs) | is.null(colorVar) | 
         (is.null(annGenes) & is.null(annMetabolites)) | is.null(inputDB))){
         
         colors_df <- .mapColors(
             nodes_df = .prepareNodes(dataNodes),
-            geneIDs = geneIDs,
+            featureIDs = featureIDs,
             colorVar = colorVar,
             annGenes = annGenes,
             annMetabolites = data.frame(annMetabolites),

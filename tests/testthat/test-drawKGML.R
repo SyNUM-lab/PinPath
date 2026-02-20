@@ -19,7 +19,7 @@ test_that("KEGG visualization", {
     outdir = tempdir(),
     annGenes = "org.Hs.eg.db",
     inputDB = "ENSEMBL",
-    geneIDs = lung_expr$GeneID,
+    featureIDs = lung_expr$GeneID,
     colorVar = lung_expr[,"log2FC"],
     nodeTable = TRUE,
     pathInfo = TRUE,

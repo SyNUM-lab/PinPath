@@ -12,6 +12,12 @@
         nrow = 2)
 }
 
+.circle <- function(x, xradius, y, yradius, npoints){
+    positions <- seq(0, 2*pi, length.out=npoints)
+    return(data.frame(
+        x = x + xradius * cos(positions), 
+        y = y + yradius * sin(positions)))
+}
 
 # ------------------------------------------------------------------------------
 #' @title Prepare data frame for plotting shapes
@@ -135,326 +141,336 @@
     
     # Filter for non-cell components
     shapes_df <- shapes_df[!(shapes_df$ShapeType %in% c(
-        "Mitochondria",
-        "Sarcoplasmic Reticulum",
-        "Endoplasmic Reticulum",
-        "Golgi Apparatus")),]
+        "Mitochondria","Sarcoplasmic Reticulum",
+        "Endoplasmic Reticulum", "Golgi Apparatus")),]
     shapes_df$Rotation[is.na(shapes_df$Rotation)] <- 0
+    
+    # Prepare data for plotting
+    label_df_plot <- shapes_df[!is.na(shapes_df$Label),]
     polygon_df_plot <- NULL
     line_df_plot <- NULL
-    rect_df_plot <- NULL
-    #shapes_df <- dplyr::arrange(shapes_df, by = ZOrder)
     for (i in seq_len(nrow(shapes_df))){
-        
-        # Define variables
-        width <- shapes_df$Width[i]
-        height <- shapes_df$Height[i]
-        centerX <- shapes_df$CenterX[i]
-        centerY <- shapes_df$CenterY[i]
-        rotation <- shapes_df$Rotation[i]
-        alpha <- shapes_df$Alpha[i]
-        fillcolor <- shapes_df$FillColor[i]
-        edgecolor <- shapes_df$Color[i]
-        thickness <- shapes_df$LineThickness[i]
         type <- shapes_df$ShapeType[i]
-        nLine <- shapes_df$nLine[i]
-        linestyle <- shapes_df$LineStyle[i]
-        valign <- shapes_df$Valign[i]
-        align <- shapes_df$Align[i]
-        
-        #======================================================================#
-        # Prepare polygons
-        #======================================================================#
         if (type %in% c(
             "Triangle", "RoundedRectangle", "Rectangle",
             "Pentagon", "Hexagon", "Oval", "mim-degradation")){
-            n_corners <- NULL
-            if (type == "Triangle"){
-                starting_angle <- 0
-                max_angle <- 2*pi
-                n_corners <- 3
-                adj <- 1
-                
-                # The width and coordinates of the triangle are not correctly 
-                # defined 
-                # in the GPML file, so we need to do some slight adjustment
-                width <- width*1.25
-                centerX <- centerX + 0.07*cos(rotation)*width
-                centerY <- centerY + 0.07*sin(rotation)*height
-            }
-            if (type == "RoundedRectangle" | type == "Rectangle"){
-                starting_angle <- 0.25*pi
-                max_angle <- 2*pi
-                n_corners <- 4
-                adj <- sqrt(2)
-            }
-            if (type == "Pentagon"){
-                starting_angle <- 0
-                max_angle <- 2*pi
-                n_corners <- 5
-                adj <- 1
-            }
-            if (type == "Hexagon"){
-                starting_angle <- 0
-                max_angle <- 2*pi
-                n_corners <- 6
-                adj <- 1
-            }
-            if (type == "Oval"){
-                starting_angle <- 0
-                max_angle <- 2*pi
-                n_corners <- 100
-                adj <- 1
-            }
-            
-            if (type == "mim-degradation"){
-                starting_angle <- 0
-                max_angle <- 2*pi
-                n_corners <- 100
-                adj <- 1
-                width <- 0.7*width
-                height <- 0.7*height
-            }
-            
-            if (!is.null(n_corners)){
-                
-                # Create angle offsets (no rotation yet)
-                angle <- seq(
-                    0, 
-                    max_angle, 
-                    length.out = n_corners + 1)[-1]  # remove duplicate 2pi
-                x <- rep(NA, n_corners)
-                y <- rep(NA, n_corners)
-                corner_coords <- matrix(NA, nrow = n_corners, ncol = 2)
-                for (c in seq_len(n_corners)){
-                    
-                    corner_coords[c,1] <- adj*width/2 * 
-                        cos(angle[c] + starting_angle)
-                    corner_coords[c,2] <- adj*height/2 * 
-                        sin(angle[c] + starting_angle)
-                    
-                }
-                
-                # Apply rotation matrix
-                rot_mat <- .rotation_matrix(-1*rotation)
-                rotated_coords <- t(rot_mat %*% t(corner_coords))
-                
-                # Translate to center
-                x <- rotated_coords[,1] + centerX
-                y <- rotated_coords[,2] + centerY
-                
-                
-                # Single line
-                if (nLine == "Single"){
-                    temp <- data.frame(
-                        angle = angle,
-                        x = x,
-                        y = y,
-                        id = i,
-                        Alpha = alpha,
-                        FillColor = fillcolor,
-                        EdgeColor = edgecolor,
-                        LineThickness = thickness*3,
-                        LineStyle = linestyle,
-                        Valign = valign,
-                        Align = align)
-                    # Double line
-                } else{
-                    temp1 <- data.frame(
-                        angle = angle,
-                        x = x,
-                        y = y,
-                        id = i,
-                        Alpha = alpha,
-                        FillColor = fillcolor,
-                        EdgeColor = edgecolor,
-                        LineThickness = thickness*10,
-                        LineStyle = linestyle,
-                        Valign = valign,
-                        Align = align)
-                    temp2 <- data.frame(
-                        angle = angle,
-                        x = x,
-                        y = y,
-                        id = paste0(i, ".2"),
-                        Alpha = 0,
-                        FillColor = "white",
-                        EdgeColor = "white",
-                        LineThickness = thickness*2,
-                        LineStyle = linestyle,
-                        Valign = valign,
-                        Align = align)
-                    temp <- rbind.data.frame(temp1, temp2)
-                }
-                
-                
-                polygon_df_plot <- rbind.data.frame(polygon_df_plot, temp)
-            }
-            
-        }
-        
-        #======================================================================#
-        # Prepare lines
-        #======================================================================#
+            temp <- .preparePolygon(shapes_df, i)
+            polygon_df_plot <- rbind.data.frame(polygon_df_plot, temp)}
         if (type %in% c("mim-degradation", "Arc")){
-            
-            if (type == "mim-degradation"){
-                xstart <- 0.7*width
-                xend <- -0.7*width
-                ystart <- 0.7*height
-                yend <- -0.7*height
-                
-                # Apply rotation matrix
-                rot_mat <- .rotation_matrix(-1*rotation)
-                rotated_coords <- t(rot_mat %*% t(
-                    matrix(c(xstart,xend,ystart,yend), nrow = 2)))
-                
-                # Translate to center
-                x <- rotated_coords[,1] + centerX
-                y <- rotated_coords[,2] + centerY
-                
-                temp <- data.frame(
-                    x1 = x[-length(x)],
-                    x2 = x[-1],
-                    y1 = y[-length(y)],
-                    y2 = y[-1],
-                    x = x,
-                    y = y,
-                    id = i,
-                    Alpha = 1,
-                    FillColor = fillcolor,
-                    EdgeColor = edgecolor,
-                    LineThickness = thickness*2,
-                    LineStyle = linestyle,
-                    Valign = valign,
-                    Align = align)
-                
-            }
-            
-            if (type == "Arc"){
-                starting_angle <- 0
-                max_angle <- pi
-                n_corners <- 100
-                adj <- 1
-                
-                # Create angle offsets (no rotation yet)
-                angle <- seq(
-                    0, 
-                    max_angle, 
-                    length.out = n_corners + 1)[-1]  # remove duplicate 2pi
-                x <- rep(NA, n_corners)
-                y <- rep(NA, n_corners)
-                corner_coords <- matrix(NA, nrow = n_corners, ncol = 2)
-                for (c in seq_len(n_corners)){
-                    
-                    corner_coords[c,1] <- adj*width/2 * 
-                        cos(angle[c] + starting_angle)
-                    corner_coords[c,2] <- adj*height/2 * 
-                        sin(angle[c] + starting_angle)
-                    
-                }
-                
-                # Apply rotation matrix
-                rot_mat <- .rotation_matrix(-1*rotation)
-                rotated_coords <- t(rot_mat %*% t(corner_coords))
-                
-                # Translate to center
-                x <- rotated_coords[,1] + centerX
-                y <- rotated_coords[,2] + centerY
-                
-                temp <- data.frame(
-                    x1 = x[-length(x)],
-                    x2 = x[-1],
-                    y1 = y[-length(y)],
-                    y2 = y[-1],
-                    id = i,
-                    Alpha = 1,
-                    FillColor = fillcolor,
-                    EdgeColor = edgecolor,
-                    LineThickness = thickness*2,
-                    LineStyle = linestyle,
-                    Valign = valign,
-                    Align = align)
-                
-            }
-            line_df_plot <- rbind.data.frame(line_df_plot, temp)
-        }
+            temp <- .prepareLine(shapes_df, i)
+            line_df_plot <- rbind.data.frame(line_df_plot, temp)}
     }
     
-    
-    #======================================================================#
-    # Plot Shapes
-    #======================================================================#
-    
-    # Plot polygons
-    if (length(polygon_df_plot) > 0){
-        
-        for (id in unique(polygon_df_plot$id)){
-            polygon_df_plot1 <- polygon_df_plot[polygon_df_plot$id == id,]
-            graphics::polygon(
-                x = polygon_df_plot1$x,
-                y = -1 *polygon_df_plot1$y,
-                col = grDevices::adjustcolor(
-                    polygon_df_plot1$FillColor[1], 
-                    alpha.f = polygon_df_plot1$Alpha[1]),
-                border = polygon_df_plot1$EdgeColor[1],
-                lwd = polygon_df_plot1$LineThickness[1],
-                lty =  polygon_df_plot1$LineStyle[1])
-        }
-        
-    }
+    # Make plot
+    if (length(polygon_df_plot) > 0){.plotPolygon(polygon_df_plot)}
     
     # Plot lines
-    if  (length(line_df_plot) > 0){
-        graphics::arrows(
-            x0 = line_df_plot$x1, x1 = line_df_plot$x2,
-            y0 = -1*line_df_plot$y1, y1 = -1*line_df_plot$y2,
-            lty = line_df_plot$LineStyle, code = 0,
-            col = line_df_plot$EdgeColor,
-            lwd = line_df_plot$LineThickness)
-    }
+    if  (length(line_df_plot) > 0){.plotLine(line_df_plot)}
     
     # Plot text labels
-    if (length(shapes_df$Label[!is.na(shapes_df$Label)]) > 0){
+    if (length(shapes_df$Label[!is.na(shapes_df$Label)])> 0){
+        .plotShapeLabel(label_df_plot)}
+}
+
+
+.preparePolygon <- function(shapes_df,i){
+    width <- shapes_df$Width[i]
+    height <- shapes_df$Height[i]
+    centerX <- shapes_df$CenterX[i]
+    centerY <- shapes_df$CenterY[i]
+    rotation <- shapes_df$Rotation[i]
+    alpha <- shapes_df$Alpha[i]
+    fillcolor <- shapes_df$FillColor[i]
+    edgecolor <- shapes_df$Color[i]
+    thickness <- shapes_df$LineThickness[i]
+    nLine <- shapes_df$nLine[i]
+    linestyle <- shapes_df$LineStyle[i]
+    valign <- shapes_df$Valign[i]
+    align <- shapes_df$Align[i]
+    type <- shapes_df$ShapeType[i]
+    
+    n_corners <- NULL
+    if (type == "Triangle"){
+        starting_angle <- 0
+        max_angle <- 2*pi
+        n_corners <- 3
+        adj <- 1
         
-        # Change NA alignment values to default values
-        labels_df <- shapes_df[!is.na(shapes_df$Label),]
-        labels_df$Align[is.na(labels_df$Align)] <- 0.5
-        labels_df$Valign[is.na(labels_df$Valign)] <- 1
+        # The width and coordinates of the triangle are not correctly 
+        # defined 
+        # in the GPML file, so we need to do some slight adjustment
+        width <- width*1.25
+        centerX <- centerX + 0.07*cos(rotation)*width
+        centerY <- centerY + 0.07*sin(rotation)*height
+    }
+    if (type == "RoundedRectangle" | type == "Rectangle"){
+        starting_angle <- 0.25*pi
+        max_angle <- 2*pi
+        n_corners <- 4
+        adj <- sqrt(2)
+    }
+    if (type == "Pentagon"){
+        starting_angle <- 0
+        max_angle <- 2*pi
+        n_corners <- 5
+        adj <- 1
+    }
+    if (type == "Hexagon"){
+        starting_angle <- 0
+        max_angle <- 2*pi
+        n_corners <- 6
+        adj <- 1
+    }
+    if (type == "Oval"){
+        starting_angle <- 0
+        max_angle <- 2*pi
+        n_corners <- 100
+        adj <- 1
+    }
+    
+    if (type == "mim-degradation"){
+        starting_angle <- 0
+        max_angle <- 2*pi
+        n_corners <- 100
+        adj <- 1
+        width <- 0.7*width
+        height <- 0.7*height
+    }
+    
+    if (!is.null(n_corners)){
         
-        # position <- NULL
-        # if (labels_df$Align == 0){
-        #   position <- 4
-        # }
-        # if (labels_df$Align == 1){
-        #   position <- 2
-        #}
+        # Create angle offsets (no rotation yet)
+        angle <- seq(
+            0, 
+            max_angle, 
+            length.out = n_corners + 1)[-1]  # remove duplicate 2pi
+        x <- rep(NA, n_corners)
+        y <- rep(NA, n_corners)
+        corner_coords <- matrix(NA, nrow = n_corners, ncol = 2)
+        for (c in seq_len(n_corners)){
+            
+            corner_coords[c,1] <- adj*width/2 * 
+                cos(angle[c] + starting_angle)
+            corner_coords[c,2] <- adj*height/2 * 
+                sin(angle[c] + starting_angle)
+            
+        }
         
-        # Offset when aligning the labels to the top/bottom or right/left
-        x_offset <- 10
-        y_offset <- 30
+        # Apply rotation matrix
+        rot_mat <- .rotation_matrix(-1*rotation)
+        rotated_coords <- t(rot_mat %*% t(corner_coords))
         
-        # Change fontface to numeric values
-        labels_df$FontFace[is.na(labels_df$FontFace)] <- 1
-        labels_df$FontFace[labels_df$FontFace == "plain"] <- 1
-        labels_df$FontFace[labels_df$FontFace == "bold"] <- 2
-        labels_df$FontFace[labels_df$FontFace == "italic"] <- 3
-        labels_df$FontFace[labels_df$FontFace== "bold.italic"] <- 4
+        # Translate to center
+        x <- rotated_coords[,1] + centerX
+        y <- rotated_coords[,2] + centerY
         
-        graphics::text(
-            x = labels_df$CenterX+(labels_df$Align-0.5)*
-                labels_df$Width+(0.5-labels_df$Align)*x_offset,
-            y = -1*(labels_df$CenterY-(labels_df$Valign-0.5)*
-                        labels_df$Height-(0.5-labels_df$Valign)*y_offset),
-            adj = c(labels_df$Align, labels_df$Valign),
-            labels = labels_df$Label,
-            cex = labels_df$FontSize/12.5,
-            col = labels_df$Color,
-            #pos = position,
-            font = as.numeric(labels_df$FontFace))
+        
+        # Single line
+        if (nLine == "Single"){
+            temp <- data.frame(
+                angle = angle,
+                x = x,
+                y = y,
+                id = i,
+                Alpha = alpha,
+                FillColor = fillcolor,
+                EdgeColor = edgecolor,
+                LineThickness = thickness*3,
+                LineStyle = linestyle,
+                Valign = valign,
+                Align = align)
+            # Double line
+        } else{
+            temp1 <- data.frame(
+                angle = angle,
+                x = x,
+                y = y,
+                id = i,
+                Alpha = alpha,
+                FillColor = fillcolor,
+                EdgeColor = edgecolor,
+                LineThickness = thickness*10,
+                LineStyle = linestyle,
+                Valign = valign,
+                Align = align)
+            temp2 <- data.frame(
+                angle = angle,
+                x = x,
+                y = y,
+                id = paste0(i, ".2"),
+                Alpha = 0,
+                FillColor = "white",
+                EdgeColor = "white",
+                LineThickness = thickness*2,
+                LineStyle = linestyle,
+                Valign = valign,
+                Align = align)
+            temp <- rbind.data.frame(temp1, temp2)
+        }
+        
+        
+        return(temp)
     }
 }
 
+.prepareLine <- function(shapes_df, i){
+    width <- shapes_df$Width[i]
+    height <- shapes_df$Height[i]
+    centerX <- shapes_df$CenterX[i]
+    centerY <- shapes_df$CenterY[i]
+    rotation <- shapes_df$Rotation[i]
+    alpha <- shapes_df$Alpha[i]
+    fillcolor <- shapes_df$FillColor[i]
+    edgecolor <- shapes_df$Color[i]
+    thickness <- shapes_df$LineThickness[i]
+    nLine <- shapes_df$nLine[i]
+    linestyle <- shapes_df$LineStyle[i]
+    valign <- shapes_df$Valign[i]
+    align <- shapes_df$Align[i]
+    type <- shapes_df$ShapeType[i]
+    
+    if (type == "mim-degradation"){
+        xstart <- 0.7*width
+        xend <- -0.7*width
+        ystart <- 0.7*height
+        yend <- -0.7*height
+        
+        # Apply rotation matrix
+        rot_mat <- .rotation_matrix(-1*rotation)
+        rotated_coords <- t(rot_mat %*% t(
+            matrix(c(xstart,xend,ystart,yend), nrow = 2)))
+        
+        # Translate to center
+        x <- rotated_coords[,1] + centerX
+        y <- rotated_coords[,2] + centerY
+        
+        temp <- data.frame(
+            x1 = x[-length(x)],
+            x2 = x[-1],
+            y1 = y[-length(y)],
+            y2 = y[-1],
+            x = x,
+            y = y,
+            id = i,
+            Alpha = 1,
+            FillColor = fillcolor,
+            EdgeColor = edgecolor,
+            LineThickness = thickness*2,
+            LineStyle = linestyle,
+            Valign = valign,
+            Align = align)
+        
+    }
+    
+    if (type == "Arc"){
+        starting_angle <- 0
+        max_angle <- pi
+        n_corners <- 100
+        adj <- 1
+        
+        # Create angle offsets (no rotation yet)
+        angle <- seq(
+            0, 
+            max_angle, 
+            length.out = n_corners + 1)[-1]  # remove duplicate 2pi
+        x <- rep(NA, n_corners)
+        y <- rep(NA, n_corners)
+        corner_coords <- matrix(NA, nrow = n_corners, ncol = 2)
+        for (c in seq_len(n_corners)){
+            
+            corner_coords[c,1] <- adj*width/2 * 
+                cos(angle[c] + starting_angle)
+            corner_coords[c,2] <- adj*height/2 * 
+                sin(angle[c] + starting_angle)
+            
+        }
+        
+        # Apply rotation matrix
+        rot_mat <- .rotation_matrix(-1*rotation)
+        rotated_coords <- t(rot_mat %*% t(corner_coords))
+        
+        # Translate to center
+        x <- rotated_coords[,1] + centerX
+        y <- rotated_coords[,2] + centerY
+        
+        temp <- data.frame(
+            x1 = x[-length(x)],
+            x2 = x[-1],
+            y1 = y[-length(y)],
+            y2 = y[-1],
+            id = i,
+            Alpha = 1,
+            FillColor = fillcolor,
+            EdgeColor = edgecolor,
+            LineThickness = thickness*2,
+            LineStyle = linestyle,
+            Valign = valign,
+            Align = align)
+        
+    }
+    return(temp)
+}
+
+.plotPolygon <- function(polygon_df_plot){
+    for (id in unique(polygon_df_plot$id)){
+        polygon_df_plot1 <- polygon_df_plot[polygon_df_plot$id == id,]
+        graphics::polygon(
+            x = polygon_df_plot1$x,
+            y = -1 *polygon_df_plot1$y,
+            col = grDevices::adjustcolor(
+                polygon_df_plot1$FillColor[1], 
+                alpha.f = polygon_df_plot1$Alpha[1]),
+            border = polygon_df_plot1$EdgeColor[1],
+            lwd = polygon_df_plot1$LineThickness[1],
+            lty =  polygon_df_plot1$LineStyle[1])
+    }
+}
+
+.plotLine <- function(line_df_plot){
+    graphics::arrows(
+        x0 = line_df_plot$x1, x1 = line_df_plot$x2,
+        y0 = -1*line_df_plot$y1, y1 = -1*line_df_plot$y2,
+        lty = line_df_plot$LineStyle, code = 0,
+        col = line_df_plot$EdgeColor,
+        lwd = line_df_plot$LineThickness)
+}
+
+.plotShapeLabel <- function(labels_df){
+    # Change NA alignment values to default values
+    labels_df$Align[is.na(labels_df$Align)] <- 0.5
+    labels_df$Valign[is.na(labels_df$Valign)] <- 1
+    
+    # position <- NULL
+    # if (labels_df$Align == 0){
+    #   position <- 4
+    # }
+    # if (labels_df$Align == 1){
+    #   position <- 2
+    #}
+    
+    # Offset when aligning the labels to the top/bottom or right/left
+    x_offset <- 10
+    y_offset <- 30
+    
+    # Change fontface to numeric values
+    labels_df$FontFace[is.na(labels_df$FontFace)] <- 1
+    labels_df$FontFace[labels_df$FontFace == "plain"] <- 1
+    labels_df$FontFace[labels_df$FontFace == "bold"] <- 2
+    labels_df$FontFace[labels_df$FontFace == "italic"] <- 3
+    labels_df$FontFace[labels_df$FontFace== "bold.italic"] <- 4
+    
+    graphics::text(
+        x = labels_df$CenterX+(labels_df$Align-0.5)*
+            labels_df$Width+(0.5-labels_df$Align)*x_offset,
+        y = -1*(labels_df$CenterY-(labels_df$Valign-0.5)*
+                    labels_df$Height-(0.5-labels_df$Valign)*y_offset),
+        adj = c(labels_df$Align, labels_df$Valign),
+        labels = labels_df$Label,
+        cex = labels_df$FontSize/12.5,
+        col = labels_df$Color,
+        #pos = position,
+        font = as.numeric(labels_df$FontFace)) 
+}
 
 # ------------------------------------------------------------------------------
 #' @title Draw braces
@@ -477,74 +493,54 @@
     # Collect coordinates of each brace
     plot_all <- NULL
     for (i in seq_len(nrow(braces_df))){
-        
-        # Set start, mid, end coordinates
-        xstart <- -0.5*braces_df$Width[i]
-        ystart <- -0.5*braces_df$Height[i]
-        xmid <- 0
-        ymid <- 0
-        xend <- 0.5*braces_df$Width[i]
-        yend <- 0.5*braces_df$Height[i]
-        
-        # Set radius of quarter circles
-        xradius <- braces_df$Width[i]/4
-        yradius <- braces_df$Height[i]/2
-        
-        # Function to create a circle 
-        # (of which only quarters will be used later)
-        circle <- function(x, y){
-            positions <- seq(0, 2*pi, length.out=npoints)
-            return(data.frame(
-                x = x + xradius * cos(positions), 
-                y = y + yradius * sin(positions)))
-        }
-        
-        # Create brace data points by calculating 4 quarter circles
-        rounds <- list(
-            data.frame(x=xstart,y=ystart),
-            leftQuartercircle = circle(
-                xstart+xradius, 
-                ystart)[seq(npoints/4+1, npoints/2),],
-            leftmidQuartercircle = circle(
-                xmid-xradius, 
-                yend)[seq(npoints/4*3+1, npoints),],
-            data.frame(x=xmid,y=yend),
-            rightmidQuartercircle = circle(
-                xmid+xradius, 
-                yend)[seq(npoints/2+1, npoints/4*3),],
-            rightQuartercircle = circle(
-                xend-xradius, 
-                ystart)[seq(1,npoints/4),],
-            data.frame(x=xend,y=ystart)
-        )
-        
-        output <- do.call(rbind, rounds)
-        output <- output[order(output$x),]
-        output$y <- output$y
-        rownames(output) <- NULL
-        
-        # Perform rotation
-        rot_mat <- .rotation_matrix(-1*braces_df$Rotation[i]+pi)
-        rotated_coords <- data.frame(t(rot_mat %*% t(output)))
-        colnames(rotated_coords) <- c("x", "y")
-        rotated_coords$x <- rotated_coords$x + braces_df$CenterX[i]
-        rotated_coords$y <- rotated_coords$y + braces_df$CenterY[i]
-        rotated_coords$group <- i
-        rotated_coords$color <- braces_df$Color[i]
-        rotated_coords$thickness <- braces_df$LineThickness[i]
-        
-        
-        # Collect all cordinates
-        plot_all <- rbind.data.frame(plot_all, rotated_coords)
-        
-    }
+        plot_all <- rbind.data.frame(plot_all, .braceCoord(braces_df, i, npoints))}
+    
     # Make plot
     graphics::lines(
         x = plot_all$x, y = -1*plot_all$y, 
-        col = plot_all$color,
-        lwd = plot_all$thickness*2)
+        col = plot_all$color, lwd = plot_all$thickness*2)
 }
 
+.braceCoord <- function(braces_df, i, npoints){
+    # Set start, mid, end coordinates and radius of quarter circles
+    xstart <- -0.5*braces_df$Width[i]; ystart <- -0.5*braces_df$Height[i]
+    xmid <- 0; ymid <- 0
+    xend <- 0.5*braces_df$Width[i]; yend <- 0.5*braces_df$Height[i]
+    xradius <- braces_df$Width[i]/4; yradius <- braces_df$Height[i]/2
+    
+    # Create brace data points by calculating 4 quarter circles
+    rounds <- list(
+        data.frame(x=xstart,y=ystart),
+        leftQuartercircle = .circle(
+            xstart+xradius, xradius, ystart, yradius,
+            npoints)[seq(npoints/4+1, npoints/2),],
+        leftmidQuartercircle = .circle(
+            xmid-xradius, xradius, yend, yradius,
+            npoints)[seq(npoints/4*3+1, npoints),],
+        data.frame(x=xmid,y=yend),
+        rightmidQuartercircle = .circle(
+            xmid+xradius, xradius, yend, yradius,
+            npoints)[seq(npoints/2+1, npoints/4*3),],
+        rightQuartercircle = .circle(
+            xend-xradius, xradius, ystart, yradius,
+            npoints)[seq(1,npoints/4),],
+        data.frame(x=xend,y=ystart))
+    output <- do.call(rbind, rounds)
+    output <- output[order(output$x),]
+    output$y <- output$y
+    rownames(output) <- NULL
+    
+    # Perform rotation
+    rot_mat <- .rotation_matrix(-1*braces_df$Rotation[i]+pi)
+    rotated_coords <- data.frame(t(rot_mat %*% t(output)))
+    colnames(rotated_coords) <- c("x", "y")
+    rotated_coords$x <- rotated_coords$x + braces_df$CenterX[i]
+    rotated_coords$y <- rotated_coords$y + braces_df$CenterY[i]
+    rotated_coords$group <- i
+    rotated_coords$color <- braces_df$Color[i]
+    rotated_coords$thickness <- braces_df$LineThickness[i]
+    return(rotated_coords)
+}
 
 # ------------------------------------------------------------------------------
 #' @title Draw cell components
@@ -569,93 +565,96 @@
     for (i in seq_len(nrow(shapes_df))){
         
         # Define variables
-        width <- shapes_df$Width[i]
-        height <- shapes_df$Height[i]
-        centerX <- shapes_df$CenterX[i]
-        centerY <- shapes_df$CenterY[i]
-        rotation <- shapes_df$Rotation[i]
-        alpha <- shapes_df$Alpha[i]
-        fillcolor <- shapes_df$FillColor[i]
-        edgecolor <- shapes_df$EdgeColor[i]
-        thickness <- shapes_df$LineThickness[i]
-        type <- shapes_df$ShapeType[i]
-        nLine <- shapes_df$nLine[i]
-        linestyle <- "solid"
+        width <- shapes_df$Width[i]; height <- shapes_df$Height[i]
+        centerX <- shapes_df$CenterX[i]; centerY <- shapes_df$CenterY[i]
+        rotation <- shapes_df$Rotation[i]; type <- shapes_df$ShapeType[i]
         
         # Add mitochondria
         if (type %in% c("Mitochondria")){
-            newWidth <- abs(sin(rotation)*height) + abs(cos(rotation)*width)
-            newHeight <- abs(cos(rotation)*height) + abs(sin(rotation)*width)
-            xmin <- centerX - 0.5*newWidth
-            xmax <- centerX + 0.5*newWidth 
-            ymin <- centerY - 0.5*newHeight
-            ymax <- centerY + 0.5*newHeight
-            
-            img <- magick::image_read(system.file(
-                "pathwayElements",
-                "Mitochondria.png", 
-                package="PinPath"))
-            img <- magick::image_rotate(img, (rotation*180)/pi)
-            img <-  magick::image_transparent(img, color = "white")
-            graphics::rasterImage(img, xmin, -ymax, xmax, -ymin)
-            
-        }
+            .drawMitochondria(width, height, centerX, centerY, rotation)}
         
         # Add sacroplasmic reticulum
         if (type %in% c("Sarcoplasmic Reticulum")){
-            height <- height*1.1
-            newWidth <- abs(sin(rotation)*height) + abs(cos(rotation)*width)
-            newHeight <- abs(cos(rotation)*height) + abs(sin(rotation)*width)
-            xmin <- centerX - 0.5*newWidth
-            xmax <- centerX + 0.5*newWidth 
-            ymin <- centerY - 0.5*newHeight
-            ymax <- centerY + 0.5*newHeight
-            
-            img <- magick::image_read(system.file(
-                "pathwayElements",
-                "SR.png", 
-                package="PinPath"))
-            img <- magick::image_rotate(img, (rotation*180)/pi)
-            img <-  magick::image_transparent(img, color = "white")
-            graphics::rasterImage(img, xmin, -ymax, xmax, -ymin)
-        }
+            .drawSR(width, height, centerX, centerY, rotation)}
         
         # Add endoplasmic reticulum
         if (type %in% c("Endoplasmic Reticulum")){
-            newWidth <- abs(sin(rotation)*height) + abs(cos(rotation)*width)
-            newHeight <- abs(cos(rotation)*height) + abs(sin(rotation)*width)
-            xmin <- centerX - 0.5*newWidth
-            xmax <- centerX + 0.5*newWidth 
-            ymin <- centerY - 0.5*newHeight
-            ymax <- centerY + 0.5*newHeight
-            
-            img <- magick::image_read(system.file(
-                "pathwayElements",
-                "ER.png", 
-                package="PinPath"))
-            img <- magick::image_rotate(img, (rotation*180)/pi)
-            img <-  magick::image_transparent(img, color = "white")
-            graphics::rasterImage(img, xmin, -ymax, xmax, -ymin)
-        }
+            .drawER(width, height, centerX, centerY, rotation)}
         
         # Add golgi apparatus
         if (type %in% c("Golgi Apparatus")){
-            height <- height*1.05
-            newWidth <- abs(sin(rotation)*height) + abs(cos(rotation)*width)
-            newHeight <- abs(cos(rotation)*height) + abs(sin(rotation)*width)
-            xmin <- centerX - 0.5*newWidth
-            xmax <- centerX + 0.5*newWidth 
-            ymin <- centerY - 0.5*newHeight
-            ymax <- centerY + 0.5*newHeight
-            
-            img <- magick::image_read(system.file(
-                "pathwayElements",
-                "Golgi.png", 
-                package="PinPath"))
-            img <- magick::image_rotate(img, (rotation*180)/pi)
-            img <-  magick::image_transparent(img, color = "white")
-            graphics::rasterImage(img, xmin, -ymax, xmax, -ymin)
-        }
+            .drawGolgi(width, height, centerX, centerY, rotation)}
     }
 }
 
+
+.drawMitochondria <- function(
+        width, height, centerX, centerY, rotation){
+    newWidth <- abs(sin(rotation)*height) + abs(cos(rotation)*width)
+    newHeight <- abs(cos(rotation)*height) + abs(sin(rotation)*width)
+    xmin <- centerX - 0.5*newWidth
+    xmax <- centerX + 0.5*newWidth 
+    ymin <- centerY - 0.5*newHeight
+    ymax <- centerY + 0.5*newHeight
+    
+    img <- magick::image_read(system.file(
+        "pathwayElements",
+        "Mitochondria.png", 
+        package="PinPath"))
+    img <- magick::image_rotate(img, (rotation*180)/pi)
+    img <-  magick::image_transparent(img, color = "white")
+    graphics::rasterImage(img, xmin, -ymax, xmax, -ymin)
+}
+
+.drawSR <- function(width, height, centerX, centerY, rotation){
+    height <- height*1.1
+    newWidth <- abs(sin(rotation)*height) + abs(cos(rotation)*width)
+    newHeight <- abs(cos(rotation)*height) + abs(sin(rotation)*width)
+    xmin <- centerX - 0.5*newWidth
+    xmax <- centerX + 0.5*newWidth 
+    ymin <- centerY - 0.5*newHeight
+    ymax <- centerY + 0.5*newHeight
+    
+    img <- magick::image_read(system.file(
+        "pathwayElements",
+        "SR.png", 
+        package="PinPath"))
+    img <- magick::image_rotate(img, (rotation*180)/pi)
+    img <-  magick::image_transparent(img, color = "white")
+    graphics::rasterImage(img, xmin, -ymax, xmax, -ymin)
+}
+
+.drawER <- function(width, height, centerX, centerY, rotation){
+    newWidth <- abs(sin(rotation)*height) + abs(cos(rotation)*width)
+    newHeight <- abs(cos(rotation)*height) + abs(sin(rotation)*width)
+    xmin <- centerX - 0.5*newWidth
+    xmax <- centerX + 0.5*newWidth 
+    ymin <- centerY - 0.5*newHeight
+    ymax <- centerY + 0.5*newHeight
+    
+    img <- magick::image_read(system.file(
+        "pathwayElements",
+        "ER.png", 
+        package="PinPath"))
+    img <- magick::image_rotate(img, (rotation*180)/pi)
+    img <-  magick::image_transparent(img, color = "white")
+    graphics::rasterImage(img, xmin, -ymax, xmax, -ymin)
+}
+
+.drawGolgi <- function(width, height, centerX, centerY, rotation){
+    height <- height*1.05
+    newWidth <- abs(sin(rotation)*height) + abs(cos(rotation)*width)
+    newHeight <- abs(cos(rotation)*height) + abs(sin(rotation)*width)
+    xmin <- centerX - 0.5*newWidth
+    xmax <- centerX + 0.5*newWidth 
+    ymin <- centerY - 0.5*newHeight
+    ymax <- centerY + 0.5*newHeight
+    
+    img <- magick::image_read(system.file(
+        "pathwayElements",
+        "Golgi.png", 
+        package="PinPath"))
+    img <- magick::image_rotate(img, (rotation*180)/pi)
+    img <-  magick::image_transparent(img, color = "white")
+    graphics::rasterImage(img, xmin, -ymax, xmax, -ymin)
+}

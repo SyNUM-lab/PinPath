@@ -13,12 +13,12 @@
 #' "svg","png",and "pdf" file extensions are accepted. If no file extension is 
 #' specified, the pathway and legend image will be generated in .svg format.
 #' The legend file gets the "legend_" prefix.
-#' @param geneIDs (optional) \code{character} vector of gene IDs.
+#' @param featureIDs (optional) \code{character} vector of feature IDs.
 #' @param colorVar (optional) \code{vector} or \code{data.frame} for coloring 
 #' the nodes in the pathway. This can be for instance a \code{data.frame} with 
 #' the log2FCs and significance in the columns. The (row) order should match 
-#' \code{geneIDs}. The color rules and palettes for the supplied values can be 
-#' set in the colorList parameter.
+#' \code{featureIDs}. The color rules and palettes for the supplied values can 
+#' be set in the colorList parameter.
 #' @param annGenes (optional) \code{character} string of the Bioconductor 
 #' annotation package (e.g., org.Hs.eg.db).
 #' @param annMetabolites (optional) \code{tibble} or \code{data.frame} with 
@@ -26,7 +26,7 @@
 #' @param inputDB (optional) Input gene ID type (SYMBOL, ENTREZID, ENSEMBL, 
 #' UNIPROT).
 #' This can be a \code{character} vector of \code{length = 1} (if all gene IDs 
-#' are of the same type) or of \code{length = nrow(geneIDs)} (if you want to 
+#' are of the same type) or of \code{length = nrow(featureIDs)} (if you want to 
 #' specify the type per gene ID).
 #' @param colorNames (optional) \code{character} vector with names of the 
 #' color variables. If \code{colorNames} is NULL, the column names of the 
@@ -62,7 +62,7 @@
 #'             outdir = tempdir(),
 #'             annGenes = "org.Hs.eg.db",
 #'             inputDB = "ENSEMBL",
-#'             geneIDs = lung_expr$GeneID,
+#'             featureIDs = lung_expr$GeneID,
 #'             colorVar = lung_expr[,"log2FC"],
 #'             nodeTable = TRUE,
 #'             legend = TRUE)
@@ -73,7 +73,7 @@ drawGPML <- function(
         infile,
         outdir = getwd(),
         outname = NULL,
-        geneIDs = NULL,
+        featureIDs = NULL,
         colorVar = NULL,
         annGenes = NULL,
         annMetabolites = NULL,
@@ -91,12 +91,11 @@ drawGPML <- function(
     gpml_fil <- .prepareGPML(gpml)
     
     # If output name is not set, give it the name of the pathway
-    if (is.null(outname)){ outname <- .makeOutName(gpml)}
+    if (is.null(outname)){outname <- .makeOutName(gpml)}
     
     # If no color is set, use default color palette
     if (is.null(colorList) & !is.null(colorVar)){
-        colorList <- defaultColorList(colorVar, ColorNames = colorNames)
-    }
+        colorList <- defaultColorList(colorVar, ColorNames = colorNames)}
     
     # Set order of plotting based on the Z-value
     ZOrder_df <- .setZorder_GPML(gpml_fil)
@@ -110,47 +109,38 @@ drawGPML <- function(
     
     # Map colors to nodes
     plotColor <- !(
-        is.null(geneIDs) | is.null(colorVar) | 
+        is.null(featureIDs) | is.null(colorVar) | 
             (is.null(annGenes) & is.null(annMetabolites)) | is.null(inputDB))
-    
     colors_df_all <- NULL
     if (plotColor){
         colors_df_all <- .mapColors(
-            nodes_df = nodes_df_all, geneIDs = geneIDs, colorVar = colorVar,
-            annGenes = annGenes, annMetabolites = data.frame(annMetabolites),
-            inputDB = inputDB, colorList = colorList, NAvalue = NAvalue)
-    }
+            nodes_df = nodes_df_all, featureIDs = featureIDs, 
+            colorVar = colorVar, annGenes = annGenes, 
+            annMetabolites = data.frame(annMetabolites),
+            inputDB = inputDB, colorList = colorList, NAvalue = NAvalue)}
     
-    # Open file for plotting
+    # Make pathway diagram
     outfile <- .openFile(
-        width = gpml$Graphics["BoardWidth"], 
+        width = gpml$Graphics["BoardWidth"],
         height = gpml$Graphics["BoardHeight"], 
         outfile = paste0(outdir,"/",outname))
-    
-    # Plot each element in GPML file
     for (i in ZOrder_df$Index){
         .drawElement(
             gpml_fil[i], plotColor, gpml_fil,
-            groupElements_df, nodes_df_all, colors_df_all)
-    }
-    
-    # Close file for plotting
+            groupElements_df, nodes_df_all, colors_df_all)}
     grDevices::dev.off()
     
     # Provide location of pathway figure (and open file if necessary)
-    outputList <- list()
-    outputList[["Pathway"]] <- outfile
+    outputList <- list(); outputList[["Pathway"]] <- outfile
     if (openFile) {shell(outputList[["Pathway"]])}
     
     # Return legend, node table, pathway information
     if (legend & !is.null(colors_df_all)){
         outputList[["Legend"]] <- .exportLegend(outdir, outname, colorList)
     } else{ outputList[["Legend"]] <- NA }
-    
     if (nodeTable & !is.null(colors_df_all)){
         outputList[["NodeTable"]] <- .returnNodeTable(colors_df_all)
     } else{ outputList[["NodeTable"]] <- NA }
-    
     if (pathInfo){
         outputList[["Information"]] <- .returnInformation(gpml)
     }else{ outputList[["Information"]] <- NA }
