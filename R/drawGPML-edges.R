@@ -14,7 +14,6 @@
             anchors <- unlist(x$Graphics[names(x$Graphics) == "Anchor"])
             anchors <- anchors[stringr::str_detect(names(anchors),"GraphId")]
             return(anchors)} else{return(NA)}})
-
     # Prepare data frame
     edges_df <- do.call(rbind, lapply(
         dataEdges, function(x){.edgeFUN(x, dataEdges_all, anchorIds)}))
@@ -160,9 +159,8 @@
     # position from the attached edge
     if ((temp_edges1$Xrel1 == 0) & (temp_edges1$Yrel1 == 0)){
         # Get the edge(s) to which the edge is attached
-        attachedEdges <- as.numeric(
-            which(unlist(lapply(
-                anchorIds, function(x) temp_edges1$GraphRef1 %in% x))))
+        attachedEdges <- as.numeric(which(unlist(lapply(
+            anchorIds, function(x) temp_edges1$GraphRef1 %in% x))))
         if(length(attachedEdges) != 0){
             # Calculate the delta X and Y, to determine whether the
             # attachment point is in Y or X direction
@@ -295,20 +293,16 @@
             dataEdges$Graphics[[p+1]]["ArrowHead"]),
         LineStyle = tolower(as.character(ifelse(
             is.na(dataEdges$Graphics$.attrs["LineStyle"]),
-            "solid",
-            dataEdges$Graphics$.attrs["LineStyle"]))),
+            "solid", dataEdges$Graphics$.attrs["LineStyle"]))),
         Color = as.character(ifelse(
             is.na(dataEdges$Graphics$.attrs["Color"]),
-            "#000000",
-            paste0("#",dataEdges$Graphics$.attrs["Color"]))),
+            "#000000", paste0("#",dataEdges$Graphics$.attrs["Color"]))),
         ConnectorType = as.character(ifelse(
             is.na(dataEdges$Graphics$.attrs["ConnectorType"]),
-            "Straight",
-            dataEdges$Graphics$.attrs["ConnectorType"])),
+            "Straight", dataEdges$Graphics$.attrs["ConnectorType"])),
         LineThickness = as.numeric(ifelse(
             is.na(dataEdges$Graphics$.attrs["LineThickness"]),
-            1,
-            dataEdges$Graphics$.attrs["LineThickness"])),
+            1,dataEdges$Graphics$.attrs["LineThickness"])),
         Force = TRUE
     )
 
@@ -510,8 +504,7 @@
     # Edges without arrow head
     sel <- c("none", "mim-necessary-stimulation")
     if (sum(df$ArrowType %in% sel) > 0){
-        plotDF <- df[df$ArrowType %in% sel,]
-        .drawEdgeLine(plotDF)}
+        plotDF <- df[df$ArrowType %in% sel,]; .drawEdgeLine(plotDF)}
     # Filled black arrow head
     sel <- c("Arrow", "mim-conversion")
     if (sum(df$ArrowType %in% sel) > 0){
@@ -530,8 +523,7 @@
     # T-bar
     sel <- c("mim-inhibition", "TBar")
     if (sum(df$ArrowType %in% sel) > 0){
-        plotDF_temp <- df[df$ArrowType %in% sel,]
-        .drawEdgeTBar(plotDF_temp)}
+        plotDF_temp <- df[df$ArrowType %in% sel,]; .drawEdgeTBar(plotDF_temp)}
     # Filled white circle
     sel <- c("mim-catalysis")
     if (sum(df$ArrowType %in% sel) > 0){
@@ -545,8 +537,7 @@
     # Straight line with gap at the end
     sel <- c("mim-gap")
     if (sum(df$ArrowType %in% sel) > 0){
-        plotDF_temp <- df[df$ArrowType %in% sel,]
-        .drawEdgeGap(plotDF_temp)}
+        plotDF_temp <- df[df$ArrowType %in% sel,]; .drawEdgeGap(plotDF_temp)}
     # `mim-cleavage`
     sel <- c("mim-cleavage")
     if (sum(df$ArrowType %in% sel) > 0){
@@ -599,13 +590,11 @@
     # Collect X and Y coordinates in separate vectors
     x1 <- plotDF_temp$X1; x2 <- plotDF_temp$X2
     y1 <- plotDF_temp$Y1; y2 <- plotDF_temp$Y2
-
-    # Offset is the distance at which the arrow head should be attached to
-    # the main body of the arrow
+    # Offset is the distance at which the arrow head should be attached
     offset <- 5
+
     plotDF <- NULL
     for (a in seq_len(nrow(plotDF_temp))){
-
         if (plotDF_temp$ArrowEnd[a] == "first"){
 
             Xstart <- x1[a]-offset*(
@@ -620,14 +609,10 @@
             Y2 <- Ystart
 
             plotDF <- rbind.data.frame(
-                plotDF,
-                data.frame(
+                plotDF,data.frame(
                     Xstart, Xend, X1, X2,
-                    Ystart, Yend, Y1, Y2
-                )
-            )
+                    Ystart, Yend, Y1, Y2))
         }
-
         if (plotDF_temp$ArrowEnd[a] == "last"){
 
             Xstart <- x1[a]
@@ -642,14 +627,10 @@
             Y2 <- -y2[a]
 
             plotDF <- rbind.data.frame(
-                plotDF,
-                data.frame(
+                plotDF,data.frame(
                     Xstart, Xend, X1, X2,
-                    Ystart, Yend, Y1, Y2
-                )
-            )
-        }
-    }
+                    Ystart, Yend, Y1, Y2))
+        }}
     return(plotDF)
 }
 
@@ -680,18 +661,13 @@
 
 .prepareEdgeOpenArrow <- function(plotDF_temp){
     # Collect X and Y coordinates in separate vectors
-    x1 <- plotDF_temp$X1
-    x2 <- plotDF_temp$X2
-    y1 <- plotDF_temp$Y1
-    y2 <- plotDF_temp$Y2
-
-    # Offset is the distance at which the arrow head should be attached to
-    # the main body of the arrow
+    x1 <- plotDF_temp$X1; x2 <- plotDF_temp$X2
+    y1 <- plotDF_temp$Y1; y2 <- plotDF_temp$Y2
+    # Offset is the distance at which the arrow head should be attached
     offset <- 5
 
     plotDF <- NULL
     for (a in seq_len(nrow(plotDF_temp))){
-
         if (plotDF_temp$ArrowEnd[a] == "first"){
 
             Xstart <- x1[a]-offset*(
@@ -706,14 +682,10 @@
             Y2 <- Ystart
 
             plotDF <- rbind.data.frame(
-                plotDF,
-                data.frame(
+                plotDF,data.frame(
                     Xstart, Xend, X1, X2,
-                    Ystart, Yend, Y1, Y2
-                )
-            )
+                    Ystart, Yend, Y1, Y2))
         }
-
         if (plotDF_temp$ArrowEnd[a] == "last"){
 
             Xstart <- x1[a]
@@ -728,15 +700,10 @@
             Y2 <- -y2[a]
 
             plotDF <- rbind.data.frame(
-                plotDF,
-                data.frame(
+                plotDF,data.frame(
                     Xstart, Xend, X1, X2,
-                    Ystart, Yend, Y1, Y2
-                )
-            )
-
-        }
-    }
+                    Ystart, Yend, Y1, Y2))
+        }}
     return(plotDF)
 }
 
@@ -767,18 +734,13 @@
 
 .prepareEdgeWhiteTriangle <- function(plotDF_temp){
     # Collect X and Y coordinates in separate vectors
-    x1 <- plotDF_temp$X1
-    x2 <- plotDF_temp$X2
-    y1 <- plotDF_temp$Y1
-    y2 <- plotDF_temp$Y2
-
+    x1 <- plotDF_temp$X1; x2 <- plotDF_temp$X2
+    y1 <- plotDF_temp$Y1; y2 <- plotDF_temp$Y2
     # Offset is the distance at which the arrow head should be attached to
-    # the main body of the arrow
     offset <- 5
 
     plotDF <- NULL
     for (a in seq_len(nrow(plotDF_temp))){
-
         if (plotDF_temp$ArrowEnd[a] == "first"){
 
             Xstart <- x1[a]-offset*(
@@ -793,14 +755,10 @@
             Y2 <- Ystart
 
             plotDF <- rbind.data.frame(
-                plotDF,
-                data.frame(
+                plotDF,data.frame(
                     Xstart, Xend, X1, X2,
-                    Ystart, Yend, Y1, Y2
-                )
-            )
+                    Ystart, Yend, Y1, Y2))
         }
-
         if (plotDF_temp$ArrowEnd[a] == "last"){
 
             Xstart <- x1[a]
@@ -815,15 +773,10 @@
             Y2 <- -y2[a]
 
             plotDF <- rbind.data.frame(
-                plotDF,
-                data.frame(
+                plotDF,data.frame(
                     Xstart, Xend, X1, X2,
-                    Ystart, Yend, Y1, Y2
-                )
-            )
-
-        }
-    }
+                    Ystart, Yend, Y1, Y2))
+        }}
     return(plotDF)
 }
 
@@ -852,26 +805,18 @@
         lwd = plotDF_temp$LineThickness,
         arr.adj = 1)
 }
+
 .prepareEdgeTBar <- function(plotDF_temp){
     # Collect X and Y coordinates in separate vectors
-    x1 <- plotDF_temp$X1
-    x2 <- plotDF_temp$X2
-    y1 <- plotDF_temp$Y1
-    y2 <- plotDF_temp$Y2
-
-    # Offset is the distance at which the arrow head should be attached to
-    # the main body of the arrow
-    offset <- 5
-
-    # Gap is the distance that should be present between the end of the
-    # arrow and the node
-    gap <- 10
+    x1 <- plotDF_temp$X1; x2 <- plotDF_temp$X2
+    y1 <- plotDF_temp$Y1; y2 <- plotDF_temp$Y2
+    # Offset is the distance at which the arrow head should be attached.
+    # Gap is the distance that should be present between the arrow and the node
+    offset <- 5; gap <- 10
 
     plotDF <- NULL
     for (a in seq_len(nrow(plotDF_temp))){
-
         if (plotDF_temp$ArrowEnd[a] == "first"){
-
             Xstart <- x1[a]-(offset+gap)*(
                 (x1[a]-x2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
             Xend <- x2[a]
@@ -886,16 +831,11 @@
             Y2 <- Ystart
 
             plotDF <- rbind.data.frame(
-                plotDF,
-                data.frame(
+                plotDF, data.frame(
                     Xstart, Xend, X1, X2,
-                    Ystart, Yend, Y1, Y2
-                )
-            )
+                    Ystart, Yend, Y1, Y2))
         }
-
         if (plotDF_temp$ArrowEnd[a] == "last"){
-
             Xstart <- x1[a]
             Xend <- x2[a]-(offset+gap)*(
                 (x2[a]-x1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
@@ -910,15 +850,10 @@
                 (y2[a]-y1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
 
             plotDF <- rbind.data.frame(
-                plotDF,
-                data.frame(
+                plotDF,data.frame(
                     Xstart, Xend, X1, X2,
-                    Ystart, Yend, Y1, Y2
-                )
-            )
-
-        }
-    }
+                    Ystart, Yend, Y1, Y2))
+        }}
     return(plotDF)
 }
 
@@ -945,18 +880,13 @@
 
 .prepareEdgeWhiteCircle <- function(plotDF_temp){
     # Collect X and Y coordinates in separate vectors
-    x1 <- plotDF_temp$X1
-    x2 <- plotDF_temp$X2
-    y1 <- plotDF_temp$Y1
-    y2 <- plotDF_temp$Y2
-
+    x1 <- plotDF_temp$X1; x2 <- plotDF_temp$X2
+    y1 <- plotDF_temp$Y1; y2 <- plotDF_temp$Y2
     # Offset is the distance at which the arrow head should be attached to
-    # the main body of the arrow
     offset <- 5
 
     plotDF <- NULL
     for (a in seq_len(nrow(plotDF_temp))){
-
         if (plotDF_temp$ArrowEnd[a] == "first"){
             Xstart <- x1[a]-offset*(
                 (x1[a]-x2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
@@ -969,12 +899,9 @@
             Ypoint <- Ystart
 
             plotDF <- rbind.data.frame(
-                plotDF,
-                data.frame(
+                plotDF,data.frame(
                     Xstart, Xend, Xpoint,
-                    Ystart, Yend, Ypoint
-                )
-            )
+                    Ystart, Yend, Ypoint))
 
         }
         if (plotDF_temp$ArrowEnd[a] == "last"){
@@ -989,21 +916,16 @@
             Ypoint <- Yend
 
             plotDF <- rbind.data.frame(
-                plotDF,
-                data.frame(
+                plotDF,data.frame(
                     Xstart, Xend, Xpoint,
-                    Ystart, Yend, Ypoint
-                )
-            )
-
-        }
-    }
+                    Ystart, Yend, Ypoint))
+        }}
     return(plotDF)
 }
 
-.drawCurveWhiteSquare <- function(plotDF_temp){
+.drawEdgeWhiteSquare <- function(plotDF_temp){
 
-    plotDF <- .prepareCurveWhiteSquare(plotDF_temp)
+    plotDF <- .prepareEdgeWhiteSquare(plotDF_temp)
 
     # Draw edges
     graphics::arrows(
@@ -1022,20 +944,15 @@
         col = plotDF_temp$Color[1])
 }
 
-.prepareCurveWhiteSquare <- function(plotDF_temp){
+.prepareEdgeWhiteSquare <- function(plotDF_temp){
     # Collect X and Y coordinates in separate vectors
-    x1 <- plotDF_temp$X1
-    x2 <- plotDF_temp$X2
-    y1 <- plotDF_temp$Y1
-    y2 <- plotDF_temp$Y2
-
+    x1 <- plotDF_temp$X1; x2 <- plotDF_temp$X2
+    y1 <- plotDF_temp$Y1; y2 <- plotDF_temp$Y2
     # Offset is the distance at which the arrow head should be attached to
-    # the main body of the arrow
     offset <- 5
 
     plotDF <- NULL
     for (a in seq_len(nrow(plotDF_temp))){
-
         if (plotDF_temp$ArrowEnd[a] == "first"){
             Xstart <- x1[a]-offset*(
                 (x1[a]-x2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
@@ -1048,13 +965,9 @@
             Ypoint <- Ystart
 
             plotDF <- rbind.data.frame(
-                plotDF,
-                data.frame(
+                plotDF,data.frame(
                     Xstart, Xend, Xpoint,
-                    Ystart, Yend, Ypoint
-                )
-            )
-
+                    Ystart, Yend, Ypoint))
         }
         if (plotDF_temp$ArrowEnd[a] == "last"){
             Xstart <- x1[a]
@@ -1068,15 +981,10 @@
             Ypoint <- Yend
 
             plotDF <- rbind.data.frame(
-                plotDF,
-                data.frame(
+                plotDF,data.frame(
                     Xstart, Xend, Xpoint,
-                    Ystart, Yend, Ypoint
-                )
-            )
-
-        }
-    }
+                    Ystart, Yend, Ypoint))
+        }}
     return(plotDF)
 }
 
@@ -1095,14 +1003,9 @@
 
 .prepareEdgeGap <- function(plotDF_temp){
     # Collect X and Y coordinates in separate vectors
-    x1 <- plotDF_temp$X1
-    x2 <- plotDF_temp$X2
-    y1 <- plotDF_temp$Y1
-    y2 <- plotDF_temp$Y2
-
-    # Gap is the distance that should be present between the end of the
-    # arrow
-    # and the node
+    x1 <- plotDF_temp$X1; x2 <- plotDF_temp$X2
+    y1 <- plotDF_temp$Y1; y2 <- plotDF_temp$Y2
+    # Gap is the distance that should be present between the arrow and node
     gap <- 10
 
     plotDF <- NULL
@@ -1118,13 +1021,9 @@
             Yend <- -y2[a]
 
             plotDF <- rbind.data.frame(
-                plotDF,
-                data.frame(
+                plotDF,data.frame(
                     Xstart, Xend,
-                    Ystart, Yend
-                )
-            )
-
+                    Ystart, Yend))
         }
         if (plotDF_temp$ArrowEnd[a] == "last"){
             Xstart <- x1[a]
@@ -1136,15 +1035,10 @@
                 (y2[a]-y1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
 
             plotDF <- rbind.data.frame(
-                plotDF,
-                data.frame(
+                plotDF,data.frame(
                     Xstart, Xend,
-                    Ystart, Yend
-                )
-            )
-
-        }
-    }
+                    Ystart, Yend))
+        }}
     return(plotDF)
 }
 
@@ -1180,140 +1074,52 @@
 }
 
 .prepareEdgeCleavage <- function(plotDF_temp){
-    # Collect X and Y coordinates in separate vectors
-    x1 <- plotDF_temp$X1
-    x2 <- plotDF_temp$X2
-    y1 <- plotDF_temp$Y1
-    y2 <- plotDF_temp$Y2
-
-    # Offset is the distance from the end node to the start of the arrow
-    # head
-    offset <- 15
-
-    # Deviation is the length of the orthogonal distance of the arrow
-    # head
-    deviation <- 12
-
-
-    plotDF_main <- NULL
-    plotDF_orth <- NULL
-    plotDF_diag <- NULL
+    x1 <- plotDF_temp$X1; x2 <- plotDF_temp$X2
+    y1 <- plotDF_temp$Y1; y2 <- plotDF_temp$Y2
+    offset <- 15 #distance from the end node to the start of the arrow head
+    deviation <- 12 #length of the orthogonal distance of the arrow head
+    plotDF_main <- NULL; plotDF_orth <- NULL; plotDF_diag <- NULL
     for (a in seq_len(nrow(plotDF_temp))){
-
         if (plotDF_temp$ArrowEnd[a] == "first"){
-
-            # Get main part of line
             Xstart <- x1[a]-offset*(
                 (x1[a]-x2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
-            Xend <- x2[a]
             Ystart <- -1*(y1[a]-offset*(
                 (y1[a]-y2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
-            Yend <- -y2[a]
-
-            plotDF_main <- rbind.data.frame(
-                plotDF_main,
-                data.frame(
-                    X1 = Xstart,
-                    X2 = Xend,
-                    Y1 = Ystart,
-                    Y2 = Yend
-                )
-            )
-
+            Xend <- x2[a]; Yend <- -y2[a]
+            plotDF_main <- rbind.data.frame(plotDF_main, data.frame(
+                X1 = Xstart,X2 = Xend,Y1 = Ystart,Y2 = Yend))
             # Get orthogonal part of the line
-            rotated_coords <- t(
-                .rotation_matrix(-0.5*pi) %*% c(
-                    deviation*(
-                        (x1[a]-x2[a])/(abs(x1[a]-x2[a])+abs(y1[a]-y2[a]))),
-                    -deviation*(
-                        (y1[a]-y2[a])/(abs(x1[a]-x2[a])+abs(y1[a]-y2[a])))
-                )
-            )
-
+            rotated_coords <- t(.rotation_matrix(-0.5*pi) %*% c(
+                deviation*((x1[a]-x2[a])/(abs(x1[a]-x2[a])+abs(y1[a]-y2[a]))),
+                -deviation*((y1[a]-y2[a])/(abs(x1[a]-x2[a])+abs(y1[a]-y2[a])))))
             Xorth_end <- rotated_coords[1,1] + Xstart
             Yorth_end <- rotated_coords[1,2] + Ystart
-
-            plotDF_orth <- rbind.data.frame(
-                plotDF_orth,
-                data.frame(
-                    X1 = Xstart,
-                    X2 = Xorth_end,
-                    Y1 = Ystart,
-                    Y2 = Yorth_end
-                )
-            )
-
+            plotDF_orth <- rbind.data.frame(plotDF_orth, data.frame(
+                X1 = Xstart, X2 = Xorth_end, Y1 = Ystart, Y2 = Yorth_end))
             # Get diagonal part of the line
-            Xdiag_end <- x1[a]
-            Ydiag_end <- -1*y1[a]
-
-            plotDF_diag <- rbind.data.frame(
-                plotDF_diag,
-                data.frame(
-                    X1 = Xorth_end,
-                    X2 = Xdiag_end,
-                    Y1 = Yorth_end,
-                    Y2 = Ydiag_end
-                )
-            )
-        }
+            Xdiag_end <- x1[a]; Ydiag_end <- -1*y1[a]
+            plotDF_diag <- rbind.data.frame(plotDF_diag, data.frame(
+                X1 = Xorth_end,X2 = Xdiag_end,Y1 = Yorth_end,Y2 = Ydiag_end))}
         if (plotDF_temp$ArrowEnd[a] == "last"){
-
-            # Get main part of line
-            Xstart <- x1[a]
+            Xstart <- x1[a];Ystart <- -y1[a]
             Xend <- x2[a]-offset*(
                 (x2[a]-x1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
-            Ystart <- -y1[a]
             Yend <- -1*(y2[a]-offset*(
                 (y2[a]-y1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
-
-            plotDF_main <- rbind.data.frame(
-                plotDF_main,
-                data.frame(
-                    X1 = Xstart,
-                    X2 = Xend,
-                    Y1 = Ystart,
-                    Y2 = Yend
-                )
-            )
-
+            plotDF_main <- rbind.data.frame(plotDF_main, data.frame(
+                X1 = Xstart,X2 = Xend,Y1 = Ystart,Y2 = Yend))
             # Get orthogonal part of the line
-            rotated_coords <- t(
-                .rotation_matrix(-0.5*pi) %*% c(
-                    deviation*(
-                        (x2[a]-x1[a])/(abs(x1[a]-x2[a])+abs(y1[a]-y2[a]))),
-                    -deviation*(
-                        (y2[a]-y1[a])/(abs(x1[a]-x2[a])+abs(y1[a]-y2[a])))
-                )
-            )
+            rotated_coords <- t(.rotation_matrix(-0.5*pi) %*% c(
+                deviation*((x2[a]-x1[a])/(abs(x1[a]-x2[a])+abs(y1[a]-y2[a]))),
+                -deviation*((y2[a]-y1[a])/(abs(x1[a]-x2[a])+abs(y1[a]-y2[a])))))
             Xorth_end <- rotated_coords[1,1] + Xend
             Yorth_end <- rotated_coords[1,2] + Yend
-
-            plotDF_orth <- rbind.data.frame(
-                plotDF_orth,
-                data.frame(
-                    X1 = Xend,
-                    X2 = Xorth_end,
-                    Y1 = Yend,
-                    Y2 = Yorth_end
-                )
-            )
-
+            plotDF_orth <- rbind.data.frame(plotDF_orth, data.frame(
+                X1 = Xend, X2 = Xorth_end,Y1 = Yend,Y2 = Yorth_end))
             # Get diagonal part of the line
-            Xdiag_end <- x2[a]
-            Ydiag_end <- -1*y2[a]
-
-            plotDF_diag <- rbind.data.frame(
-                plotDF_diag,
-                data.frame(
-                    X1 = Xorth_end,
-                    X2 = Xdiag_end,
-                    Y1 = Yorth_end,
-                    Y2 = Ydiag_end
-                )
-            )
-        }
-    }
+            Xdiag_end <- x2[a]; Ydiag_end <- -1*y2[a]
+            plotDF_diag <- rbind.data.frame(plotDF_diag, data.frame(
+                X1 = Xorth_end,X2 = Xdiag_end,Y1 = Yorth_end,Y2 = Ydiag_end))}}
     return(list(plotDF_main, plotDF_orth, plotDF_diag))
 }
 

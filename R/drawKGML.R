@@ -1,62 +1,62 @@
 # ------------------------------------------------------------------------------
 #' @title Draw pathway from KGML file
 #'
-#' @description This function draws a pathway from a KGML file with the option 
+#' @description This function draws a pathway from a KGML file with the option
 #' to map, e.g., expression data onto the pathway diagram.
-#' @param infile Input KGML file. This can be a character string of the 
+#' @param infile Input KGML file. This can be a character string of the
 #' KGML file location (e.g., "Downloads/WP42500.KGML").
-#' @param outdir (optional) Output directory. The pathway and legend images 
+#' @param outdir (optional) Output directory. The pathway and legend images
 #' will be saved in this directory.
-#' @param outname (optional) The file name of the output pathway image. 
-#' "svg","png",and "pdf" file extensions are accepted. If no file extension is 
+#' @param outname (optional) The file name of the output pathway image.
+#' "svg","png",and "pdf" file extensions are accepted. If no file extension is
 #' specified, the pathway and legend image will be generated in .svg format.
 #' The legend file gets the "legend_" prefix.
 #' @param featureIDs (optional) \code{character} vector of gene IDs.
-#' @param colorVar (optional) \code{vector} or \code{data.frame} for 
-#' coloring the nodes in the pathway. This can be for instance a 
+#' @param colorVar (optional) \code{vector} or \code{data.frame} for
+#' coloring the nodes in the pathway. This can be for instance a
 #' \code{data.frame} with the log2FCs and significance in the columns.
-#' The (row) order should match \code{featureIDs}. The color rules and palettes 
+#' The (row) order should match \code{featureIDs}. The color rules and palettes
 #' for the supplied values can be set in the colorList parameter.
-#' @param annGenes (optional) \code{character} string of the Bioconductor 
+#' @param annGenes (optional) \code{character} string of the Bioconductor
 #' annotation package (e.g., org.Hs.eg.db).
-#' @param annMetabolites (optional) \code{tibble} or \code{data.frame} with 
+#' @param annMetabolites (optional) \code{tibble} or \code{data.frame} with
 #' metabolite mapping information (see metaboliteIDmapping package).
-#' @param inputDB (optional) Input gene ID type 
-#' (SYMBOL, ENTREZID, ENSEMBL, UNIPROT). This can be a \code{character} vector 
-#' of \code{length = 1} (if all gene IDs are of the same type) or of 
-#' \code{length = nrow(featureIDs)} (if you want to specify the type per 
+#' @param inputDB (optional) Input gene ID type
+#' (SYMBOL, ENTREZID, ENSEMBL, UNIPROT). This can be a \code{character} vector
+#' of \code{length = 1} (if all gene IDs are of the same type) or of
+#' \code{length = nrow(featureIDs)} (if you want to specify the type per
 #' gene ID).
-#' @param colorNames (optional) \code{character} vector with names of the 
-#' color variables. If \code{colorNames} is NULL, the column names of the 
+#' @param colorNames (optional) \code{character} vector with names of the
+#' color variables. If \code{colorNames} is NULL, the column names of the
 #' \code{colorVar} \code{data.frame} will be used.
-#' @param colorList (optional) A list with information about the coloring of 
-#' the nodes. An example can be generated using the \link{defaultColorList} 
+#' @param colorList (optional) A list with information about the coloring of
+#' the nodes. An example can be generated using the \link{defaultColorList}
 #' function.
 #' @param NAvalue (optional) Node color for \code{NA} values.
-#' @param legend (optional) Logical (TRUE or FALSE). Should the legend be 
+#' @param legend (optional) Logical (TRUE or FALSE). Should the legend be
 #' plotted?
-#' @param nodeTable (optional) Logical (TRUE or FALSE). Should a node table 
+#' @param nodeTable (optional) Logical (TRUE or FALSE). Should a node table
 #' be returned?
-#' @param pathInfo (optional) Logical (TRUE or FALSE). Should pathway 
+#' @param pathInfo (optional) Logical (TRUE or FALSE). Should pathway
 #' information be returned?
-#' @param openFile (optional) Logical (TRUE or FALSE). Should the pathway file 
+#' @param openFile (optional) Logical (TRUE or FALSE). Should the pathway file
 #' be opened after it has been saved?
-#' @return A \code{list} with the node table and the file location of the 
+#' @return A \code{list} with the node table and the file location of the
 #' pathway and legend image.
 #' @examples
-#' 
+#'
 #'  # Load example data
 #'  lung_expr <- read.csv(system.file("extdata",
-#'                                   "data-lung-cancer.csv", 
-#'                                   package="PinPath"), 
+#'                                   "data-lung-cancer.csv",
+#'                                   package="PinPath"),
 #'                       stringsAsFactors = FALSE)
-#' 
+#'
 #'  # Select pathway
 #'  pathway_id <- "hsa05223"
 #'  bfc <- BiocFileCache::BiocFileCache()
-#'  infile <- BiocFileCache::bfcrpath(bfc, 
+#'  infile <- BiocFileCache::bfcrpath(bfc,
 #'  paste0("https://rest.kegg.jp/get/",pathway_id,"/kgml"))
-#' 
+#'
 #'  # Draw pathway
 #'  pathVis <- PinPath::drawKGML(
 #'             infile = infile,
@@ -67,64 +67,47 @@
 #'             colorVar = lung_expr[,"log2FC"],
 #'             nodeTable = TRUE,
 #'             legend = TRUE)
-#' 
+#'
 #' @export
 
 drawKGML <- function(
-        infile,
-        outdir = getwd(),
-        outname = NULL,
-        annGenes = NULL,
-        annMetabolites = NULL,
-        inputDB = NULL,
-        featureIDs = NULL,
-        colorVar = NULL,
-        colorNames = NULL,
-        colorList = NULL,
-        NAvalue = "#F0F0F0",
-        legend = FALSE,
-        nodeTable = FALSE,
-        pathInfo = FALSE,
-        openFile = TRUE
-){
+        infile,outdir = getwd(),outname = NULL,annGenes = NULL,
+        annMetabolites = NULL,inputDB = NULL,featureIDs = NULL,colorVar = NULL,
+        colorNames = NULL,colorList = NULL,NAvalue = "#F0F0F0",legend = FALSE,
+        nodeTable = FALSE,pathInfo = FALSE,openFile = TRUE){
     # Read and prepare GPML file
     kgml <- XML::xmlToList(XML::xmlParse(infile))
-    
-    # If output name is not set, give it the name of the pathway
+    # Set default values if necessary
     if (is.null(outname)){outname <- .makeOutName_KGML(kgml)}
-    
-    # If no color is set, use default color palette
     if (is.null(colorList) & !is.null(colorVar)){
         colorList <- defaultColorList(colorVar, ColorNames = colorNames)}
-    
+
     # Get patway image
     image_name <- BiocFileCache::bfcrpath(
         BiocFileCache::BiocFileCache(), kgml[[length(kgml)]]["image"])
     img <- magick::image_read(image_name)
     img <-  magick::image_transparent(img, color = "#BFFFBF")
-    
+
     # Map colors to entries
     entries_df <- .extractEntries(kgml[names(kgml) == "entry"])
     if (!(
-        is.null(featureIDs) | is.null(colorVar) | 
+        is.null(featureIDs) | is.null(colorVar) |
         (is.null(annGenes) & is.null(annMetabolites)) | is.null(inputDB))){
         colors_df <- .mapColors(
             nodes_df = entries_df, featureIDs = featureIDs,
             colorVar = colorVar, annGenes = annGenes,
             annMetabolites = data.frame(annMetabolites), inputDB = inputDB,
             colorList = colorList, NAvalue = NAvalue)}
-    
+
     # Draw pathway
     outfile <- .openFile(
         width = dim(magick::image_data(img))[2],
-        height = dim(magick::image_data(img))[3], 
+        height = dim(magick::image_data(img))[3],
         outfile = paste0(outdir,"/",outname))
     .makeKGMLpathway(colors_df,img); grDevices::dev.off()
-
-    # Save file location in output list
     outputList <- list(); outputList[["Pathway"]] <- outfile
     if (openFile) {shell(outfile)}
-    
+
     # Return legend, node table, pathway information
     if (legend & !is.null(colorList)){
         outputList[["Legend"]] <- .exportLegend(outdir, outname, colorList)
@@ -140,12 +123,12 @@ drawKGML <- function(
 
 
 .extractEntries <- function(dataEntries){
-    
+
     entryFUN <- function(dataEntries){
         data.frame(
             Names = as.character(dataEntries$graphics["name"]),
             ID = strsplit(
-                as.character(dataEntries$graphics["name"]), 
+                as.character(dataEntries$graphics["name"]),
                 ",\\s*")[[1]][1],
             Database = "HGNC",
             KEGG = as.character(dataEntries$.attrs["name"]),
@@ -161,9 +144,9 @@ drawKGML <- function(
         )
     }
     entries_df <- do.call(rbind, lapply(dataEntries, entryFUN))
-    # entries_df$ID<- iconv(entries_df$ID, from = 'UTF-8', 
+    # entries_df$ID<- iconv(entries_df$ID, from = 'UTF-8',
     # to = 'ASCII//TRANSLIT')
-    
+
     return(entries_df)
 }
 
@@ -179,9 +162,9 @@ drawKGML <- function(
         lty = colors_df$LineStyle,
         lwd = colors_df$LineThickness
     )
-    
+
     # Draw pathway image
     graphics::rasterImage(
-        img, 0, -dim(magick::image_data(img))[3], 
-        dim(magick::image_data(img))[2], 0) 
+        img, 0, -dim(magick::image_data(img))[3],
+        dim(magick::image_data(img))[2], 0)
 }

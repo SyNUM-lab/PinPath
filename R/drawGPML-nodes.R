@@ -7,107 +7,80 @@
 #' @noRd
 
 .prepareNodes <- function(dataNodes){
-    
-    nodeFUN <- function(dataNodes){
-        data.frame(
-            CenterX = as.numeric(dataNodes$Graphics["CenterX"]),
-            CenterY = as.numeric(dataNodes$Graphics["CenterY"]),
-            Width = as.numeric(dataNodes$Graphics["Width"]),
-            Height = as.numeric(dataNodes$Graphics["Height"]),
-            ZOrder = as.numeric(dataNodes$Graphics["ZOrder"]),
-            FillColor = as.character(ifelse(
-                is.na(dataNodes$Graphics["FillColor"]) | 
-                    dataNodes$Graphics["FillColor"] == "Transparent",
-                "white", 
-                paste0("#",dataNodes$Graphics["FillColor"]))
-            ),
-            Alpha = 1,
-            Color = as.character(ifelse(
-                is.na(dataNodes$Graphics["Color"]),
-                "#000000", 
-                paste0("#", dataNodes$Graphics["Color"]))
-            ),
-            Label = as.character(stringr::str_remove_all(
-                dataNodes$.attrs["TextLabel"],"\\n+$")),
-            FontSize = as.numeric(dataNodes$Graphics["FontSize"]),
-            FontWeight = tolower(
-                as.character(dataNodes$Graphics["FontWeight"])),
-            FontStyle = tolower(
-                as.character(dataNodes$Graphics["FontStyle"])),
-            Valign = ifelse(
-                as.character(dataNodes$Graphics["Valign"]) == "Middle", 
-                0.5,
-                ifelse(as.character(
-                    dataNodes$Graphics["Valign"]) == "Top", 
-                    1,0)
-            ), 
-            Align = ifelse(
-                as.character(dataNodes$Graphics["Align"]) == "Middle", 
-                0.5,
-                ifelse(
-                    as.character(
-                        dataNodes$Graphics["Align"]) == "Top",
-                    1,0)
-            ), 
-            ShapeType = ifelse(
-                is.na(as.character(dataNodes$Graphics["ShapeType"])),
-                "Rectangle", 
-                as.character(dataNodes$Graphics["ShapeType"])
-            ),
-            Rotation = 0,
-            LineThickness = as.numeric(ifelse(
-                is.na(dataNodes$Graphics["LineThickness"]),
-                1,
-                dataNodes$Graphics["LineThickness"]
-            ))/2,
-            LineStyle = as.character(ifelse(
-                is.na(dataNodes$Graphics["LineStyle"]),
-                "solid", 
-                tolower(dataNodes$Graphics["LineStyle"])
-            )),
-            nLine = ifelse(
-                sum(stringr::str_detect(
-                    unlist(
-                        dataNodes[
-                            which(names(dataNodes) == "Attribute")]
-                    ), 
-                    "Double")
-                ) == 0, "Single", "Double"),
-            NodeType = as.character(dataNodes$.attrs["Type"]),
-            Database = as.character(dataNodes$Xref["Database"]),
-            ID = as.character(dataNodes$Xref["ID"]),
-            GroupRef = as.character(dataNodes$.attrs["GroupRef"]),
-            GraphId = as.character(dataNodes$.attrs["GraphId"]),
-            GraphId1 = dataNodes$ID
-        )
-    }
-    
-    nodes_df <- do.call(rbind, lapply(dataNodes, nodeFUN))
-    
+
+    # Extract nodes
+    nodes_df <- do.call(rbind, lapply(dataNodes, .nodeFUN))
+
     # Change font face
     nodes_df$FontFace <- "plain"
     nodes_df$FontFace[(
-        !is.na(nodes_df$FontWeight) & is.na(nodes_df$FontStyle))] <- 
+        !is.na(nodes_df$FontWeight) & is.na(nodes_df$FontStyle))] <-
         nodes_df$FontWeight[(
             !is.na(nodes_df$FontWeight) & is.na(nodes_df$FontStyle))]
     nodes_df$FontFace[(
-        is.na(nodes_df$FontWeight) & !is.na(nodes_df$FontStyle))] <- 
+        is.na(nodes_df$FontWeight) & !is.na(nodes_df$FontStyle))] <-
         nodes_df$FontStyle[(
             is.na(nodes_df$FontWeight) & !is.na(nodes_df$FontStyle))]
     nodes_df$FontFace[(
-        (nodes_df$FontWeight == "bold") & 
+        (nodes_df$FontWeight == "bold") &
             (nodes_df$FontStyle == "italic")) | (
-                (nodes_df$FontWeight == "italic") & 
+                (nodes_df$FontWeight == "italic") &
                     (nodes_df$FontStyle == "bold"))] <- "bold.italic"
-    
+
     # Change line style
     nodes_df$LineStyle <- ifelse(
         nodes_df$LineStyle == "broken",
         "dashed", "solid")
-    
+
     return(nodes_df)
 }
 
+.nodeFUN <- function(dataNodes){
+    data.frame(
+        CenterX = as.numeric(dataNodes$Graphics["CenterX"]),
+        CenterY = as.numeric(dataNodes$Graphics["CenterY"]),
+        Width = as.numeric(dataNodes$Graphics["Width"]),
+        Height = as.numeric(dataNodes$Graphics["Height"]),
+        ZOrder = as.numeric(dataNodes$Graphics["ZOrder"]),
+        FillColor = as.character(ifelse(
+            is.na(dataNodes$Graphics["FillColor"]) |
+                dataNodes$Graphics["FillColor"] == "Transparent",
+            "white", paste0("#",dataNodes$Graphics["FillColor"]))),
+        Alpha = 1,
+        Color = as.character(ifelse(
+            is.na(dataNodes$Graphics["Color"]),
+            "#000000", paste0("#", dataNodes$Graphics["Color"]))),
+        Label = as.character(stringr::str_remove_all(
+            dataNodes$.attrs["TextLabel"],"\\n+$")),
+        FontSize = as.numeric(dataNodes$Graphics["FontSize"]),
+        FontWeight = tolower(as.character(dataNodes$Graphics["FontWeight"])),
+        FontStyle = tolower(as.character(dataNodes$Graphics["FontStyle"])),
+        Valign = ifelse(
+            as.character(dataNodes$Graphics["Valign"]) == "Middle",
+            0.5,ifelse(as.character(dataNodes$Graphics["Valign"])=="Top",1,0)),
+        Align = ifelse(
+            as.character(dataNodes$Graphics["Align"]) == "Middle",
+            0.5,ifelse(as.character(dataNodes$Graphics["Align"])=="Top",1,0)),
+        ShapeType = ifelse(
+            is.na(as.character(dataNodes$Graphics["ShapeType"])),
+            "Rectangle", as.character(dataNodes$Graphics["ShapeType"])),
+        Rotation = 0,
+        LineThickness = as.numeric(ifelse(
+            is.na(dataNodes$Graphics["LineThickness"]),
+            1,dataNodes$Graphics["LineThickness"]))/2,
+        LineStyle = as.character(ifelse(
+            is.na(dataNodes$Graphics["LineStyle"]),
+            "solid", tolower(dataNodes$Graphics["LineStyle"]))),
+        nLine = ifelse(sum(stringr::str_detect(unlist(
+            dataNodes[which(names(dataNodes) == "Attribute")]
+        ),"Double")) == 0, "Single", "Double"),
+        NodeType = as.character(dataNodes$.attrs["Type"]),
+        Database = as.character(dataNodes$Xref["Database"]),
+        ID = as.character(dataNodes$Xref["ID"]),
+        GroupRef = as.character(dataNodes$.attrs["GroupRef"]),
+        GraphId = as.character(dataNodes$.attrs["GraphId"]),
+        GraphId1 = dataNodes$ID)
+}
 
 # ------------------------------------------------------------------------------
 #' @title Draw nodes
@@ -121,25 +94,25 @@
 #' @noRd
 
 .drawNodes <- function(nodes_df, colors_df){
-    
-    # Set edge color to black, unless no expression data is plotted on 
+
+    # Set edge color to black, unless no expression data is plotted on
     # that specific node type
     if (length(colors_df) > 0){
         exNodeType <- rownames(
             table(
-                colors_df$NodeType, 
+                colors_df$NodeType,
                 colors_df$Scale))[
                     rowSums(table(colors_df$NodeType, colors_df$Scale)) == 0]
         nodes_df$Color[!(nodes_df$NodeType %in% exNodeType)] <- "#000000"
     }
-    
+
     # Set font weight
     nodes_df$FontFace[is.na(nodes_df$FontFace)] <- 1
     nodes_df$FontFace[nodes_df$FontFace == "plain"] <- 1
     nodes_df$FontFace[nodes_df$FontFace == "bold"] <- 2
     nodes_df$FontFace[nodes_df$FontFace == "italic"] <- 3
     nodes_df$FontFace[nodes_df$FontFace == "bold.italic"] <- 4
-    
+
     # Make plot
     graphics::rect(
         xleft = nodes_df$CenterX - 0.5* nodes_df$Width,
@@ -157,7 +130,7 @@
         cex = nodes_df$FontSize/12.5,
         col = nodes_df$Color,
         font = as.numeric(nodes_df$FontFace))
-    
+
 }
 
 

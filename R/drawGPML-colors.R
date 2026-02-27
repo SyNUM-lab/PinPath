@@ -76,26 +76,23 @@
                 input <- NULL
                 for (i in seq_len(ncol(colorVar))){
                     input <- rbind(
-                        input,
-                        data.frame(
+                        input, data.frame(
                             GeneID = featureIDs[inputDB == db],
                             Col = colorVar[inputDB == db,i],
-                            Scale = i, ScaleName = colnames(colorVar)[i]))
-                }
+                            Scale = i, ScaleName = colnames(colorVar)[i]))}
             } else{
                 input <- data.frame(
                     GeneID = featureIDs[inputDB == db],
                     Col = colorVar[inputDB == db],
-                    Scale = 1,ScaleName = "Color")
-            }
+                    Scale = 1,ScaleName = "Color")}
 
             # Convert node IDs
-            nodeAnn <- .nodeAnnotation(featureIDs_fil, db, annGenes)
+            nodeAnn <- .geneAnnotation(featureIDs_fil, db, annGenes)
 
             # Combine node annotation with input
-            nodeAnn <- dplyr::left_join(nodeAnn, input,
-                                        by = c("InputId" = "GeneID"),
-                                        relationship = "many-to-many")
+            nodeAnn <- dplyr::left_join(
+                nodeAnn, input, by = c("InputId" = "GeneID"),
+                relationship = "many-to-many")
 
             # Change column names
             nodeAnn <- nodeAnn[,c(
@@ -128,7 +125,7 @@
     return(DBname)
 }
 
-.nodeAnnotation <- function(featureIDs_fil, db, annGenes){
+.geneAnnotation <- function(featureIDs_fil, db, annGenes){
     databases_GPML <- unique(featureIDs_fil$Database)
     nodeAnn <- NULL
 
@@ -204,7 +201,7 @@
                     Scale = 1, ScaleName = "Color")
             }
             # Convert node IDs
-            nodeAnn <- .nodeAnnotation(featureIDs_fil, db, annGenes)
+            nodeAnn <- .metaboliteAnnotation(featureIDs_fil,db,annMetabolites)
 
             # Combine node annotation with input
             nodeAnn <- dplyr::left_join(
@@ -221,6 +218,40 @@
         }
         return(nodeAnn_metabolite)
     }
+}
+
+.metaboliteAnnotation<- function(featureIDs_fil, db, annMetabolites){
+    databases_GPML <- unique(featureIDs_fil$Database)
+    nodeAnn <- NULL
+    for (i in seq_along(databases_GPML)){
+        keytype <- databases_GPML[i]
+
+        # If gene IDs are already the same as the input IDs
+        if (keytype == db){
+            temp <- featureIDs_fil[featureIDs_fil$Database == keytype, ]
+            temp$InputId <- temp$ID
+            temp <- unique(temp[,c("GraphId1", "InputId")])
+
+            # If gene IDs are different from input IDs
+        }else{
+            temp <- tryCatch({
+                temp <- featureIDs_fil[featureIDs_fil$Database == keytype, ]
+                ann <- annMetabolites[
+                    annMetabolites[,keytype] %in% temp$ID,c(keytype, db)]
+                ann <- ann[!(is.na(ann[,1]) | is.na(ann[,2])),]
+                temp <- dplyr::left_join(
+                    temp, ann, by = c("ID" = keytype),
+                    relationship = "many-to-many")
+                colnames(temp) <- c("Database", "ID", "GraphId1", "InputId")
+                temp <- unique(temp[,c("GraphId1", "InputId")])
+                temp
+            }, error = function(cond){NULL})
+        }
+        nodeAnn <- rbind.data.frame(nodeAnn, temp)
+    }
+    nodeAnn <- nodeAnn[!duplicated(nodeAnn),]
+    nodeAnn <- nodeAnn[!is.na(nodeAnn$InputId),]
+    return(nodeAnn)
 }
 
 .splitNode <- function(colors_df){

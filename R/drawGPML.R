@@ -68,72 +68,44 @@
 #'             legend = TRUE)
 #'
 #' @export
-
 drawGPML <- function(
-        infile,
-        outdir = getwd(),
-        outname = NULL,
-        featureIDs = NULL,
-        colorVar = NULL,
-        annGenes = NULL,
-        annMetabolites = NULL,
-        inputDB = NULL,
-        colorNames = NULL,
-        colorList = NULL,
-        NAvalue = "#F0F0F0",
-        legend = FALSE,
-        nodeTable = FALSE,
-        pathInfo = FALSE,
-        openFile = TRUE
-){
+        infile,outdir = getwd(),outname = NULL,featureIDs = NULL,
+        colorVar = NULL,annGenes = NULL,annMetabolites = NULL,inputDB = NULL,
+        colorNames = NULL,colorList = NULL,NAvalue = "#F0F0F0",legend = FALSE,
+        nodeTable = FALSE,pathInfo = FALSE,openFile = TRUE){
     # Read and prepare GPML file
     gpml <- XML::xmlToList(XML::xmlParse(xml2::read_xml(infile)))
     gpml_fil <- .prepareGPML(gpml)
-
-    # If output name is not set, give it the name of the pathway
+    # Set default values if necessary
     if (is.null(outname)){outname <- .makeOutName(gpml)}
-
-    # If no color is set, use default color palette
     if (is.null(colorList) & !is.null(colorVar)){
         colorList <- defaultColorList(colorVar, ColorNames = colorNames)}
-
     # Set order of plotting based on the Z-value
     ZOrder_df <- .setZorder_GPML(gpml_fil)
-
     # Get all elements that could be part of a group
     groupElements_df <- .prepareLabels(
         gpml_fil[names(gpml_fil) %in% c("DataNode", "Label")])
-
     # Prepare nodes
     nodes_df_all <- .prepareNodes(gpml_fil[names(gpml_fil) == "DataNode"])
-
     # Map colors to nodes
     plotColor <- !(
         is.null(featureIDs) | is.null(colorVar) |
             (is.null(annGenes) & is.null(annMetabolites)) | is.null(inputDB))
     colors_df_all <- NULL
-    if (plotColor){
-        colors_df_all <- .mapColors(
-            nodes_df = nodes_df_all, featureIDs = featureIDs,
-            colorVar = colorVar, annGenes = annGenes,
-            annMetabolites = data.frame(annMetabolites),
-            inputDB = inputDB, colorList = colorList, NAvalue = NAvalue)}
+    if (plotColor){colors_df_all <- .mapColors(
+        nodes_df = nodes_df_all, annGenes, data.frame(annMetabolites), inputDB,
+        featureIDs, colorVar, colorList, NAvalue)}
 
     # Make pathway diagram
     outfile <- .openFile(
-        width = gpml$Graphics["BoardWidth"],
-        height = gpml$Graphics["BoardHeight"],
-        outfile = paste0(outdir,"/",outname))
+        gpml$Graphics["BoardWidth"], gpml$Graphics["BoardHeight"],
+        paste0(outdir,"/",outname))
     for (i in ZOrder_df$Index){
         .drawElement(
-            gpml_fil[i], plotColor, gpml_fil,
-            groupElements_df, nodes_df_all, colors_df_all)}
-    grDevices::dev.off()
-
-    # Provide location of pathway figure (and open file if necessary)
+            gpml_fil[i], plotColor, gpml_fil, groupElements_df, nodes_df_all,
+            colors_df_all)}; grDevices::dev.off()
     outputList <- list(); outputList[["Pathway"]] <- outfile
     if (openFile) {shell(outputList[["Pathway"]])}
-
     # Return legend, node table, pathway information
     if (legend & !is.null(colors_df_all)){
         outputList[["Legend"]] <- .exportLegend(outdir, outname, colorList)
@@ -144,7 +116,6 @@ drawGPML <- function(
     if (pathInfo){
         outputList[["Information"]] <- .returnInformation(gpml)
     }else{ outputList[["Information"]] <- NA }
-
     return(outputList)
 }
 
@@ -297,7 +268,7 @@ drawGPML <- function(
 }
 
 
-.openFile <- function(width, height, CanvasSize, outfile){
+.openFile <- function(width, height, outfile){
     width <- as.numeric(width)
     height <- as.numeric(height)
     file_extension <- tolower(tools::file_ext(outfile))

@@ -94,7 +94,7 @@ pathVis <- PinPath::drawGPML(
     infile = infile,
     annGenes = "org.Hs.eg.db",
     inputDB = "ENSEMBL",
-    geneIDs = lung_expr$GeneID,
+    featureIDs = lung_expr$GeneID,
     colorVar = lung_expr[,c("log2FC", "Significant")],
     colorList = colorList,
     nodeTable = TRUE,
