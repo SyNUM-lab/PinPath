@@ -5,6 +5,13 @@ layout: pages
 ---
 <br>
 
+## Table of contents
+* [Installation](#installation)
+* [Draw WikiPathways](#draw-wikipathways)
+* [Draw KEGG](#draw-kegg)
+
+<br>
+
 ## Installation
 Use the following R code to install the development version of the PinPath package:
 
@@ -17,7 +24,7 @@ remotes::install_github("SyNUM-lab/PinPath")
 ```
 <br>
 
-## Quick start
+## Draw WikiPathways
 First, load necessary packages and data:
 ```r
 # Load packages
@@ -41,7 +48,7 @@ pathVis <- PinPath::drawGPML(
   infile = infile,
   annGenes = "org.Hs.eg.db",
   inputDB = "ENSEMBL",
-  geneIDs = lung_expr$GeneID,
+  featureIDs = lung_expr$GeneID,
   colorVar = lung_expr[,"log2FC"],
   colorNames = "logFC",
   nodeTable = TRUE,
@@ -63,7 +70,7 @@ pathVis <- PinPath::GPML2Network(
   infile = infile,
   annGenes = "org.Hs.eg.db",
   inputDB = "ENSEMBL",
-  geneIDs = lung_expr$GeneID,
+  featureIDs = lung_expr$GeneID,
   colorVar = lung_expr[,"log2FC"],
   colorNames = "logFC",
   nodeTable = TRUE,
@@ -78,6 +85,8 @@ pathVis <- PinPath::GPML2Network(
   src="/assets/img/pathways/legend_Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg"
   alt="Legend"
   style="width: 40%; height: auto;">
+<br>
 
+## Draw KEGG
 
 

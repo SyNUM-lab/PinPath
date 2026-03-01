@@ -144,6 +144,15 @@ document.addEventListener("DOMContentLoaded", () => {
   	  <main class="container px-3 py-4">
     <p><br /></p>
 
+<h2 id="table-of-contents">Table of contents</h2>
+<ul>
+  <li><a href="#installation">Installation</a></li>
+  <li><a href="#draw-wikipathways">Draw WikiPathways</a></li>
+  <li><a href="#draw-kegg">Draw KEGG</a></li>
+</ul>
+
+<p><br /></p>
+
 <h2 id="installation">Installation</h2>
 <p>Use the following R code to install the development version of the PinPath package:</p>
 
@@ -155,7 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </span></code></pre></div></div>
 <p><br /></p>
 
-<h2 id="quick-start">Quick start</h2>
+<h2 id="draw-wikipathways">Draw WikiPathways</h2>
 <p>First, load necessary packages and data:</p>
 <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Load packages</span><span class="w">
 </span><span class="n">library</span><span class="p">(</span><span class="n">PinPath</span><span class="p">)</span><span class="w">
@@ -177,7 +186,7 @@ document.addEventListener("DOMContentLoaded", () => {
   </span><span class="n">infile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">infile</span><span class="p">,</span><span class="w">
   </span><span class="n">annGenes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"org.Hs.eg.db"</span><span class="p">,</span><span class="w">
   </span><span class="n">inputDB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"ENSEMBL"</span><span class="p">,</span><span class="w">
-  </span><span class="n">geneIDs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lung_expr</span><span class="o">$</span><span class="n">GeneID</span><span class="p">,</span><span class="w">
+  </span><span class="n">featureIDs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lung_expr</span><span class="o">$</span><span class="n">GeneID</span><span class="p">,</span><span class="w">
   </span><span class="n">colorVar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lung_expr</span><span class="p">[,</span><span class="s2">"log2FC"</span><span class="p">],</span><span class="w">
   </span><span class="n">colorNames</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"logFC"</span><span class="p">,</span><span class="w">
   </span><span class="n">nodeTable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">,</span><span class="w">
@@ -192,7 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
   </span><span class="n">infile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">infile</span><span class="p">,</span><span class="w">
   </span><span class="n">annGenes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"org.Hs.eg.db"</span><span class="p">,</span><span class="w">
   </span><span class="n">inputDB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"ENSEMBL"</span><span class="p">,</span><span class="w">
-  </span><span class="n">geneIDs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lung_expr</span><span class="o">$</span><span class="n">GeneID</span><span class="p">,</span><span class="w">
+  </span><span class="n">featureIDs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lung_expr</span><span class="o">$</span><span class="n">GeneID</span><span class="p">,</span><span class="w">
   </span><span class="n">colorVar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lung_expr</span><span class="p">[,</span><span class="s2">"log2FC"</span><span class="p">],</span><span class="w">
   </span><span class="n">colorNames</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"logFC"</span><span class="p">,</span><span class="w">
   </span><span class="n">nodeTable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">,</span><span class="w">
@@ -200,7 +209,10 @@ document.addEventListener("DOMContentLoaded", () => {
 </span></code></pre></div></div>
 
 <p><img src="/assets/img/pathways/network_Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg" alt="Network" style="width: 70%; height: auto;" />
-<img src="/assets/img/pathways/legend_Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg" alt="Legend" style="width: 40%; height: auto;" /></p>
+<img src="/assets/img/pathways/legend_Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg" alt="Legend" style="width: 40%; height: auto;" />
+<br /></p>
+
+<h2 id="draw-kegg">Draw KEGG</h2>
 
 
    </main>
