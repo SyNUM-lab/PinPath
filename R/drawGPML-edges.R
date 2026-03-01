@@ -1161,148 +1161,99 @@
 }
 
 .prepareEdgeTrans <- function(plotDF_temp){
-    x1 <- plotDF_temp$X1
-    x2 <- plotDF_temp$X2
-    y1 <- plotDF_temp$Y1
-    y2 <- plotDF_temp$Y2
-
-    # Gap is the distance between node and main line
-    gap <- 15
-
-    # extend is how much the main line should extend beyond the gap
-    extend <- 5
-
-    # Deviation is the length of the orthogonal distance of the arrow head
-    deviation <- 10
-
-    plotDF_main <- NULL
-    plotDF_orth <- NULL
-    plotDF_end <- NULL
+    gap <- 15 # distance between node and main line
+    extend <- 5 # how much the main line should extend beyond the gap
+    deviation <- 10 # length of the orthogonal distance of the arrow head
+    plotDF_main <- NULL; plotDF_orth <- NULL; plotDF_end <- NULL
     for (a in seq_len(nrow(plotDF_temp))){
-
         if (plotDF_temp$ArrowEnd[a] == "first"){
-
-            # Get main part of line
-            Xstart <- x1[a]-(gap-extend)*(
-                (x1[a]-x2[a])/ (abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
-            Xend <- x2[a]
-            Ystart <- -1*(y1[a]-(gap-extend)*(
-                (y1[a]-y2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
-            Yend <- -y2[a]
-
-            plotDF_main <- rbind.data.frame(
-                plotDF_main,
-                data.frame(
-                    X1 = Xstart,
-                    X2 = Xend,
-                    Y1 = Ystart,
-                    Y2 = Yend
-                )
-            )
-
-            # Get orthogonal part of the line
-            rotated_coords <- t(
-                .rotation_matrix(-0.5*pi) %*% c(
-                    deviation*(
-                        (x1[a]-x2[a])/(abs(x1[a]-x2[a])+abs(y1[a]-y2[a]))),
-                    -deviation*(
-                        (y1[a]-y2[a])/(abs(x1[a]-x2[a])+abs(y1[a]-y2[a])))
-                )
-            )
-
-            Xstart <- x1[a]-(gap)*(
-                (x1[a]-x2[a])/ (abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
-            Ystart <- -1*(y1[a]-(gap)*(
-                (y1[a]-y2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
-            Xorth_end <- Xstart - rotated_coords[1,1]
-            Yorth_end <- Ystart - rotated_coords[1,2]
-
-            plotDF_orth <- rbind.data.frame(
-                plotDF_orth,
-                data.frame(
-                    X1 = Xstart,
-                    X2 = Xorth_end,
-                    Y1 = Ystart,
-                    Y2 = Yorth_end
-                )
-            )
-
-            # Get end part of the line
-            Xend_end <- x1[a] - rotated_coords[1,1]
-            Yend_end <- -1*y1[a] - rotated_coords[1,2]
-
-            plotDF_end <- rbind.data.frame(
-                plotDF_end,
-                data.frame(
-                    X1 = Xorth_end,
-                    X2 = Xend_end,
-                    Y1 = Yorth_end,
-                    Y2 = Yend_end
-                )
-            )
-
+            plotList <- .prepareEdgeTrans_first(
+                plotDF_temp, gap, extend, deviation,
+                plotDF_main, plotDF_orth, plotDF_end,a)
+            plotDF_main <- plotList[[1]]
+            plotDF_orth <- plotList[[2]]
+            plotDF_end <- plotList[[3]]
         }
         if (plotDF_temp$ArrowEnd[a] == "last"){
-
-            # Get main part of line
-            Xstart <- x1[a]
-            Xend <- x2[a]-(gap-extend)*(
-                (x2[a]-x1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
-            Ystart <- -y1[a]
-            Yend <- -1*(y2[a]-(gap-extend)*(
-                (y2[a]-y1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
-
-            plotDF_main <- rbind.data.frame(
-                plotDF_main,
-                data.frame(
-                    X1 = Xstart,
-                    X2 = Xend,
-                    Y1 = Ystart,
-                    Y2 = Yend
-                )
-            )
-
-            # Get orthogonal part of the line
-            rotated_coords <- t(
-                .rotation_matrix(-0.5*pi) %*% c(
-                    deviation*(
-                        (x1[a]-x2[a])/(abs(x1[a]-x2[a])+abs(y1[a]-y2[a]))),
-                    -deviation*(
-                        (y1[a]-y2[a])/(abs(x1[a]-x2[a])+abs(y1[a]-y2[a])))
-                )
-            )
-
-            Xstart <- x2[a]-(gap)*(
-                (x2[a]-x1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
-            Ystart <- -1*(y2[a]-(gap)*(
-                (y2[a]-y1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
-            Xorth_end <- Xstart + rotated_coords[1,1]
-            Yorth_end <- Ystart + rotated_coords[1,2]
-
-            plotDF_orth <- rbind.data.frame(
-                plotDF_orth,
-                data.frame(
-                    X1 = Xstart,
-                    X2 = Xorth_end,
-                    Y1 = Ystart,
-                    Y2 = Yorth_end
-                )
-            )
-
-            # Get end part of the line
-            Xend_end <- x2[a] + rotated_coords[1,1]
-            Yend_end <- -1*y2[a] + rotated_coords[1,2]
-
-            plotDF_end <- rbind.data.frame(
-                plotDF_end,
-                data.frame(
-                    X1 = Xorth_end,
-                    X2 = Xend_end,
-                    Y1 = Yorth_end,
-                    Y2 = Yend_end
-                )
-            )
+            plotList <- .prepareEdgeTrans_last(
+                plotDF_temp, gap, extend, deviation,
+                plotDF_main, plotDF_orth, plotDF_end,a)
+            plotDF_main <- plotList[[1]]
+            plotDF_orth <- plotList[[2]]
+            plotDF_end <- plotList[[3]]
         }
+        return(list(plotDF_main, plotDF_orth, plotDF_end))
     }
+}
+
+.prepareEdgeTrans_first <- function(
+        plotDF_temp, gap, extend, deviation,
+        plotDF_main, plotDF_orth, plotDF_end,a){
+    x1 <- plotDF_temp$X1; x2 <- plotDF_temp$X2
+    y1 <- plotDF_temp$Y1; y2 <- plotDF_temp$Y2
+
+    # Get main part of line
+    Xstart <- x1[a]-(gap-extend)*(
+        (x1[a]-x2[a])/ (abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
+    Ystart <- -1*(y1[a]-(gap-extend)*(
+        (y1[a]-y2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
+    Xend <- x2[a]; Yend <- -y2[a]
+    plotDF_main <- rbind.data.frame(plotDF_main, data.frame(
+        X1 = Xstart,X2 = Xend,Y1 = Ystart,Y2 = Yend))
+    # Get orthogonal part of the line
+    rotated_coords <- t(.rotation_matrix(-0.5*pi) %*% c(
+        deviation*((x1[a]-x2[a])/(abs(x1[a]-x2[a])+abs(y1[a]-y2[a]))),
+        -deviation*((y1[a]-y2[a])/(abs(x1[a]-x2[a])+abs(y1[a]-y2[a])))))
+    Xstart <- x1[a]-(gap)*(
+        (x1[a]-x2[a])/ (abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
+    Ystart <- -1*(y1[a]-(gap)*(
+        (y1[a]-y2[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
+    Xorth_end <- Xstart - rotated_coords[1,1]
+    Yorth_end <- Ystart - rotated_coords[1,2]
+    plotDF_orth <- rbind.data.frame(plotDF_orth,data.frame(
+        X1 = Xstart,X2 = Xorth_end,Y1 = Ystart,Y2 = Yorth_end))
+    # Get end part of the line
+    Xend_end <- x1[a] - rotated_coords[1,1]
+    Yend_end <- -1*y1[a] - rotated_coords[1,2]
+    plotDF_end <- rbind.data.frame(plotDF_end,data.frame(
+        X1 = Xorth_end,X2 = Xend_end,Y1 = Yorth_end,Y2 = Yend_end))
+
     return(list(plotDF_main, plotDF_orth, plotDF_end))
 }
+
+
+.prepareEdgeTrans_last <- function(
+        plotDF_temp, gap, extend, deviation,
+        plotDF_main, plotDF_orth, plotDF_end,a){
+    x1 <- plotDF_temp$X1; x2 <- plotDF_temp$X2
+    y1 <- plotDF_temp$Y1; y2 <- plotDF_temp$Y2
+
+    # Get main part of line
+    Xstart <- x1[a]; Ystart <- -y1[a]
+    Xend <- x2[a]-(gap-extend)*(
+        (x2[a]-x1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
+    Yend <- -1*(y2[a]-(gap-extend)*(
+        (y2[a]-y1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
+    plotDF_main <- rbind.data.frame(plotDF_main,data.frame(
+        X1 = Xstart,X2 = Xend,Y1 = Ystart,Y2 = Yend))
+    # Get orthogonal part of the line
+    rotated_coords <- t(.rotation_matrix(-0.5*pi) %*% c(
+        deviation*((x1[a]-x2[a])/(abs(x1[a]-x2[a])+abs(y1[a]-y2[a]))),
+        -deviation*((y1[a]-y2[a])/(abs(x1[a]-x2[a])+abs(y1[a]-y2[a])))))
+    Xstart <- x2[a]-(gap)*(
+        (x2[a]-x1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a])))
+    Ystart <- -1*(y2[a]-(gap)*(
+        (y2[a]-y1[a])/(abs(x1[a]-x2[a]) + abs(y1[a]-y2[a]))))
+    Xorth_end <- Xstart + rotated_coords[1,1]
+    Yorth_end <- Ystart + rotated_coords[1,2]
+    plotDF_orth <- rbind.data.frame(plotDF_orth,data.frame(
+        X1 = Xstart,X2 = Xorth_end,Y1 = Ystart,Y2 = Yorth_end))
+    # Get end part of the line
+    Xend_end <- x2[a] + rotated_coords[1,1]
+    Yend_end <- -1*y2[a] + rotated_coords[1,2]
+    plotDF_end <- rbind.data.frame(plotDF_end,data.frame(
+        X1 = Xorth_end,X2 = Xend_end,Y1 = Yorth_end,Y2 = Yend_end))
+
+    return(list(plotDF_main, plotDF_orth, plotDF_end))
+}
+

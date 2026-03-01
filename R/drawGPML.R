@@ -530,18 +530,21 @@ drawGPML <- function(
 
 
 .returnInformation <- function(gpml){
-    info <-  c(
-        "Name" = as.character(gpml$.attrs["Name"]),
-        "ID" = as.character(gpml$.attrs["Version"]),
-        "Link" = paste0(
-            "https://www.wikipathways.org/pathways/",
-            stringr::str_split(gpml$.attrs["Version"], "_")[[1]][1],
-            ".html"),
-        "Description" = gpml[
-            which(names(gpml) == "Comment")][
-                which.max(
-                    nchar(gpml[which(names(gpml) == "Comment")])
-                )][[1]][[1]])
-
-    return(info)
+    info <- tryCatch({
+        c(
+            "Name" = as.character(gpml$.attrs["Name"]),
+            "ID" = as.character(gpml$.attrs["Version"]),
+            "Link" = paste0(
+                "https://www.wikipathways.org/pathways/",
+                stringr::str_split(gpml$.attrs["Version"], "_")[[1]][1],
+                ".html"),
+            "Description" = gpml[
+                which(names(gpml) == "Comment")][
+                    which.max(
+                        nchar(gpml[which(names(gpml) == "Comment")])
+                    )][[1]][[1]])
+    },error = function(cond){
+        return(NULL)
+    })
+    return(NA)
 }

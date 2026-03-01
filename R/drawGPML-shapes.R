@@ -230,7 +230,7 @@
     if (type == "mim-degradation"){
         starting_angle <- 0; max_angle <- 2*pi
         n_corners <- 100; adj <- 1
-        width <- 0.7*width; height <- 0.7*height}
+        width <- 0.8*width; height <- 0.8*height}
 
     param <- list(
         width, height, centerX, centerY, rotation, type, alpha, fillcolor,
@@ -266,8 +266,8 @@
     linestyle <- shapes_df$LineStyle[i]; valign <- shapes_df$Valign[i]
     align <- shapes_df$Align[i]
 
-    xstart <- 0.7*width; xend <- -0.7*width
-    ystart <- 0.7*height; yend <- -0.7*height
+    xstart <- 0.5*width; xend <- -0.5*width
+    ystart <- 0.5*height; yend <- -0.5*height
 
     # Apply rotation matrix
     rot_mat <- .rotation_matrix(-1*rotation)
