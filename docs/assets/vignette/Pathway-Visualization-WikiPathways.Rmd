@@ -1,0 +1,141 @@
+---
+title: "WikiPathways pathway visualization"
+author: "by Jarno Koetsier"
+date: "`r Sys.Date()`"
+output: md_document
+---
+
+```{r setup, echo=FALSE, results="hide"}
+knitr::opts_chunk$set(
+    tidy = FALSE,
+    cache = FALSE,
+    dev = "png",
+    message = FALSE, error = FALSE, warning = TRUE)
+```
+
+# WikiPathways pathway visualization
+This tutorial will cover visualizing differential expression analysis results 
+onto *WikiPathways* pathway diagrams.
+
+<br>
+
+## Installation
+First, make sure you have *PinPath* installed.
+```{r installation, message = FALSE, warning = FALSE}
+library(PinPath)
+library(rWikiPathways)
+library(org.Hs.eg.db)
+```
+
+<br>
+
+## Dataset
+The example dataset we will use compares the expression of transcripts in 
+lung cancer biopsies versus normal tissue. Differential expression analysis 
+has already been performed, generating log2FCs and p-values for each gene. 
+```{r dataset, message = FALSE, warning = FALSE}
+lung_expr <- read.csv(
+    system.file("extdata","data-lung-cancer.csv", package ="PinPath"), 
+    stringsAsFactors = FALSE)
+```
+
+In the pathway, we want to show which gene is significantly differentially 
+expressed. For this, we will use an adjusted p-value cutoff of 0.05.
+```{r significance, results = 'asis'}
+lung_expr$Significant <- ifelse(lung_expr$adj.P.Value < 0.05, "Yes", "No")
+```
+
+<br>
+
+## Set colors
+After we have loaded and prepared the differential expression analysis 
+statistics, we need to define how to color the statistics in the pathway 
+diagram. In this vignette, we will plot the log2FC and significance of each 
+gene on the pathway diagram. We can start by loading the default color palette.
+```{r default-color-values}
+colorList <- PinPath::defaultColorList(lung_expr[,c("log2FC", "Significant")])
+```
+
+In the next step, we can adjust the default color palette to the desired color 
+values. For instance, we want to display a green color when a gene is 
+differentially expressed  and a white color when it is not.
+```{r modify-significant-color}
+colorList[["Significant"]]$Color <- c(
+    "Yes" = "green",
+    "No" = "white")
+```
+
+Furthermore, we can set the minimum and maximum value  of the log2FC color
+gradient to -1.5 and 1.5, respectively.
+```{r modify-log2FC-color}
+colorList[["log2FC"]]$ColorVal <- c(
+    "MinVal" = -1.5,
+    "MidVal" = 0,
+    "MaxVal" = 1.5)
+```
+
+<br>
+
+## Plot pathway
+We can now plot the differential expression statistics on the 
+*WP5087: Pleural mesothelioma* pathway.
+If not specified otherwise, the pathway and legend image will be saved in 
+your working directory. The pathway image will be opened by default.
+```{r plot-pathway, message = FALSE, warning = FALSE}
+# WP5087: Pleural mesothelioma
+pathway_id <- "WP5087"
+infile <- rWikiPathways::getPathway(pathway_id)
+
+# Draw pathway
+pathVis <- PinPath::drawGPML(
+    infile = infile,
+    annGenes = "org.Hs.eg.db",
+    inputDB = "ENSEMBL",
+    featureIDs = lung_expr$GeneID,
+    colorVar = lung_expr[,c("log2FC", "Significant")],
+    colorList = colorList,
+    nodeTable = TRUE,
+    legend = TRUE)
+```
+
+<p>Pathway image:</p>
+<img src="{{ "/assets/img/pathways/Pleural_mesothelioma_WP5087_r140461_Homo_sapiens.svg" | relative_url }}"
+width="1000">
+<hr>
+<p>Legend image:</p>
+<img src="{{ "/assets/img/pathways/legend_Pleural_mesothelioma_WP5087_r140461_Homo_sapiens.svg" | relative_url }}"
+width="500">
+
+<br>
+
+## Plot network
+You can also plot the pathway as a network. In contrast to the pathway diagram, every element (e.g., gene/protein) is represented exactly once.
+```{r plot-network, message = FALSE, warning = FALSE}
+pathVis <- PinPath::GPML2Network(
+  infile = infile,
+  annGenes = "org.Hs.eg.db",
+  inputDB = "ENSEMBL",
+  featureIDs = lung_expr$GeneID,
+  colorVar = lung_expr[,c("log2FC", "Significant")],
+  colorList = colorList,
+  nodeSize = 0.5,
+  nodeTable = TRUE,
+  legend = TRUE) 
+```
+
+
+<p>Network image:</p>
+<img src="{{ "/assets/img/pathways/network_Pleural_mesothelioma_WP5087_r140461_Homo_sapiens.svg" | relative_url }}"
+width="1000">
+<hr>
+<p>Legend image:</p>
+<img src="{{ "/assets/img/pathways/legend_network_Pleural_mesothelioma_WP5087_r140461_Homo_sapiens.svg" | relative_url }}"
+width="500">
+
+<br>
+
+## Session info
+```{r sessionInfo}
+sessionInfo()
+```
+

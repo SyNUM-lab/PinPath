@@ -5,10 +5,9 @@ layout: pages
 ---
 <br>
 
-## Table of contents
-* [Installation](#installation)
-* [Draw WikiPathways](#draw-wikipathways)
-* [Draw KEGG](#draw-kegg)
+## Tutorials
+*  <a href="{{ '/wikipathways-visualization' | relative_url }}">WikiPathways pathway visualization</a>
+*  <a href="{{ '/kegg-visualization' | relative_url }}">KEGG pathway visualization</a>
 
 <br>
 
@@ -24,7 +23,7 @@ remotes::install_github("SyNUM-lab/PinPath")
 ```
 <br>
 
-## Draw WikiPathways
+## Quick start
 First, load necessary packages and data:
 ```r
 # Load packages
@@ -34,8 +33,7 @@ library(org.Hs.eg.db)
 
 # Load example data
 lung_expr <- read.csv(
-system.file("extdata", "data-lung-cancer.csv",package="PinPath"),
-                      stringsAsFactors = FALSE)
+system.file("extdata", "data-lung-cancer.csv", package="PinPath"), stringsAsFactors = FALSE)
 ```
 
 Now, you can plot the data onto the *Non-small cell lung cancer (WP4255)* pathway:
@@ -86,7 +84,3 @@ pathVis <- PinPath::GPML2Network(
   alt="Legend"
   style="width: 40%; height: auto;">
 <br>
-
-## Draw KEGG
-
-

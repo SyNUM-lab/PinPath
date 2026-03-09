@@ -50,12 +50,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </head>
 
-<body>
+<body  class="d-flex flex-column min-vh-100">
 	{% include octocat_corner.html %}	
   	{% include header.html %}
-  	  <main class="container px-3 py-4">
+	<main class="container px-3 py-4 flex-grow-1">
     {{ content }}
-   </main>
+	</main>
   	{% include footer.html %}
 </body>
 </html>

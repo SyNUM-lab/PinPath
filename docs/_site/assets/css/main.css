@@ -65,6 +65,11 @@ html { overflow-y: scroll; }
 h2 { color: black }
 h1, h3, h4 { color: black }
 
+img {
+  max-width: 100%;
+  height: auto;
+}
+
 /* Carousel */
 .carousel-control-prev-icon {
   width: 40px;
@@ -142,4 +147,23 @@ pre code {
 .copy-btn.copied {
   color: #1a7f37;
   border-color: #1a7f37;
+}
+
+.highlight .c1 { color: #737373; }
+.highlight .o { color: #CB181D; }
+.highlight .s2 { color:#D94801; }
+.highlight .kc { color:#4292C6; }
+
+.sponsor-logos {
+  display: flex;
+  align-items: center;
+  gap: 40px;         
+  flex-wrap: wrap;
+  padding-bottom: 40px;     
+}
+
+.sponsor-logos img {
+  height: 60px;        
+  width: auto;         
+  object-fit: contain; 
 }
