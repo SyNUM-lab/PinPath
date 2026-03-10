@@ -515,7 +515,7 @@ drawGPML <- function(
 }
 
 
-.makeOutName <- function(gpml){
+.makeOutName <- function(gpml, network = FALSE){
 
     # Extract information from GPML file
     PathwayName <- gpml$.attrs["Name"]
@@ -525,6 +525,7 @@ drawGPML <- function(
     # Combine information into name
     outname <- paste0(PathwayName,"_",PathwayID, "_",Organism)
     outname <- stringr::str_replace_all(outname, " ", "_")
+    if(network){outname <- paste0("network_", outname)}
     outname <- make.names(outname)
 }
 

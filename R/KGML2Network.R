@@ -86,7 +86,7 @@ KGML2Network <- function(
     kgml <- XML::xmlToList(XML::xmlParse(infile))
 
     # Set default values if necessary
-    if (is.null(outname)){outname <- .makeOutName_KGML(kgml)}
+    if (is.null(outname)){outname <- .makeOutName_KGML(kgml, network = TRUE)}
     if (is.null(colorList) & !is.null(colorVar)){
         colorList <- defaultColorList(colorVar, ColorNames = colorNames)}
 
@@ -123,7 +123,7 @@ KGML2Network <- function(
 
 
 
-.makeOutName_KGML <- function(kgml){
+.makeOutName_KGML <- function(kgml, network = FALSE){
     # Get pathway name
     PathwayName <- kgml[[length(kgml)]]["title"]
 
@@ -136,6 +136,7 @@ KGML2Network <- function(
     # Make name
     outname <- paste0(PathwayName,"_",PathwayID, "_",Organism)
     outname <- stringr::str_replace_all(outname, " ", "_")
+    if(network){outname <- paste0("network_", outname)}
     outname <- make.names(outname)
     return(outname)
 }
@@ -298,6 +299,10 @@ KGML2Network <- function(
 
     # Finalize network
     g_plot <- g_plot +
+        .geom_node_split(
+            linewidth = 0.3,
+            alpha = 0, color = "lightgrey",
+            nCol = 1, iCol = 1, nodeSize = nodeSize) +
         ggraph::geom_node_text(ggplot2::aes(label = .data$name), size = 2) +
         ggplot2::theme_void() +
         ggplot2::theme(legend.position = "none")

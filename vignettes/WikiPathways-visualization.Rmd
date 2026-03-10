@@ -1,3 +1,21 @@
+---
+title: "1. WikiPathways visualization"
+author: "by Jarno Koetsier"
+package: PinPath
+date: "`r Sys.Date()`"
+output: 
+    BiocStyle::html_document:
+    toc_float: true
+    includes:
+      in_header: Pathway-Visualization-schema.html
+# pdf_document:
+#   toc: true
+vignette: >
+    %\VignetteIndexEntry{1. WikiPathways visualization}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
+---
+
 ```{r setup, echo=FALSE, results="hide"}
 knitr::opts_chunk$set(
     tidy = FALSE,
@@ -6,23 +24,18 @@ knitr::opts_chunk$set(
     message = FALSE, error = FALSE, warning = TRUE)
 ```
 
-# WikiPathways pathway visualization
-This tutorial will cover visualizing differential expression analysis results 
+This vignette will cover visualizing differential expression analysis results 
 onto *WikiPathways* pathway diagrams.
 
-<br>
-
-## Installation
-First, make sure you have *PinPath* installed.
+# Getting started
+First, make sure you install and load all necessary packages.
 ```{r installation, message = FALSE, warning = FALSE}
 library(PinPath)
 library(rWikiPathways)
 library(org.Hs.eg.db)
 ```
 
-<br>
-
-## Dataset
+# Dataset
 The example dataset we will use compares the expression of transcripts in 
 lung cancer biopsies versus normal tissue. Differential expression analysis 
 has already been performed, generating log2FCs and p-values for each gene. 
@@ -38,9 +51,7 @@ expressed. For this, we will use an adjusted p-value cutoff of 0.05.
 lung_expr$Significant <- ifelse(lung_expr$adj.P.Value < 0.05, "Yes", "No")
 ```
 
-<br>
-
-## Set colors
+# Set colors
 After we have loaded and prepared the differential expression analysis 
 statistics, we need to define how to color the statistics in the pathway 
 diagram. In this vignette, we will plot the log2FC and significance of each 
@@ -67,9 +78,7 @@ colorList[["log2FC"]]$ColorVal <- c(
     "MaxVal" = 1.5)
 ```
 
-<br>
-
-## Plot pathway
+# Plot pathway
 We can now plot the differential expression statistics on the 
 *WP5087: Pleural mesothelioma* pathway.
 If not specified otherwise, the pathway and legend image will be saved in 
@@ -91,43 +100,40 @@ pathVis <- PinPath::drawGPML(
     legend = TRUE)
 ```
 
-<p>Pathway image:</p>
-<img src="/assets/img/pathways/Pleural_mesothelioma_WP5087_r140461_Homo_sapiens.svg"
+Pathway image:
+<img src="Pleural_mesothelioma_WP5087_r140461_Homo_sapiens.svg" 
 width="1000">
-<hr>
-<p>Legend image:</p>
-<img src="/assets/img/pathways/legend_Pleural_mesothelioma_WP5087_r140461_Homo_sapiens.svg"
+
+Legend image:
+<img src="legend_Pleural_mesothelioma_WP5087_r140461_Homo_sapiens.svg" 
 width="500">
 
-<br>
-
-## Plot network
-You can also plot the pathway as a network. In contrast to the pathway diagram, every element (e.g., gene/protein) is represented exactly once.
+# Plot network
+You can also plot the pathway as a network. In contrast to the pathway diagram, 
+every element (e.g., gene/protein) is represented exactly once in the network.
 ```{r plot-network, message = FALSE, warning = FALSE}
 pathVis <- PinPath::GPML2Network(
-  infile = infile,
-  annGenes = "org.Hs.eg.db",
-  inputDB = "ENSEMBL",
-  featureIDs = lung_expr$GeneID,
-  colorVar = lung_expr[,c("log2FC", "Significant")],
-  colorList = colorList,
-  nodeSize = 0.5,
-  nodeTable = TRUE,
-  legend = TRUE) 
+	infile = infile,
+	annGenes = "org.Hs.eg.db",
+	inputDB = "ENSEMBL",
+	featureIDs = lung_expr$GeneID,
+	colorVar = lung_expr[,c("log2FC", "Significant")],
+	colorList = colorList,
+	nodeSize = 0.5,
+	nodeTable = TRUE,
+	legend = FALSE) 
 ```
 
-
-<p>Network image:</p>
-<img src="/assets/img/pathways/network_Pleural_mesothelioma_WP5087_r140461_Homo_sapiens.svg"
+Network image:
+<img src="network_Pleural_mesothelioma_WP5087_r140461_Homo_sapiens.svg" 
 width="1000">
-<hr>
-<p>Legend image:</p>
-<img src="/assets/img/pathways/legend_network_Pleural_mesothelioma_WP5087_r140461_Homo_sapiens.svg"
+
+Legend image:
+<img src="legend_Pleural_mesothelioma_WP5087_r140461_Homo_sapiens.svg" 
 width="500">
 
-<br>
+# Session info
 
-## Session info
 ```{r sessionInfo}
 sessionInfo()
 ```

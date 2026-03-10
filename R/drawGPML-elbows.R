@@ -127,11 +127,11 @@
 
     # If both attachment points are in Y direction
     if ((ys1-ys2 != 0) & (ye1-ye2 != 0)){
-        param <- .coords_yy(xs1,xs2,xe1,xe2,ys1,ys2,ye1,ye2)
+        param <- .coords_yy(xs1,xs2,xe1,xe2,ys1,ys2,ye1,ye2,minMove)
     }
     # If both attachment points are in X direction
     if ((xs1-xs2 != 0) & (xe1-xe2 != 0)){
-        param <- .coords_xx(xs1,xs2,xe1,xe2,ys1,ys2,ye1,ye2)
+        param <- .coords_xx(xs1,xs2,xe1,xe2,ys1,ys2,ye1,ye2,minMove)
     }
     # If only starting point is in X direction
     if ((xs1-xs2 != 0) & (xe1-xe2 == 0)){
@@ -152,7 +152,7 @@
     return(temp)
 }
 
-.coords_yy <- function(xs1,xs2,xe1,xe2,ys1,ys2,ye1,ye2){
+.coords_yy <- function(xs1,xs2,xe1,xe2,ys1,ys2,ye1,ye2,minMove){
     # Both ends cannot move in y-direction
     if ((sign(ys1-ys2) != sign(ys2-ye2)) & sign(ye1-ye2) != sign(ye2-ys2)){
         yi1 <- ys2 # Keep y the same
@@ -186,7 +186,7 @@
     return(list(xs1,xs2,xi1,xi2,xe1, xe2,ys1,ys2,yi1,yi2,ye1,ye2))
 }
 
-.coords_xx <- function(xs1,xs2,xe1,xe2,ys1,ys2,ye1,ye2){
+.coords_xx <- function(xs1,xs2,xe1,xe2,ys1,ys2,ye1,ye2,minMove){
     # Both ends cannot move in x-direction
     if ((sign(xs1-xs2) != sign(xs2-xe2)) & sign(xe1-xe2) != sign(xe2-xs2)){
         xi1 <- xs2 # Keep x the same

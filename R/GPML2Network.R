@@ -208,7 +208,7 @@ GPML2Network <- function(
     gpml_fil <- .prepareGPML(gpml)
 
     # Set default values if necessary
-    if (is.null(outname)){ outname <- .makeOutName(gpml)}
+    if (is.null(outname)){ outname <- .makeOutName(gpml, network = TRUE)}
     if (is.null(colorList) & !is.null(colorVar)){
         colorList <- defaultColorList(colorVar, ColorNames = colorNames)}
 
