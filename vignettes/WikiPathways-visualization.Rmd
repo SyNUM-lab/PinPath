@@ -97,7 +97,8 @@ pathVis <- PinPath::drawGPML(
     colorVar = lung_expr[,c("log2FC", "Significant")],
     colorList = colorList,
     nodeTable = TRUE,
-    legend = TRUE)
+    legend = TRUE,
+    openFile = FALSE) # <-- set to TRUE to open the image automatically
 ```
 
 Pathway image:
@@ -121,7 +122,8 @@ pathVis <- PinPath::GPML2Network(
 	colorList = colorList,
 	nodeSize = 0.5,
 	nodeTable = TRUE,
-	legend = FALSE) 
+	legend = FALSE,
+	openFile = FALSE) # <-- set to TRUE to open the image automatically
 ```
 
 Network image:

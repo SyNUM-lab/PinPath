@@ -117,13 +117,13 @@ document.addEventListener("DOMContentLoaded", () => {
           </li>
 
           <li class="d-inline-block px-3">
-            <a class="nav-underline "
+            <a class="nav-underline current"
                href="https://019c28d6-11da-6eb9-2aeb-d79ddc76e85a.share.connect.posit.cloud/" target="_blank"
                style="color:white; font-size:24px;"><b>Web app</b></a>
           </li>
 
           <li class="d-inline-block px-3">
-            <a class="nav-underline current"
+            <a class="nav-underline "
                href="/help/"
                style="color:white; font-size:24px;"><b>Help</b></a>
           </li>
@@ -143,49 +143,83 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	<main class="container px-3 py-4 flex-grow-1">
     <p><br /></p>
-<div class="container px-1">
-<h3 style="color:#084594;">If you need help, please visit one of the pages below:</h3>
-
+<h1 id="pinpath-web-app">PinPath web app</h1>
+<p>The PinPath web app can be used to visualize data onto pathway diagrams, and pinpoint where in the pathway the relevant changes occur.
+Results from (epi)genomics, transcriptomics, (phospho)proteomics, metabolomics and many more experiments can be visualized onto pathway diagrams from KEGG and WikiPathways. 
+You can also upload your own GPML and KGML files to visualize data onto custom pathways.
 <br />
-<div class="card-deck text-center">
+<br /></p>
 
-  <div class="card" style="text-align:left">
-    <img src="/assets/img/icons/r-icon.png" class="card-img-top px-4 py-2" alt="R-icon" />
-    <div class="card-body">
-      <h3 class="card-title" style="color:#084594">Help with R package</h3>
-      <ul style="font-size: 18px">
-			<li><a href="/r-package">Quick start and tutorials</a></li>
-			<li><a href="/assets/manual/PinPath_0.99.0.pdf" target="_blank">Documentation</a></li>
-	  </ul>
-    </div>
-  </div>
-  
-  <div class="card" style="text-align:left">
-    <img src="/assets/img/icons/web-icon.png" class="card-img-top px-4 py-1" alt="Web-icon" />
-    <div class="card-body">
-       <h3 class="card-title" style="color:#084594">Help with web app</h3>
-          <ul style="font-size: 18px">
-			<li><a href="/web-app">Quick start and tutorials</a></li>
-			<li><a href="/web-app-docs">Documentation</a></li>
-			<li><a href="/shiny">Run PinPath web app locally</a></li>
-	  </ul>
-    </div>
-  </div>
-  
-    <div class="card" style="text-align:left">
-    <img src="/assets/img/icons/faq-icon.png" class="card-img-top px-4 py-1" alt="FAQs-icon" />
-    <div class="card-body">
-       <h3 class="card-title"><a style="color:#084594" href="/faq">FAQs</a></h3>
-    </div>
-  </div>  
-</div>
-<br />
-<br />
+<h3 id="table-of-content">Table of content</h3>
+<ol>
+  <li><a href="#data">Data upload</a></li>
+  <li><a href="#vis">Pathway visualization</a></li>
+  <li><a href="#ora">Overrepresentation analysis</a></li>
+</ol>
 
+<p><br /></p>
 
+<h3 id="data-upload-">Data upload <a name="data"></a></h3>
+<p>The uploaded data should include at least two columns: one column with the gene, protein, or metabolite IDs and one column that can be used for coloring. 
+Including more columns is also possible, as long as there is at least one column with feature IDs and at least one column that can be used for coloring.</p>
 
+<p>This is how a statistics table could look like:</p>
+<hr />
 
-</div>
+<table>
+  <thead>
+    <tr>
+      <th>Gene</th>
+      <th style="text-align: right">    log2FC</th>
+      <th style="text-align: right">      p-value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>MECP2</td>
+      <td style="text-align: right">    2.24</td>
+      <td style="text-align: right">      0.0001</td>
+    </tr>
+    <tr>
+      <td>LHX1</td>
+      <td style="text-align: right">    1.23</td>
+      <td style="text-align: right">      0.0345</td>
+    </tr>
+    <tr>
+      <td>FUT5</td>
+      <td style="text-align: right">    0.98</td>
+      <td style="text-align: right">      0.6418</td>
+    </tr>
+    <tr>
+      <td>….</td>
+      <td style="text-align: right">    ….</td>
+      <td style="text-align: right">      ….</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<p>If your statistics table looks like this, you can later decide to color the pathway nodes with the log2FC, the p-value, or both!</p>
+
+<p><br />
+<br /></p>
+
+<h3 id="pathway-visualization-">Pathway visualization <a name="vis"></a></h3>
+<p>After you have uploaded the data, you can visualize the data onto the pathway. Particularly, you can color the nodes of the pathway by one or more variables. 
+The color palette can be fully customized and the pathway image, legend image, and node table can be downloaded as separate files. Furthermore, all pathways 
+diagrams can also be converted to a network visualization.</p>
+
+<p><br /></p>
+
+<h3 id="overrepresentation-analysis-">Overrepresentation analysis <a name="ora"></a></h3>
+<p>You can also perform overrepresentation analysis to identify relevant pathways. 
+For this, you need to have column in the statistics table that indicates whether a gene is differentially expressed or not. 
+If this column does not exist, you can add this column (see <code>Adding columns to data</code> tab).
+The clusterProfiler package is used for the overrepresentation analysis. 
+Note that overrepresentation analysis on the metabolites is not supported (yet).</p>
+
+<p><br /></p>
 
 	</main>
   	<!DOCTYPE HTML>

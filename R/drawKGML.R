@@ -46,10 +46,9 @@
 #' @examples
 #'
 #'  # Load example data
-#'  lung_expr <- read.csv(system.file("extdata",
-#'                                   "data-lung-cancer.csv",
-#'                                   package="PinPath"),
-#'                       stringsAsFactors = FALSE)
+#'  lung_expr <- read.csv(system.file(
+#'      "extdata","data-lung-cancer.csv", package="PinPath"),
+#'      stringsAsFactors = FALSE)
 #'
 #'  # Select pathway
 #'  pathway_id <- "hsa05223"
@@ -59,14 +58,15 @@
 #'
 #'  # Draw pathway
 #'  pathVis <- PinPath::drawKGML(
-#'             infile = infile,
-#'             outdir = tempdir(),
-#'             annGenes = "org.Hs.eg.db",
-#'             inputDB = "ENSEMBL",
-#'             featureIDs = lung_expr$GeneID,
-#'             colorVar = lung_expr[,"log2FC"],
-#'             nodeTable = TRUE,
-#'             legend = TRUE)
+#'      infile = infile,
+#'      outdir = tempdir(),
+#'      annGenes = "org.Hs.eg.db",
+#'      inputDB = "ENSEMBL",
+#'      featureIDs = lung_expr$GeneID,
+#'      colorVar = lung_expr[,"log2FC"],
+#'      nodeTable = TRUE,
+#'      legend = TRUE,
+#'      openFile = FALSE) # <-- set to TRUE to open the image automatically
 #'
 #' @export
 

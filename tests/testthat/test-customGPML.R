@@ -20,7 +20,8 @@ test_that("Custom GPML visualization", {
     colorVar = lung_expr[,c("log2FC", "isSig")],
     nodeTable = TRUE,
     pathInfo = TRUE,
-    legend = TRUE)
+    legend = TRUE,
+    openFile = FALSE) # <-- set to TRUE to open the image automatically
 
   expect_equal(length(pathVis),4)
 })

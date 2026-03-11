@@ -102,23 +102,23 @@ to map, e.g., expression data onto the network diagram.
 \examples{
 
  # Load example data
- lung_expr <- read.csv(system.file("extdata",
-                                  "data-lung-cancer.csv",
-                                  package="PinPath"),
-                      stringsAsFactors = FALSE)
+ lung_expr <- read.csv(system.file(
+     "extdata","data-lung-cancer.csv", package="PinPath"),
+     stringsAsFactors = FALSE)
 
  # Select pathway
  infile <- rWikiPathways::getPathway("WP4255")
 
  # Draw pathway
  pathVis <- PinPath::GPML2Network(
-            infile = infile,
-            outdir = tempdir(),
-            annGenes = "org.Hs.eg.db",
-            inputDB = "ENSEMBL",
-            featureIDs = lung_expr$GeneID,
-            colorVar = lung_expr[,"log2FC"],
-            nodeTable = TRUE,
-            legend = TRUE)
+     infile = infile,
+     outdir = tempdir(),
+     annGenes = "org.Hs.eg.db",
+     inputDB = "ENSEMBL",
+     featureIDs = lung_expr$GeneID,
+     colorVar = lung_expr[,"log2FC"],
+     nodeTable = TRUE,
+     legend = TRUE,
+     openFile = FALSE) # <-- set to TRUE to open the image automatically
 
 }

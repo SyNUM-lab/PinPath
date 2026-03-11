@@ -166,4 +166,29 @@ pre code {
   height: 60px;        
   width: auto;         
   object-fit: contain; 
+|}
+ 
+.card-img{
+  object-fit: contain; 
+  max-height: 200px;
+}
+
+.card-img-top{
+  object-fit: contain;
+  max-height: 100px;
+  border: 2px solid #084594;
+  border-radius: 3px 3px 0 0;
+}
+
+.card-footer {
+  box-shadow: 0;
+  border: 0;
+  padding: 16px;
+  text-align: left;
+  background-color: #FFFFFF;
+}
+
+.card-title {
+  text-align: center;
+  color: #084594;
 }

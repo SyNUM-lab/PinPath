@@ -98,7 +98,8 @@ pathVis <- PinPath::drawKGML(
 	colorVar = lung_expr[,c("log2FC", "Significant")],
 	colorList = colorList,
 	nodeTable = TRUE,
-	legend = TRUE)
+	legend = TRUE,
+	openFile = FALSE) # <-- set to TRUE to open the image automatically
 ```
 
 Pathway image:
@@ -121,7 +122,8 @@ pathVis <- PinPath::KGML2Network(
 	colorVar = lung_expr[,c("log2FC", "Significant")],
 	colorList = colorList,
 	nodeTable = TRUE,
-	legend = FALSE)
+	legend = FALSE,
+	openFile = FALSE) # <-- set to TRUE to open the image automatically
 ```
 
 Network image:

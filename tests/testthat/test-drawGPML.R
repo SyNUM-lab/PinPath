@@ -4,8 +4,8 @@ library(org.Hs.eg.db)
 
 
 test_that("WikiPathways visualization", {
-  
-  lung_expr <- read.csv(system.file("extdata","data-lung-cancer.csv", package="PinPath"), 
+
+  lung_expr <- read.csv(system.file("extdata","data-lung-cancer.csv", package="PinPath"),
                         stringsAsFactors = FALSE)
 
   pathVis <- PinPath::drawGPML(
@@ -17,8 +17,9 @@ test_that("WikiPathways visualization", {
     colorVar = lung_expr[,"log2FC"],
     nodeTable = TRUE,
     pathInfo = TRUE,
-    legend = TRUE)
-  
+    legend = TRUE,
+    openFile = FALSE) # <-- set to TRUE to open the image automatically
+
   expect_equal(length(pathVis),4)
 })
 

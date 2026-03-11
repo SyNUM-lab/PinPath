@@ -15,14 +15,12 @@
 #' @examples
 #'
 #' # Load example data
-#' lung_expr <- read.csv(system.file("extdata",
-#'                                   "data-lung-cancer.csv",
-#'                                    package="PinPath"),
-#'                       stringsAsFactors = FALSE)
+#'  lung_expr <- read.csv(system.file(
+#'      "extdata","data-lung-cancer.csv", package="PinPath"),
+#'      stringsAsFactors = FALSE)
 #'
 #' # Set significance as a binary variable
-#' lung_expr$Significant <- ifelse(lung_expr$adj.P.Value < 0.05,
-#'                                 "Yes", "No")
+#' lung_expr$Significant <- ifelse(lung_expr$adj.P.Value < 0.05, "Yes", "No")
 #'
 #' # Make default color list
 #' colorList <- PinPath::defaultColorList(

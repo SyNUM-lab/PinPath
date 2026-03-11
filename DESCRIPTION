@@ -45,7 +45,7 @@ Suggests:
 Depends:
     R (>= 4.5.0)
 Encoding: UTF-8
-Description: Visualize of omics data onto pathways from WikiPathways and KEGG.
+Description: With PinPath, you can visualize omics data onto pathways diagrams from WikiPathways and KEGG.
 License: MIT + file LICENSE
 URL: https://github.com/SyNUM-lab/PinPath
 BugReports: https://github.com/SyNUM-lab/PinPath/issues
