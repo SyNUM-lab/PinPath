@@ -9,7 +9,7 @@
 
 .prepareEdges <- function(dataEdges, dataEdges_all){
     # Get graph IDs from the anchor points
-    anchorIds <- lapply(dataEdges, function(x){
+    anchorIds <- lapply(dataEdges_all, function(x){
         if ("Anchor" %in% names(x$Graphics)){
             anchors <- unlist(x$Graphics[names(x$Graphics) == "Anchor"])
             anchors <- anchors[stringr::str_detect(names(anchors),"GraphId")]
@@ -19,7 +19,7 @@
         dataEdges, function(x){.edgeFUN(x, dataEdges_all, anchorIds)}))
 
     # Prepare straight edges
-    straight <- c("Straight", "Segment")
+    straight <- c("Straight", "Segmented")
     if (nrow(edges_df[edges_df$ConnectorType %in% straight,]) > 0){
         edges_df_straight <- edges_df[edges_df$ConnectorType %in% straight,]
         edges_df_straight$LineStyle[
@@ -76,7 +76,7 @@
 
         edges_df_dif2 <- edges_df_dif1
         edges_df_dif2$ArrowEnd <- "last"
-        dges_df_dif2$ArrowType <- edges_df_dif2$ArrowHead2
+        edges_df_dif2$ArrowType <- edges_df_dif2$ArrowHead2
 
         edges_df_dif <- rbind.data.frame(edges_df_dif1, edges_df_dif2)
         edges_df_all <- rbind.data.frame(
@@ -137,7 +137,6 @@
             temp_edges <- .edgeFUN_custom_edge2(
                 dataEdges, dataEdges_all, anchorIds, edges_df, p)
         }
-
 
         # Now we have the add information about the arrows to the
         # data.frame
@@ -448,11 +447,11 @@
         # If the attached edge moves predominantly in X direction,
         # the attachment point should be in the Y direction
         if (abs(dY) <= abs(dX)){
-            if (edges_df$Y1 > edges_df$Y2){
+            if (edges_df$Y1 < edges_df$Y2){
                 edges_df$Yrel1 <- -1}else{edges_df$Yrel1 <- 1}}
 
     } else{
-        if (edges_df$Y1 > edges_df$Y2){
+        if (edges_df$Y1 < edges_df$Y2){
             edges_df$Yrel1 <- -1} else{edges_df$Yrel1 <- 1}}
     return(edges_df)
 }

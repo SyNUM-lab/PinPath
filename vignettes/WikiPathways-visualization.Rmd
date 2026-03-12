@@ -114,16 +114,16 @@ You can also plot the pathway as a network. In contrast to the pathway diagram,
 every element (e.g., gene/protein) is represented exactly once in the network.
 ```{r plot-network, message = FALSE, warning = FALSE}
 pathVis <- PinPath::GPML2Network(
-	infile = infile,
-	annGenes = "org.Hs.eg.db",
-	inputDB = "ENSEMBL",
-	featureIDs = lung_expr$GeneID,
-	colorVar = lung_expr[,c("log2FC", "Significant")],
-	colorList = colorList,
-	nodeSize = 0.5,
-	nodeTable = TRUE,
-	legend = FALSE,
-	openFile = FALSE) # <-- set to TRUE to open the image automatically
+    infile = infile,
+    annGenes = "org.Hs.eg.db",
+    inputDB = "ENSEMBL",
+    featureIDs = lung_expr$GeneID,
+    colorVar = lung_expr[,c("log2FC", "Significant")],
+    colorList = colorList,
+    nodeSize = 0.5,
+    nodeTable = TRUE,
+    legend = FALSE,
+    openFile = FALSE) # <-- set to TRUE to open the image automatically
 ```
 
 Network image:

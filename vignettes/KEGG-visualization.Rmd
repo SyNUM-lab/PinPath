@@ -86,20 +86,20 @@ your working directory. The pathway image will be opened by default.
 # Select pathway
 pathway_id <- "hsa05207"
 infile <- BiocFileCache::bfcrpath(
-	BiocFileCache::BiocFileCache(), 
-	paste0("https://rest.kegg.jp/get/",pathway_id,"/kgml"))
-  
+    BiocFileCache::BiocFileCache(),
+    paste0("https://rest.kegg.jp/get/",pathway_id,"/kgml"))
+
 # Plot pathway
 pathVis <- PinPath::drawKGML(
-	infile = infile,
-	annGenes = "org.Hs.eg.db",
-	inputDB = "ENSEMBL",
-	featureIDs = lung_expr$GeneID,
-	colorVar = lung_expr[,c("log2FC", "Significant")],
-	colorList = colorList,
-	nodeTable = TRUE,
-	legend = TRUE,
-	openFile = FALSE) # <-- set to TRUE to open the image automatically
+    infile = infile,
+    annGenes = "org.Hs.eg.db",
+    inputDB = "ENSEMBL",
+    featureIDs = lung_expr$GeneID,
+    colorVar = lung_expr[,c("log2FC", "Significant")],
+    colorList = colorList,
+    nodeTable = TRUE,
+    legend = TRUE,
+    openFile = FALSE) # <-- set to TRUE to open the image automatically
 ```
 
 Pathway image:
@@ -115,15 +115,15 @@ You can also plot the pathway as a network. In contrast to the pathway diagram,
 every element (e.g., gene/protein) is represented exactly once in the network.
 ```{r plot-network, message = FALSE, warning = FALSE}
 pathVis <- PinPath::KGML2Network(
-	infile = infile,
-	annGenes = "org.Hs.eg.db",
-	inputDB = "ENSEMBL",
-	featureIDs = lung_expr$GeneID,
-	colorVar = lung_expr[,c("log2FC", "Significant")],
-	colorList = colorList,
-	nodeTable = TRUE,
-	legend = FALSE,
-	openFile = FALSE) # <-- set to TRUE to open the image automatically
+    infile = infile,
+    annGenes = "org.Hs.eg.db",
+    inputDB = "ENSEMBL",
+    featureIDs = lung_expr$GeneID,
+    colorVar = lung_expr[,c("log2FC", "Significant")],
+    colorList = colorList,
+    nodeTable = TRUE,
+    legend = FALSE,
+    openFile = FALSE) # <-- set to TRUE to open the image automatically
 ```
 
 Network image:

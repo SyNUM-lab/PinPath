@@ -94,6 +94,8 @@
 #' @noRd
 
 .drawNodes <- function(nodes_df, colors_df){
+    nodes_df$Align[is.na(nodes_df$Align)] <- 0.5
+    nodes_df$Valign[is.na(nodes_df$Valign)] <- 1
 
     # Set edge color to black, unless no expression data is plotted on
     # that specific node type
@@ -113,6 +115,10 @@
     nodes_df$FontFace[nodes_df$FontFace == "italic"] <- 3
     nodes_df$FontFace[nodes_df$FontFace == "bold.italic"] <- 4
 
+    # Offset when aligning the labels to the top/bottom or right/left
+    x_offset <- 10
+    y_offset <- 30
+
     # Make plot
     graphics::rect(
         xleft = nodes_df$CenterX - 0.5* nodes_df$Width,
@@ -124,13 +130,15 @@
         lty = nodes_df$LineStyle,
         lwd = nodes_df$LineThickness*2)
     graphics::text(
-        x = nodes_df$CenterX,
-        y = -1*nodes_df$CenterY,
+        x = nodes_df$CenterX+(nodes_df$Align-0.5)*
+            nodes_df$Width+(0.5-nodes_df$Align)*x_offset,
+        y = -1*(nodes_df$CenterY-(nodes_df$Valign-0.5)*
+                    nodes_df$Height-(0.5-nodes_df$Valign)*y_offset),
+        adj = c(nodes_df$Align, nodes_df$Valign),
         labels = nodes_df$Label,
         cex = nodes_df$FontSize/12.5,
         col = nodes_df$Color,
         font = as.numeric(nodes_df$FontFace))
-
 }
 
 

@@ -331,15 +331,24 @@
 .plotPolygon <- function(polygon_df_plot){
     for (id in unique(polygon_df_plot$id)){
         polygon_df_plot1 <- polygon_df_plot[polygon_df_plot$id == id,]
-        graphics::polygon(
-            x = polygon_df_plot1$x,
-            y = -1 *polygon_df_plot1$y,
-            col = grDevices::adjustcolor(
-                polygon_df_plot1$FillColor[1],
-                alpha.f = polygon_df_plot1$Alpha[1]),
-            border = polygon_df_plot1$EdgeColor[1],
-            lwd = polygon_df_plot1$LineThickness[1],
-            lty =  polygon_df_plot1$LineStyle[1])
+        if (polygon_df_plot1$LineThickness[1] == 0){
+            graphics::polygon(
+                x = polygon_df_plot1$x,
+                y = -1 *polygon_df_plot1$y,
+                col = grDevices::adjustcolor(
+                    polygon_df_plot1$FillColor[1],
+                    alpha.f = polygon_df_plot1$Alpha[1]),
+                border = NA)
+        }else{
+            graphics::polygon(
+                x = polygon_df_plot1$x,
+                y = -1 *polygon_df_plot1$y,
+                col = grDevices::adjustcolor(
+                    polygon_df_plot1$FillColor[1],
+                    alpha.f = polygon_df_plot1$Alpha[1]),
+                border = polygon_df_plot1$EdgeColor[1],
+                lwd = polygon_df_plot1$LineThickness[1],
+                lty =  polygon_df_plot1$LineStyle[1])}
     }
 }
 

@@ -280,20 +280,13 @@ drawGPML <- function(
         if ((height <= 1100) | (width <= 1100)){
             grDevices::png(
                 file = outfile,
-                width = width*18, height = height*18,
-                units = "px", res = 1200, pointsize = 12)
+                width = width*0.015, height = height*0.015,
+                units = "in", res = 600, pointsize = 12)
         }else{
-            if (height >= width){
-                grDevices::png(
-                    file = outfile,
-                    width = width*(1100/height), height = 1100,
-                    units = "px", res = 1200 * (1100/height), pointsize = 12)
-            }else {
-                grDevices::png(
-                    file = outfile,
-                    width = 1100, height = height*(1100/width),
-                    units = "px", res = 1200 * (1100/width), pointsize = 12)
-            }
+            warning("PNG cannot be generated, so SVG is generated instead.")
+            outfile <- paste0(outfile, ".svg")
+            svglite::svglite(
+                outfile, width = width*0.015, height = height*0.015)
         }
     }else if (file_extension == "pdf"){
         grDevices::pdf(outfile, width = width*0.015, height = height*0.015)
@@ -302,7 +295,7 @@ drawGPML <- function(
         if (file_extension != ""){
             warning(
                 "The output file does not have a valid file extension.
-                Generating .svg file instead.")
+                Generating SVG file instead.")
         }
         svglite::svglite(outfile,width = width*0.015,height = height*0.015)
     }
@@ -544,8 +537,6 @@ drawGPML <- function(
                     which.max(
                         nchar(gpml[which(names(gpml) == "Comment")])
                     )][[1]][[1]])
-    },error = function(cond){
-        return(NULL)
-    })
-    return(NA)
+    },error = function(cond){NA})
+    return(info)
 }

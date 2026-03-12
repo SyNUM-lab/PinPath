@@ -1,21 +1,20 @@
 ![PinPath](/inst/img/logo_grey.png)
 
-# About
+# About PinPath
 PinPath is an R package for visualizing (omics) data onto pathway diagrams, and **pinpoint** where in the pathway the relevant changes occur.
 Results from (epi)genomics, transcriptomics, (phospho)proteomics, metabolomics and many more experiments can be visualized onto pathway diagrams from KEGG and WikiPathways. 
 You can also use your own GPML and KGML files to visualize data onto custom pathways. 
 As long as your data can be linked to genes, proteins, or metabolites, you can visualize it using PinPath. 
-Do you want to get more information or run the PinPath web app? Please visit our website: [tba]
 
-## Publications
-No publications yet....
+Please visit our website for more information: SyNUM-lab.github.io/PinPath
 
 ## Installation
-Use the following R code to install the development version of the PinPath package:
+Use the following R code to install the development version of PinPath:
 
 ```r
 # install "remotes" package
-install.packages("remotes")
+if (!require("remotes", quietly = TRUE))
+    install.packages("remotes")
       
 # Install PinPath from GitHub
 remotes::install_github("SyNUM-lab/PinPath") 
@@ -31,8 +30,8 @@ library(org.Hs.eg.db)
 
 # Load example data
 lung_expr <- read.csv(
-system.file("extdata", "data-lung-cancer.csv",package="PinPath"),
-                      stringsAsFactors = FALSE)
+    system.file("extdata", "data-lung-cancer.csv", package="PinPath"), 
+    stringsAsFactors = FALSE)
 ```
 
 Now, you can plot the data onto the *Non-small cell lung cancer (WP4255)* pathway:
