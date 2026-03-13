@@ -54,11 +54,11 @@ pathVis <- PinPath::drawGPML(
 ```
 
 <img
-  src="/assets/img/pathways/Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg"
+  src="{{ "/assets/img/pathways/Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg" | relative_url }}"
   alt="Pathway"
   style="width: 70%; height: auto;">
 <img
-  src="/assets/img/pathways/legend_Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg"
+  src="{{ "/assets/img/pathways/legend_Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg" | relative_url }}"
   alt="Legend"
   style="width: 40%; height: auto;">
 
@@ -76,11 +76,11 @@ pathVis <- PinPath::GPML2Network(
 ```
 
 <img
-  src="/assets/img/pathways/network_Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg"
+  src="{{ "/assets/img/pathways/network_Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg" | relative_url }}"
   alt="Network"
   style="width: 70%; height: auto;">
 <img
-  src="/assets/img/pathways/legend_Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg"
+  src="{{ "/assets/img/pathways/legend_Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg" | relative_url }}"
   alt="Legend"
   style="width: 40%; height: auto;">
 <br>
