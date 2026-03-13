@@ -22,7 +22,7 @@ You can also visualize your own custom GPML and KGML files. As long as your data
 		  <p><a href="{{ '/releases' | relative_url }}" style="color: white;">Version 0.99.0</a></p>
 		  <br>
 		  <p style="font-size: 30px"><b>Licence</b></p>
-		  <p><a href="https://github.com/SyNUM-lab/PinPath/blob/devel/LICENSE" target="_blank" style="color: white;">MIT License</a></p>
+		  <p><a href="https://github.com/SyNUM-lab/PinPath/blob/devel/LICENSE.md" target="_blank" style="color: white;">MIT License</a></p>
 </div>
 </div>
 </div>
