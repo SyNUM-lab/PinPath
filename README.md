@@ -6,7 +6,7 @@ Results from (epi)genomics, transcriptomics, (phospho)proteomics, metabolomics a
 You can also use your own GPML and KGML files to visualize data onto custom pathways. 
 As long as your data can be linked to genes, proteins, or metabolites, you can visualize it using PinPath. 
 
-Please visit our website for more information: SyNUM-lab.github.io/PinPath
+Please visit our website for more information: [SyNUM-lab.github.io/PinPath](https://synum-lab.github.io/PinPath/)
 
 ## Installation
 Use the following R code to install the development version of PinPath:
