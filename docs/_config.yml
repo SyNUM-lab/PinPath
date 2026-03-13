@@ -3,8 +3,5 @@ highlighter: rouge
 
 include: ['_pages']
 
-url: "https://synum-lab.github.io/"
-baseurl: "/PinPath"
-
 plugins:
 - jekyll-sitemap
