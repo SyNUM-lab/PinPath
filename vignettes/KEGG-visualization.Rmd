@@ -5,13 +5,14 @@ package: PinPath
 date: "`r Sys.Date()`"
 output: 
     BiocStyle::html_document:
-    toc_float: true
+    toc: true
+    toc_depth: 2
     includes:
       in_header: Pathway-Visualization-schema.html
 # pdf_document:
 #   toc: true
 vignette: >
-    %\VignetteIndexEntry{1. KEGG visualization}
+    %\VignetteIndexEntry{2. KEGG visualization}
     %\VignetteEngine{knitr::rmarkdown}
     %\VignetteEncoding{UTF-8}
 ---
@@ -24,13 +25,30 @@ knitr::opts_chunk$set(
     message = FALSE, error = FALSE, warning = TRUE)
 ```
 
-This vignette will cover visualizing differential expression analysis results 
-onto *KEGG* pathway diagrams.
+# Introduction
+PinPath allows you to visualize your data onto pathways diagrams, 
+and pinpoint where the relevant changes occur. Results from (epi)genomics,
+transcriptomics, (phospho)proteomics, metabolomics and many more experiments 
+can be visualized onto pathway diagrams from **WikiPathways** and **KEGG**. 
+You can also visualize your own custom GPML and KGML files. As long as 
+your data can be linked to genes, proteins, or metabolites, you can visualize 
+it using PinPath.
 
-# Getting started
+<br>
+This vignette will cover visualizing differential expression analysis results 
+onto **KEGG** pathway diagrams.
+
+# Installation
 First, make sure you install and load all necessary packages.
-```{r installation, message = FALSE, warning = FALSE}
+```{r install-pinpath, message = FALSE, warning = FALSE, eval=FALSE}
+if (!require("remotes", quietly = TRUE))
+    install.packages("remotes")
+remotes::install_github("SyNUM-lab/PinPath") 
 library(PinPath)
+```
+
+We will also use the *org.Hs.eg.db* package in this vignette.
+```{r install-others, message = FALSE, warning = FALSE, eval=FALSE}
 library(org.Hs.eg.db)
 ```
 
