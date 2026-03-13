@@ -1,6 +1,6 @@
 ---
 title: "About PinPath"
-permalink: /about
+permalink: PinPath/about
 layout: pages
 ---
 <br>
