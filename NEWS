@@ -1,4 +1,4 @@
-Changes in version 0.1.0
+Changes in version 0.99.0
 + New features
     - Pathway visualization functions: drawGPML and drawKGML
     - Pathway to network functions: GPML2Network and KGML2Network
