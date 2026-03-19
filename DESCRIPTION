@@ -3,15 +3,11 @@ Type: Package
 Title: Visualization of Omics Data on Pathway Diagrams
 Version: 0.99.0
 Date: 2026-03-12
-Authors@R: c(person("Jarno", "Koetsier", role = c("aut","cre"),
-                     email = "jarno.koetsier@gmail.com",
-                     comment = c(ORCID = "0000-0002-7981-1345")),
-             person("Lars", "Eijssen", role = "aut",
-                     comment = c(ORCID = "0000-0002-6473-2839")),
-	     person("Egon", "Willighagen", role = "aut",
-                     comment = c(ORCID = "0000-0001-7542-0286")),
-             person("Stichting Terre - The Dutch Rett Syndrome Foundation", role="fnd")
-           )
+Authors@R: c(
+    person("Jarno", "Koetsier", role = c("aut","cre"), email = "jarno.koetsier@gmail.com", comment = c(ORCID = "0000-0002-7981-1345")),
+    person("Lars", "Eijssen", role = "aut", comment = c(ORCID = "0000-0002-6473-2839")),
+    person("Egon", "Willighagen", role = "aut", comment = c(ORCID = "0000-0001-7542-0286")),
+    person("Stichting Terre - The Dutch Rett Syndrome Foundation", role="fnd"))
 Imports: 
     grDevices, 
     graphics, 
