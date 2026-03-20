@@ -51,6 +51,8 @@ pathVis <- PinPath::drawGPML(
   legend = TRUE) 
 ```
 
+You can find the file locations of the pathway and legend images in `pathVis[["Pathway"]]` and `pathVis[["Legend"]]`, respectively.
+
 ![Pathway](/inst/img/Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg)
 ![Legend](/inst/img/legend_Non.small_cell_lung_cancer_WP4255_r140411_Homo_sapiens.svg)
 
