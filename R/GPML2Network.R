@@ -202,7 +202,7 @@ GPML2Network <- function(
         colorVar = NULL,annGenes = NULL,annMetabolites = NULL,inputDB = NULL,
         colorNames = NULL,colorList = NULL,NAvalue = "#F0F0F0",
         layout = "nicely",unconnectedNodes = FALSE,alpha = 0.9,nodeSize = 1,
-        legend = FALSE,nodeTable = FALSE,pathInfo = FALSE,openFile = TRUE){
+        legend = FALSE,nodeTable = FALSE,pathInfo = FALSE,openFile = FALSE){
     # Read and prepare GPML file
     gpml <- XML::xmlToList(XML::xmlParse(xml2::read_xml(infile)))
     gpml_fil <- .prepareGPML(gpml)

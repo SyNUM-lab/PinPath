@@ -74,7 +74,7 @@ drawKGML <- function(
         infile,outdir = getwd(),outname = NULL,annGenes = NULL,
         annMetabolites = NULL,inputDB = NULL,featureIDs = NULL,colorVar = NULL,
         colorNames = NULL,colorList = NULL,NAvalue = "#F0F0F0",legend = FALSE,
-        nodeTable = FALSE,pathInfo = FALSE,openFile = TRUE){
+        nodeTable = FALSE,pathInfo = FALSE,openFile = FALSE){
     # Read and prepare GPML file
     kgml <- XML::xmlToList(XML::xmlParse(infile))
     # Set default values if necessary

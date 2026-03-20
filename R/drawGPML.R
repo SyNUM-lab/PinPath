@@ -72,7 +72,7 @@ drawGPML <- function(
         infile,outdir = getwd(),outname = NULL,featureIDs = NULL,
         colorVar = NULL,annGenes = NULL,annMetabolites = NULL,inputDB = NULL,
         colorNames = NULL,colorList = NULL,NAvalue = "#F0F0F0",legend = FALSE,
-        nodeTable = FALSE,pathInfo = FALSE,openFile = TRUE){
+        nodeTable = FALSE,pathInfo = FALSE,openFile = FALSE){
     # Read and prepare GPML file
     gpml <- XML::xmlToList(XML::xmlParse(xml2::read_xml(infile)))
     gpml_fil <- .prepareGPML(gpml)

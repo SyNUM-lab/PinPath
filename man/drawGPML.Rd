@@ -19,7 +19,7 @@ drawGPML(
   legend = FALSE,
   nodeTable = FALSE,
   pathInfo = FALSE,
-  openFile = TRUE
+  openFile = FALSE
 )
 }
 \arguments{
