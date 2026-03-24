@@ -105,6 +105,8 @@ pathVis <- PinPath::drawGPML(
 	legend = TRUE)
 ```
 
+You can find the file locations of the pathway and legend images in `pathVis[["Pathway"]]` and `pathVis[["Legend"]]`, respectively.
+
 <p>Pathway image:</p>
 <img src="{{ "/assets/img/pathways/Pleural_mesothelioma_WP5087_r140461_Homo_sapiens.svg" | relative_url }}"
 width="1000">
