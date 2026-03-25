@@ -39,7 +39,7 @@ Suggests:
     org.Hs.eg.db,
     metaboliteIDmapping
 Depends:
-    R (>= 4.5.0)
+    R (>= 4.6.0)
 Encoding: UTF-8
 Description: With PinPath, you can visualize omics data onto pathways diagrams from WikiPathways and KEGG.
 License: MIT + file LICENSE
