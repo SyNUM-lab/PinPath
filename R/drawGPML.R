@@ -42,7 +42,7 @@
 #' @param pathInfo (optional) Logical (TRUE or FALSE). Should pathway
 #' information be returned?
 #' @param openFile (optional) Logical (TRUE or FALSE). Should the pathway file
-#' be opened after it has been saved?
+#' be opened after it has been saved? This option only works for Windows users.
 #' @return A \code{list} with the node table and the file location of the
 #' pathway and legend image.
 #' @examples
