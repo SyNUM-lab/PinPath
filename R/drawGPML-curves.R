@@ -36,7 +36,6 @@
     curve_df <- df[df$GraphId == edge,]
     curve_df <- curve_df[
         !((curve_df$X1 == curve_df$X2) & (curve_df$Y1 == curve_df$Y2)),]
-
     # Get all X and Y coordinates defining the path of edge
     X_all <- c(curve_df$X1[1],curve_df$X2)
     Y_all <- c(curve_df$Y1[1],curve_df$Y2)
@@ -52,14 +51,15 @@
             function(n) sum(duplicated(Y_all)[c(n,n+1)]),
             FUN.VALUE = numeric(1))==2))
     if (length(remove_index) > 0){
-        X_all <- X_all[-remove_index]; Y_all <- Y_all[-remove_index]}
-
+        X_all <- X_all[-remove_index]
+        Y_all <- Y_all[-remove_index]}
     # Collect the coordinates of the corners, start, and end points
     X_corners <- X_all[-c(1,length(X_all))]
     Y_corners <- Y_all[-c(1,length(Y_all))]
-    X_start <- X_all[1]; X_end <- X_all[length(X_all)]
-    Y_start <- Y_all[1]; Y_end <- Y_all[length(X_all)]
-
+    X_start <- X_all[1]
+    X_end <- X_all[length(X_all)]
+    Y_start <- Y_all[1]
+    Y_end <- Y_all[length(X_all)]
     # The mid points are in-between the corner points
     if (length(X_corners) > 1){
         X_mid <- vapply(
@@ -68,13 +68,10 @@
         Y_mid <- vapply(
             seq_len(length(Y_corners)-1),
             function(n) mean(Y_corners[c(n,n+1)]),FUN.VALUE = numeric(1))
-
-        # Collect all relevant X and Y coordinates for plotting the curves
         X_points <- c(X_start, X_mid[!is.na(X_mid)], X_end)
         Y_points <- c(Y_start, Y_mid[!is.na(Y_mid)], Y_end)} else{
-            # Collect all relevant X and Y coordinates for plotting the curves
-            X_points <- c(X_start, X_end); Y_points <- c(Y_start, Y_end)}
-
+            X_points <- c(X_start, X_end)
+            Y_points <- c(Y_start, Y_end)}
     # The last thing to do: separate the X and Y coordinates into sub-edges
     # Each curve can only be fitted to a sub-edge consisting of the
     # start, mid, and end
@@ -145,26 +142,23 @@
     # Edges without arrow head
     sel <- c("none", "mim-necessary-stimulation")
     if (sum(df$arrowType %in% sel) > 0){
-        plotDF <- df[df$arrowType %in% sel,]; .drawCurveLine(plotDF)}
+        .drawCurveLine(df[df$arrowType %in% sel,])}
     # Filled black arrow head
     sel <- c("Arrow", "mim-conversion")
     if (sum(df$arrowType %in% sel) > 0){
-        plotDF_temp <- df[df$arrowType %in% sel,]
-        .drawCurveTriangle(plotDF_temp)}
+        .drawCurveTriangle(df[df$arrowType %in% sel,])}
     # Open arrow head
     sel <- c("mim-binding", "mim-modification")
     if (sum(df$arrowType %in% sel) > 0){
-        plotDF_temp <- df[df$arrowType %in% sel,]
-        .drawCurveOpenArrow(plotDF_temp)}
+        .drawCurveOpenArrow(df[df$arrowType %in% sel,])}
     # Filled white arrow
     sel <- c("mim-stimulation")
     if (sum(df$arrowType %in% sel) > 0){
-        plotDF_temp <- df[df$arrowType %in% sel,]
-        .drawCurveWhiteTriangle(plotDF_temp)}
+        .drawCurveWhiteTriangle(df[df$arrowType %in% sel,])}
     # T-bar
     sel <- c("mim-inhibition", "TBar")
     if (sum(df$arrowType %in% sel) > 0){
-        plotDF_temp <- df[df$arrowType %in% sel,]; .drawCurveTBar(plotDF_temp)}
+        .drawCurveTBar(df[df$arrowType %in% sel,])}
     # Filled white circle
     sel <- c("mim-catalysis")
     if (sum(df$arrowType %in% sel) > 0){
@@ -173,22 +167,19 @@
     # Filled white square
     sel <- c("mim-covalent-bond")
     if (sum(df$arrowType %in% sel) > 0){
-        plotDF_temp <- df[df$arrowType %in% sel,]
-        .drawCurveWhiteSquare(plotDF_temp)}
+        .drawCurveWhiteSquare(df[df$arrowType %in% sel,])}
     # Straight line with gap at the end
     sel <- c("mim-gap")
     if (sum(df$arrowType %in% sel) > 0){
-        plotDF_temp <- df[df$arrowType %in% sel,]; .drawCurveGap(plotDF_temp)}
+        .drawCurveGap(df[df$arrowType %in% sel,])}
     # `mim-cleavage`
     sel <- c("mim-cleavage")
     if (sum(df$arrowType %in% sel) > 0){
-        plotDF_temp <- df[df$arrowType %in% sel,]
-        .drawCurveCleavage(plotDF_temp)}
+        .drawCurveCleavage(df[df$arrowType %in% sel,])}
     # `mim-transcription-translation`
     sel <- c("mim-transcription-translation")
     if (sum(df$arrowType %in% sel) > 0){
-        plotDF_temp <- df[df$arrowType %in% sel,]
-        .drawCurveTrans(plotDF_temp)}
+        .drawCurveTrans(df[df$arrowType %in% sel,])}
 }
 
 
@@ -205,7 +196,8 @@
 
 .drawCurveTriangle <- function(plotDF_temp){
     plotList <- .prepareCurveTriangle(plotDF_temp)
-    plotDF_main <- plotList[[1]]; plotDF_end <- plotList[[2]]
+    plotDF_main <- plotList[[1]]
+    plotDF_end <- plotList[[2]]
 
     grid::grid.bezier(
         x = plotDF_main$x,
@@ -237,7 +229,8 @@
     # Offset is the distance at which the arrow should be attached
     offset <- 5
 
-    plotDF_main <- NULL; plotDF_end <- NULL
+    plotDF_main <- NULL
+    plotDF_end <- NULL
     for (i in seq_along(groups)){
         temp_main <- plotDF_temp[plotDF_temp$group == groups[i],]
         if ("last" %in% temp_main$arrowEnd){
@@ -285,8 +278,10 @@
 
 .prepareCurveTriangle_first <- function(temp_main, offset){
     # Collect X and Y coordinates in separate vectors
-    x1 <- temp_main$x[1]; x2 <- temp_main$x[2]
-    y1 <- temp_main$y[1]; y2 <- temp_main$y[2]
+    x1 <- temp_main$x[1]
+    x2 <- temp_main$x[2]
+    y1 <- temp_main$y[1]
+    y2 <- temp_main$y[2]
 
     # Calculate offsets
     x_offset <- offset*((x1-x2)/(abs(x1-x2) + abs(y1-y2)))
@@ -307,7 +302,8 @@
 
 .drawCurveOpenArrow <- function(plotDF_temp){
     plotList <- .prepareCurveOpenArrow(plotDF_temp)
-    plotDF_main <- plotList[[1]]; plotDF_end <- plotList[[2]]
+    plotDF_main <- plotList[[1]]
+    plotDF_end <- plotList[[2]]
 
     # Draw edges
     grid::grid.bezier(
@@ -340,7 +336,8 @@
     # the main body of the arrow
     offset <- 5
 
-    plotDF_main <- NULL; plotDF_end <- NULL
+    plotDF_main <- NULL
+    plotDF_end <- NULL
     for (i in seq_along(groups)){
 
         temp_main <- plotDF_temp[plotDF_temp$group == groups[i],]
@@ -423,7 +420,8 @@
 
 .drawCurveWhiteTriangle <- function(plotDF_temp){
     plotList <- .prepareCurveWhiteTriangle(plotDF_temp)
-    plotDF_main <- plotList[[1]]; plotDF_end <- plotList[[2]]
+    plotDF_main <- plotList[[1]]
+    plotDF_end <- plotList[[2]]
 
     # Draw edges
     grid::grid.bezier(
@@ -541,7 +539,8 @@
 .drawCurveTBar <- function(plotDF_temp){
 
     plotList <- .prepareCurveTBar(plotDF_temp)
-    plotDF_main <- plotList[[1]]; plotDF_end <- plotList[[2]]
+    plotDF_main <- plotList[[1]]
+    plotDF_end <- plotList[[2]]
 
     # Draw edges
     grid::grid.bezier(
@@ -666,7 +665,8 @@
 .drawCurveWhiteCircle <- function(plotDF_temp){
 
     plotList <- .prepareCurveWhiteCircle(plotDF_temp)
-    plotDF_main <- plotList[[1]]; plotDF_end <- plotList[[2]]
+    plotDF_main <- plotList[[1]]
+    plotDF_end <- plotList[[2]]
 
     # Draw edges
     grid::grid.bezier(
@@ -776,7 +776,8 @@
 .drawCurveWhiteSquare <- function(plotDF_temp){
 
     plotList <- .prepareCurveWhiteSquare(plotDF_temp)
-    plotDF_main <- plotList[[1]]; plotDF_end <- plotList[[2]]
+    plotDF_main <- plotList[[1]]
+    plotDF_end <- plotList[[2]]
 
     # Draw edges
     grid::grid.bezier(
@@ -1143,19 +1144,19 @@
 }
 
 .prepareCurveTrans <- function(plotDF_temp){
+
     # Get all edge groups. Each edge group corresponds to one bezier curve
     groups <- unique(plotDF_temp$group)
-
     # Gap is the distance between node and main line
     gap <- 15
-
     # extend is how much the main line should extend beyond the gap
     extend <- 5
-
     # Deviation is the length of the orthogonal distance of the arrow head
     deviation <- 10
 
-    plotDF_main <- NULL; plotDF_orth <- NULL; plotDF_end <- NULL
+    plotDF_main <- NULL
+    plotDF_orth <- NULL
+    plotDF_end <- NULL
     for (i in seq_along(groups)){
         temp_main <- plotDF_temp[plotDF_temp$group == groups[i],]
 
@@ -1182,8 +1183,10 @@
 
 .prepareCurveTrans_last <- function(temp_main, gap, extend, deviation){
     # Collect X and Y coordinates in separate vectors
-    x1 <- temp_main$x[nrow(temp_main)-1]; x2 <- temp_main$x[nrow(temp_main)]
-    y1 <- temp_main$y[nrow(temp_main)-1]; y2 <- temp_main$y[nrow(temp_main)]
+    x1 <- temp_main$x[nrow(temp_main)-1]
+    x2 <- temp_main$x[nrow(temp_main)]
+    y1 <- temp_main$y[nrow(temp_main)-1]
+    y2 <- temp_main$y[nrow(temp_main)]
 
     # Calculate gaps
     x_gap <- gap*((x1-x2)/(abs(x1-x2) + abs(y1-y2)))
@@ -1226,7 +1229,6 @@
         x_gap - x_extend
     temp_main$y[nrow(temp_main)] <- temp_main$y[nrow(temp_main)] +
         y_gap - y_extend
-
     return(list(temp_main, temp_orth, temp_end))
 }
 

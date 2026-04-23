@@ -12,6 +12,10 @@
 #' \code{data.frame} will be used.
 #' @return A list that can be provided to \link{drawGPML} to set the node
 #' colors in the pathway diagram.
+#' @details For both divergent and sequential color scales,
+#' values outside the specified range (\code{minVal} to \code{maxVal})
+#' are clipped and mapped to the colors corresponding to the
+#' minimum (\code{minCol}) or maximum (\code{maxCol}).
 #' @examples
 #'
 #' # Load example data

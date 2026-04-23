@@ -40,7 +40,8 @@
 #' @param pathInfo (optional) Logical (TRUE or FALSE). Should pathway
 #' information be returned?
 #' @param openFile (optional) Logical (TRUE or FALSE). Should the pathway file
-#' be opened after it has been saved? This option only works for Windows users.
+#' be opened after it has been saved?
+#' This option only works for Windows users.
 #' @return A \code{list} with the node table and the file location of the
 #' pathway and legend image.
 #' @examples
@@ -81,13 +82,11 @@ drawKGML <- function(
     if (is.null(outname)){outname <- .makeOutName_KGML(kgml)}
     if (is.null(colorList) & !is.null(colorVar)){
         colorList <- defaultColorList(colorVar, ColorNames = colorNames)}
-
     # Get patway image
     image_name <- BiocFileCache::bfcrpath(
         BiocFileCache::BiocFileCache(), kgml[[length(kgml)]]["image"])
     img <- magick::image_read(image_name)
     img <-  magick::image_transparent(img, color = "#BFFFBF")
-
     # Map colors to entries
     entries_df <- .extractEntries(kgml[names(kgml) == "entry"])
     if (!(
@@ -98,16 +97,16 @@ drawKGML <- function(
             colorVar = colorVar, annGenes = annGenes,
             annMetabolites = data.frame(annMetabolites), inputDB = inputDB,
             colorList = colorList, NAvalue = NAvalue)}
-
     # Draw pathway
     outfile <- .openFile(
         width = dim(magick::image_data(img))[2],
         height = dim(magick::image_data(img))[3],
-        outfile = paste0(outdir,"/",outname))
-    .makeKGMLpathway(colors_df,img); grDevices::dev.off()
-    outputList <- list(); outputList[["Pathway"]] <- outfile
-    if (openFile) {shell(outfile)}
-
+        outfile = file.path(outdir, outname))
+    .makeKGMLpathway(colors_df,img)
+    grDevices::dev.off()
+    outputList <- list()
+    outputList[["Pathway"]] <- outfile
+    if (openFile) {.autoFileOpen(outfile)}
     # Return legend, node table, pathway information
     if (legend & !is.null(colorList)){
         outputList[["Legend"]] <- .exportLegend(outdir, outname, colorList)

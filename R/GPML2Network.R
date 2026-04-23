@@ -207,12 +207,10 @@ GPML2Network <- function(
     # Read and prepare GPML file
     gpml <- XML::xmlToList(XML::xmlParse(xml2::read_xml(infile)))
     gpml_fil <- .prepareGPML(gpml)
-
     # Set default values if necessary
     if (is.null(outname)){ outname <- .makeOutName(gpml, network = TRUE)}
     if (is.null(colorList) & !is.null(colorVar)){
         colorList <- defaultColorList(colorVar, ColorNames = colorNames)}
-
     # Extract nodes
     dataNodes <- gpml_fil[names(gpml_fil) == "DataNode"]
     nodes_df_temp <- .prepareNodes_network(dataNodes)
@@ -223,7 +221,8 @@ GPML2Network <- function(
     df <- .allNodes_network(
         dataNodes, nodes_df_temp, groups_df, featureIDs, colorVar, annGenes,
         annMetabolites, inputDB, colorList, NAvalue)
-    nodes_df <- df[[1]]; colors_df <- df[[2]]
+    nodes_df <- df[[1]]
+    colors_df <- df[[2]]
     # Prepare edges for plotting
     edges_df <- .allEdges_network(gpml_fil, nodes_df, groups_df)
     # Split nodes for multiple color scales
@@ -233,8 +232,9 @@ GPML2Network <- function(
     g_plot <- .makeNetwork(
         edges_df, nodes_df_split, unconnectedNodes, layout, nodeSize, alpha)
     outfile <- .exportNetwork(g_plot, outdir, outname, nodeSize)
-    outputList <- list(); outputList[["Pathway"]] <- outfile
-    if (openFile) {shell(outputList[["Pathway"]])}
+    outputList <- list()
+    outputList[["Pathway"]] <- outfile
+    if (openFile) {.autoFileOpen(outputList[["Pathway"]])}
 
     # Return legend, node table, pathway information
     if (legend & !is.null(colorList)){
@@ -256,7 +256,7 @@ GPML2Network <- function(
 
     # Export plot
     if (file_extension == "svg"){
-        outfile <-  paste0(outdir,"/",outname)
+        outfile <-  file.path(outdir, outname)
         svglite::svglite(
             outfile,
             width = 13.3/nodeSize,
@@ -264,7 +264,7 @@ GPML2Network <- function(
         plot(g_plot)
         grDevices::dev.off()
     }else if (file_extension %in% c("png", "tiff", "pdf")){
-        outfile <-  paste0(outdir,"/",outname)
+        outfile <-  file.path(outdir, outname)
         ggplot2::ggsave(
             g_plot, file = outfile,
             width = 13.3/nodeSize,
@@ -277,7 +277,7 @@ GPML2Network <- function(
                 Generating .svg file instead.")
         }
         # Set output file
-        outfile <- paste0(outdir,"/",outname,".svg")
+        outfile <- file.path(outdir, paste0(outname,".svg"))
 
         svglite::svglite(
             outfile,
@@ -355,8 +355,9 @@ GPML2Network <- function(
         nodes_df <- dplyr::left_join(
             nodes_df_temp, colors_df[, c("GraphId1", "ColorValue","Scale")],
             by = c("GraphId1" = "GraphId1"))
-    } else{nodes_df$ColorValue <- "white"; nodes_df$Scale <- 1}
-
+    } else{
+        nodes_df$ColorValue <- "white"
+        nodes_df$Scale <- 1}
     # Change name
     nodes_df$name <- nodes_df$Label
     nodes_df <- nodes_df[,c(
@@ -376,7 +377,6 @@ GPML2Network <- function(
             collapse = "_")
         graph_ids[g] <- groups_df$GraphId[groups_df$GroupId == group_ids[g]][1]
     }
-
     # Combine groups with node information
     if (length(group_names) > 0){
         nodes_df <- rbind.data.frame(

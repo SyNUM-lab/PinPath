@@ -75,7 +75,8 @@ returned?}
 information be returned?}
 
 \item{openFile}{(optional) Logical (TRUE or FALSE). Should the pathway file
-be opened after it has been saved? This option only works for Windows users.}
+be opened after it has been saved?
+This option only works for Windows users.}
 }
 \value{
 A \code{list} with the node table and the file location of the

@@ -1,7 +1,13 @@
-Changes in version 0.99.0
-+ New features
-    - Pathway visualization functions: drawGPML and drawKGML
-    - Pathway to network functions: GPML2Network and KGML2Network
-    - Function to set default colors for pathway/network visualization:	defaultColorList
-+ Bug fixes
-    - First official release. So, no bugs yet...
+Changes in version 0.99.3
++ docs folder removed and website moved to https://synum-lab.github.io/PinPath-web/
++ DESCRIPTON file updated: R dependency version (>= 4.6.0) and lazyLoad field
++ Document and script added about how example data files were generated
++ Installation instructions updated in vignette and README
+
+Changes in version 0.99.2
++ Typos fixed in website
++ Documentation updated: indicate that usage of openFile is only available for Windows.
+
+Changes in version 0.99.1
++ Default value of openFile set to FALSE
++ Documentation updated

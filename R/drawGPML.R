@@ -42,7 +42,8 @@
 #' @param pathInfo (optional) Logical (TRUE or FALSE). Should pathway
 #' information be returned?
 #' @param openFile (optional) Logical (TRUE or FALSE). Should the pathway file
-#' be opened after it has been saved? This option only works for Windows users.
+#' be opened after it has been saved?
+#' This option only works for Windows users.
 #' @return A \code{list} with the node table and the file location of the
 #' pathway and legend image.
 #' @examples
@@ -95,17 +96,18 @@ drawGPML <- function(
     if (plotColor){colors_df_all <- .mapColors(
         nodes_df = nodes_df_all, annGenes, data.frame(annMetabolites), inputDB,
         featureIDs, colorVar, colorList, NAvalue)}
-
     # Make pathway diagram
     outfile <- .openFile(
         gpml$Graphics["BoardWidth"], gpml$Graphics["BoardHeight"],
-        paste0(outdir,"/",outname))
+        file.path(outdir, outname))
     for (i in ZOrder_df$Index){
         .drawElement(
             gpml_fil[i], plotColor, gpml_fil, groupElements_df, nodes_df_all,
-            colors_df_all)}; grDevices::dev.off()
-    outputList <- list(); outputList[["Pathway"]] <- outfile
-    if (openFile) {shell(outputList[["Pathway"]])}
+            colors_df_all)}
+    grDevices::dev.off()
+    outputList <- list()
+    outputList[["Pathway"]] <- outfile
+    if (openFile) {.autoFileOpen(outputList[["Pathway"]])}
     # Return legend, node table, pathway information
     if (legend & !is.null(colors_df_all)){
         outputList[["Legend"]] <- .exportLegend(outdir, outname, colorList)
@@ -113,8 +115,7 @@ drawGPML <- function(
     if (nodeTable & !is.null(colors_df_all)){
         outputList[["NodeTable"]] <- .returnNodeTable(colors_df_all)
     } else{ outputList[["NodeTable"]] <- NA }
-    if (pathInfo){
-        outputList[["Information"]] <- .returnInformation(gpml)
+    if (pathInfo){outputList[["Information"]] <- .returnInformation(gpml)
     }else{ outputList[["Information"]] <- NA }
     return(outputList)
 }
@@ -452,7 +453,7 @@ drawGPML <- function(
 
     # Export plot
     if (file_extension == "svg"){
-        outfile_legend <- paste0(outdir,"/legend_",outname)
+        outfile_legend <- file.path(outdir, paste0("legend_", outname))
         svglite::svglite(
             outfile_legend,
             width = 5, height = length(colorList) + 1.25)
@@ -460,7 +461,7 @@ drawGPML <- function(
         grDevices::dev.off()
     }
     else if (file_extension == "pdf"){
-        outfile_legend <- paste0(outdir,"/legend_",outname)
+        outfile_legend <- file.path(outdir, paste0("legend_", outname))
         grDevices::pdf(
             outfile_legend ,
             width = 5, height = length(colorList) + 1.25)
@@ -468,7 +469,7 @@ drawGPML <- function(
         grDevices::dev.off()
     }
     else if (file_extension == "png"){
-        outfile_legend <- paste0(outdir,"/legend_",outname)
+        outfile_legend <- file.path(outdir, paste0("legend_", outname))
         grDevices::png(
             file = outfile_legend,
             width = 5, height = length(colorList) + 1.25,
@@ -477,7 +478,7 @@ drawGPML <- function(
         grDevices::dev.off()
     }
     else{
-        outfile_legend <- paste0(outdir,"/legend_",outname, ".svg")
+        outfile_legend <- file.path(outdir, paste0("legend_", outname, ".svg"))
         svglite::svglite(
             outfile_legend ,
             width = 5, height = length(colorList) + 1.25)
@@ -539,4 +540,15 @@ drawGPML <- function(
                     )][[1]][[1]])
     },error = function(cond){NA})
     return(info)
+}
+
+.autoFileOpen <- function(path){
+    if ((.Platform$OS.type == "windows")&
+        (exists("shell", mode="function"))){
+        shell(path)
+    }else{
+        warning("\n\n
+    Automatic opening of the pathway image is only supported on Windows;
+    please open the file manually on other operating systems.")
+    }
 }

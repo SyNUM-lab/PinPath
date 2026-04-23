@@ -95,7 +95,8 @@ KGML2Network <- function(
     df <- .prepareEntries_network(
         kgml, featureIDs, colorVar, annGenes, annMetabolites, inputDB,
         colorList, NAvalue)
-    entries_df <- df[[1]]; colors_df <- df[[2]]
+    entries_df <- df[[1]]
+    colors_df <- df[[2]]
     # Prepare relations
     relations_df <- .prepareRelations_network(kgml, entries_df)
     # split entries
@@ -106,8 +107,9 @@ KGML2Network <- function(
         relations_df, entries_df_split, unconnectedNodes, layout, nodeSize,
         alpha)
     outfile <- .exportNetwork(g_plot, outdir, outname, nodeSize)
-    outputList <- list(); outputList[["Pathway"]] <- outfile
-    if (openFile) {shell(outfile)}
+    outputList <- list()
+    outputList[["Pathway"]] <- outfile
+    if (openFile) {.autoFileOpen(outfile)}
 
     # Return legend, node table, pathway information
     if (legend & !is.null(colorList)){

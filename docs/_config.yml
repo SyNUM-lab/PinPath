@@ -1,7 +1,0 @@
-markdown: kramdown
-highlighter: rouge
-
-include: ['_pages']
-
-plugins:
-- jekyll-sitemap

@@ -321,7 +321,8 @@
     }
 
     # Get the unique color scales
-    scales <- unique(colors_df$Scale); scales <- scales[!is.na(scales)]
+    scales <- unique(colors_df$Scale)
+    scales <- scales[!is.na(scales)]
 
     # For each scale, we are going to add the color
     plot_df_scale <- NULL

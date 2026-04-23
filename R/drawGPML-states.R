@@ -51,36 +51,38 @@
 #' @noRd
 
 .drawStates <- function(states_df){
-    starting_angle <- 0; n_corners <- 100
-    adj <- 1; polygon_df_plot <- NULL
+    starting_angle <- 0
+    n_corners <- 100
+    adj <- 1
+    polygon_df_plot <- NULL
     polygon_df_plot <- NULL
     for (i in seq_len(nrow(states_df))){
         # Define variables
-        centerX <- states_df$X[i]; centerY <- states_df$Y[i]
-        textLabel <- states_df$TextLabel[i]; graphId <- states_df$GraphId[i]
+        centerX <- states_df$X[i]
+        centerY <- states_df$Y[i]
+        textLabel <- states_df$TextLabel[i]
+        graphId <- states_df$GraphId[i]
         param <- .getStateParameters(states_df, i)
 
         if (!is.null(param)){
             starting_angle <- param[["starting_angle"]]
-            max_angle <- param[["max_angle"]]; n_corners <- param[["n_corners"]]
-            adj <- param[["adj"]]; rotation <- param[["rotation"]]
-            width <- param[["width"]]; height <- param[["height"]]
-
+            max_angle <- param[["max_angle"]]
+            n_corners <- param[["n_corners"]]
+            adj <- param[["adj"]]
+            rotation <- param[["rotation"]]
+            width <- param[["width"]]
+            height <- param[["height"]]
             # Create angle offsets (no rotation yet)
             angle <- seq(0, max_angle, length.out = n_corners + 1)[-1]
-            #x <- rep(NA, n_corners); y <- rep(NA, n_corners)
             corner_coords <- matrix(NA, nrow = n_corners, ncol = 2)
             for (c in seq_len(n_corners)){
                 corner_coords[c,1] <- adj*width/2 *
                     cos(angle[c] + starting_angle)
                 corner_coords[c,2] <- adj*height/2 *
-                    sin(angle[c] + starting_angle)
-            }
-
+                    sin(angle[c] + starting_angle)}
             # Apply rotation matrix
             rot_mat <- .rotation_matrix(-1*rotation)
             rotated_coords <- t(rot_mat %*% t(corner_coords))
-
             # Translate to center
             x <- rotated_coords[,1] + centerX
             y <- rotated_coords[,2] + centerY
@@ -98,7 +100,8 @@
 
 
 .getStateParameters <- function(states_df, i){
-    width <- states_df$Width[i]; height <- states_df$Height[i]
+    width <- states_df$Width[i]
+    height <- states_df$Height[i]
     type <- states_df$ShapeType[i]
     if (type == "Square"){
         return(list(

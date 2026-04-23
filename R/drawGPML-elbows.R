@@ -48,21 +48,30 @@
 
     # If only the starting point is in the X direction
     if (abs(df$Xrel1[i]) == 1){
-        xs <- df$X1[i]; ys <- df$Y1[i]
-        xi <- df$X2[i]; yi <- df$Y1[i] # Move first in X direction
-        xe <- df$X2[i]; ye <- df$Y2[i]}
+        xs <- df$X1[i]
+        ys <- df$Y1[i]
+        xi <- df$X2[i]
+        yi <- df$Y1[i] # Move first in X direction
+        xe <- df$X2[i]
+        ye <- df$Y2[i]}
 
     # If only the end point is in the X direction
     if (abs(df$Xrel2[i]) == 1){
-        xs <- df$X1[i]; ys <- df$Y1[i]
-        xi <- df$X1[i]; yi <- df$Y2[i] # Move first in Y direction
-        xe <- df$X2[i]; ye <- df$Y2[i]}
+        xs <- df$X1[i]
+        ys <- df$Y1[i]
+        xi <- df$X1[i]
+        yi <- df$Y2[i] # Move first in Y direction
+        xe <- df$X2[i]
+        ye <- df$Y2[i]}
 
     # If neither/both starting point and end point are in the X direction
     if ((abs(df$Xrel2[i]) != 1) & (abs(df$Xrel1[i]) != 1)){
-        xs <- df$X1[i]; ys <- df$Y1[i]
-        xi <- df$X1[i]; yi <- df$Y2[i] # Move first in Y direction
-        xe <- df$X2[i]; ye <- df$Y2[i]}
+        xs <- df$X1[i]
+        ys <- df$Y1[i]
+        xi <- df$X1[i]
+        yi <- df$Y2[i] # Move first in Y direction
+        xe <- df$X2[i]
+        ye <- df$Y2[i]}
 
     # Combine the straight edges of each elbow edge into a temporary data frame
     temp <- .prepareCustomElbow_df(df, i, xs, xi, xe, ys, yi, ye)
@@ -141,9 +150,17 @@
     if ((xs1-xs2 == 0) & (xe1-xe2 != 0)){
         param <- .coords_yx(xs1,xs2,xe1,xe2,ys1,ys2,ye1,ye2)
     }
-    xs1 <- param[[1]]; xs2 <- param[[2]]; xi1 <- param[[3]]; xi2 <- param[[4]]
-    xe1 <- param[[5]]; xe2 <- param[[6]]; ys1 <- param[[7]]; ys2 <- param[[8]]
-    yi1 <- param[[9]]; yi2 <- param[[10]]; ye1 <- param[[11]];
+    xs1 <- param[[1]]
+    xs2 <- param[[2]]
+    xi1 <- param[[3]]
+    xi2 <- param[[4]]
+    xe1 <- param[[5]]
+    xe2 <- param[[6]]
+    ys1 <- param[[7]]
+    ys2 <- param[[8]]
+    yi1 <- param[[9]]
+    yi2 <- param[[10]]
+    ye1 <- param[[11]]
     ye2 <- param[[12]]
 
     # Combine the straight edges of each elbow edge into a temporary data frame

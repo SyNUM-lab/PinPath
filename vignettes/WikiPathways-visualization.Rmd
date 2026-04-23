@@ -41,15 +41,16 @@ onto **WikiPathways** pathway diagrams.
 # Installation
 First, make sure you install and load all necessary packages.
 ```{r install-pinpath, message = FALSE, warning = FALSE, eval=FALSE}
-if (!require("remotes", quietly = TRUE))
-    install.packages("remotes")
-remotes::install_github("SyNUM-lab/PinPath") 
-library(PinPath)
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("PinPath")
 ```
 
-We will also use the *rWikipathways* and *org.Hs.eg.db* packages in this
-vignette.
+Besides PinPath, we will also use the *rWikipathways* and *org.Hs.eg.db* 
+packages in this vignette.
 ```{r install-others, message = FALSE, warning = FALSE, eval=FALSE}
+library(PinPath)
 library(rWikiPathways)
 library(org.Hs.eg.db)
 ```
@@ -88,8 +89,10 @@ colorList[["Significant"]]$Color <- c(
     "No" = "white")
 ```
 
-Furthermore, we can set the minimum and maximum value  of the log2FC color
-gradient to -1.5 and 1.5, respectively.
+Furthermore, we can set the minimum and maximum value of the log2FC color
+gradient to -1.5 and 1.5, respectively. Note that values exceeding these bounds 
+are clipped and mapped to the colors representing the respective minimum or 
+maximum.
 ```{r modify-log2FC-color}
 colorList[["log2FC"]]$ColorVal <- c(
     "MinVal" = -1.5,

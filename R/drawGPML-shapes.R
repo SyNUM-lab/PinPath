@@ -198,50 +198,53 @@
 }
 
 .getPolygonParameters <- function(shapes_df, i){
-    width <- shapes_df$Width[i]; height <- shapes_df$Height[i]
-    centerX <- shapes_df$CenterX[i]; centerY <- shapes_df$CenterY[i]
-    rotation <- shapes_df$Rotation[i]; type <- shapes_df$ShapeType[i]
-    alpha <- shapes_df$Alpha[i]; fillcolor <- shapes_df$FillColor[i]
-    edgecolor <- shapes_df$Color[i]; thickness <- shapes_df$LineThickness[i]
-    nLine <- shapes_df$nLine[i]; linestyle <- shapes_df$LineStyle[i]
-    valign <- shapes_df$Valign[i]; align <- shapes_df$Align[i]
-
-    n_corners <- NULL
-    if (type == "Triangle"){
-        starting_angle <- 0; max_angle <- 2*pi
-        n_corners <- 3; adj <- 1
-        # The width and coordinates of the triangle are not correctly
-        # defined, so we need to do some slight adjustment
-        width <- width*1.25
-        centerX <- centerX + 0.07*cos(rotation)*width
-        centerY <- centerY + 0.07*sin(rotation)*height}
-    if (type == "RoundedRectangle" | type == "Rectangle"){
-        starting_angle <- 0.25*pi; max_angle <- 2*pi
-        n_corners <- 4; adj <- sqrt(2)}
-    if (type == "Pentagon"){
-        starting_angle <- 0; max_angle <- 2*pi
-        n_corners <- 5; adj <- 1}
-    if (type == "Hexagon"){
-        starting_angle <- 0; max_angle <- 2*pi
-        n_corners <- 6; adj <- 1}
-    if (type == "Oval"){
-        starting_angle <- 0; max_angle <- 2*pi
-        n_corners <- 100; adj <- 1}
-    if (type == "mim-degradation"){
-        starting_angle <- 0; max_angle <- 2*pi
-        n_corners <- 100; adj <- 1
-        width <- 0.8*width; height <- 0.8*height}
-
     param <- list(
-        width, height, centerX, centerY, rotation, type, alpha, fillcolor,
-        edgecolor, thickness, nLine, linestyle, valign, align,
-        starting_angle, max_angle, n_corners, adj)
-
+        shapes_df$Width[i], shapes_df$Height[i], shapes_df$CenterX[i],
+        shapes_df$CenterY[i], shapes_df$Rotation[i], shapes_df$ShapeType[i],
+        shapes_df$Alpha[i], shapes_df$FillColor[i], shapes_df$Color[i],
+        shapes_df$LineThickness[i], shapes_df$nLine[i], shapes_df$LineStyle[i],
+        shapes_df$Valign[i], shapes_df$Align[i], NULL, NULL, NULL, NULL)
     names(param) <- c(
-        "width", "height", "centerX", "centerY", "rotation", "type",
-        "alpha", "fillcolor", "edgecolor", "thickness", "nLine",
-        "linestyle", "valign", "align", "starting_angle", "max_angle",
-        "n_corners", "adj")
+        "width", "height", "centerX", "centerY", "rotation", "type", "alpha",
+        "fillcolor", "edgecolor", "thickness", "nLine", "linestyle", "valign",
+        "align", "starting_angle", "max_angle", "n_corners", "adj")
+    if (param[["type"]] == "Triangle"){
+        param[["starting_angle"]] <- 0
+        param[["max_angle"]] <- 2*pi
+        param[["n_corners"]] <- 3
+        param[["adj"]] <- 1
+        param[["width"]] <- param[["width"]]*1.25
+        param[["centerX"]] <- param[["centerX"]] +
+            0.07*cos(param[["rotation"]])*param[["width"]]
+        param[["centerY"]] <- param[["centerY"]] +
+            0.07*sin(param[["rotation"]])*param[["height"]]}
+    if (param[["type"]]=="RoundedRectangle" | param[["type"]]=="Rectangle"){
+        param[["starting_angle"]] <- 0.25*pi
+        param[["max_angle"]] <- 2*pi
+        param[["n_corners"]] <- 4
+        param[["adj"]] <- sqrt(2)}
+    if (param[["type"]] == "Pentagon"){
+        param[["starting_angle"]] <- 0
+        param[["max_angle"]] <- 2*pi
+        param[["n_corners"]] <- 5
+        param[["adj"]] <- 1}
+    if (param[["type"]] == "Hexagon"){
+        param[["starting_angle"]] <- 0
+        param[["max_angle"]] <- 2*pi
+        param[["n_corners"]] <- 6
+        param[["adj"]] <- 1}
+    if (param[["type"]] == "Oval"){
+        param[["starting_angle"]] <- 0
+        param[["max_angle"]] <- 2*pi
+        param[["n_corners"]] <- 100
+        param[["adj"]] <- 1}
+    if (param[["type"]] == "mim-degradation"){
+        param[["starting_angle"]] <- 0
+        param[["max_angle"]] <- 2*pi
+        param[["n_corners"]] <- 100
+        param[["adj"]] <- 1
+        param[["width"]] <- 0.8*param[["width"]]
+        param[["height"]] <- 0.8*param[["height"]]}
     return(param)
 }
 
@@ -258,16 +261,24 @@
 }
 
 .prepareDegradation <- function(shapes_df, i){
-    width <- shapes_df$Width[i]; height <- shapes_df$Height[i]
-    centerX <- shapes_df$CenterX[i]; centerY <- shapes_df$CenterY[i]
-    rotation <- shapes_df$Rotation[i]; alpha <- shapes_df$Alpha[i]
-    fillcolor <- shapes_df$FillColor[i]; edgecolor <- shapes_df$Color[i]
-    thickness <- shapes_df$LineThickness[i]; nLine <- shapes_df$nLine[i]
-    linestyle <- shapes_df$LineStyle[i]; valign <- shapes_df$Valign[i]
+    width <- shapes_df$Width[i]
+    height <- shapes_df$Height[i]
+    centerX <- shapes_df$CenterX[i]
+    centerY <- shapes_df$CenterY[i]
+    rotation <- shapes_df$Rotation[i]
+    alpha <- shapes_df$Alpha[i]
+    fillcolor <- shapes_df$FillColor[i]
+    edgecolor <- shapes_df$Color[i]
+    thickness <- shapes_df$LineThickness[i]
+    nLine <- shapes_df$nLine[i]
+    linestyle <- shapes_df$LineStyle[i]
+    valign <- shapes_df$Valign[i]
     align <- shapes_df$Align[i]
 
-    xstart <- 0.5*width; xend <- -0.5*width
-    ystart <- 0.5*height; yend <- -0.5*height
+    xstart <- 0.5*width
+    xend <- -0.5*width
+    ystart <- 0.5*height
+    yend <- -0.5*height
 
     # Apply rotation matrix
     rot_mat <- .rotation_matrix(-1*rotation)
@@ -289,20 +300,29 @@
 }
 
 .prepareArc <- function(shapes_df, i){
-    width <- shapes_df$Width[i]; height <- shapes_df$Height[i]
-    centerX <- shapes_df$CenterX[i]; centerY <- shapes_df$CenterY[i]
-    rotation <- shapes_df$Rotation[i]; alpha <- shapes_df$Alpha[i]
-    fillcolor <- shapes_df$FillColor[i]; edgecolor <- shapes_df$Color[i]
-    thickness <- shapes_df$LineThickness[i]; nLine <- shapes_df$nLine[i]
-    linestyle <- shapes_df$LineStyle[i]; valign <- shapes_df$Valign[i]
+    width <- shapes_df$Width[i]
+    height <- shapes_df$Height[i]
+    centerX <- shapes_df$CenterX[i]
+    centerY <- shapes_df$CenterY[i]
+    rotation <- shapes_df$Rotation[i]
+    alpha <- shapes_df$Alpha[i]
+    fillcolor <- shapes_df$FillColor[i]
+    edgecolor <- shapes_df$Color[i]
+    thickness <- shapes_df$LineThickness[i]
+    nLine <- shapes_df$nLine[i]
+    linestyle <- shapes_df$LineStyle[i]
+    valign <- shapes_df$Valign[i]
     align <- shapes_df$Align[i]
 
-    starting_angle <- 0; max_angle <- pi
-    n_corners <- 100; adj <- 1
+    starting_angle <- 0
+    max_angle <- pi
+    n_corners <- 100
+    adj <- 1
 
     # Create angle offsets (no rotation yet)
     angle <- seq(0, max_angle, length.out = n_corners + 1)[-1]
-    x <- rep(NA, n_corners); y <- rep(NA, n_corners)
+    x <- rep(NA, n_corners)
+    y <- rep(NA, n_corners)
     corner_coords <- matrix(NA, nrow = n_corners, ncol = 2)
     for (c in seq_len(n_corners)){
         corner_coords[c,1] <- adj*width/2 *
@@ -430,10 +450,14 @@
 
 .braceCoord <- function(braces_df, i, npoints){
     # Set start, mid, end coordinates and radius of quarter circles
-    xstart <- -0.5*braces_df$Width[i]; ystart <- -0.5*braces_df$Height[i]
-    xmid <- 0; ymid <- 0
-    xend <- 0.5*braces_df$Width[i]; yend <- 0.5*braces_df$Height[i]
-    xradius <- braces_df$Width[i]/4; yradius <- braces_df$Height[i]/2
+    xstart <- -0.5*braces_df$Width[i]
+    ystart <- -0.5*braces_df$Height[i]
+    xmid <- 0
+    ymid <- 0
+    xend <- 0.5*braces_df$Width[i]
+    yend <- 0.5*braces_df$Height[i]
+    xradius <- braces_df$Width[i]/4
+    yradius <- braces_df$Height[i]/2
 
     # Create brace data points by calculating 4 quarter circles
     rounds <- list(
@@ -492,9 +516,12 @@
     for (i in seq_len(nrow(shapes_df))){
 
         # Define variables
-        width <- shapes_df$Width[i]; height <- shapes_df$Height[i]
-        centerX <- shapes_df$CenterX[i]; centerY <- shapes_df$CenterY[i]
-        rotation <- shapes_df$Rotation[i]; type <- shapes_df$ShapeType[i]
+        width <- shapes_df$Width[i]
+        height <- shapes_df$Height[i]
+        centerX <- shapes_df$CenterX[i]
+        centerY <- shapes_df$CenterY[i]
+        rotation <- shapes_df$Rotation[i]
+        type <- shapes_df$ShapeType[i]
 
         # Add mitochondria
         if (type %in% c("Mitochondria")){
