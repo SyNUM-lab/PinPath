@@ -123,87 +123,87 @@
 #' @title Draw network from GPML file
 #'
 #' @description This function draws a network from a GPML file with the option
-#' to map, e.g., expression data onto the network diagram.
+#'   to map, e.g., expression data onto the network diagram.
 #' @param infile Input GPML file. This can be a character string of the GPML
-#' file location (e.g., "Downloads/WP42500.gpml") or a GPML string provided by
-#' [rWikiPathways::getPathway].
+#'   file location (e.g., "Downloads/WP42500.gpml") or a GPML string provided
+#'   by [rWikiPathways::getPathway].
 #' @param outdir (optional) Output directory. The pathway and legend images
-#' will be saved in this directory.
+#'   will be saved in this directory.
 #' @param outname (optional) The file name of the output pathway image.
-#' "svg","png",and "pdf" file extensions are accepted. If no file extension is
-#' specified, the pathway and legend image will be generated in .svg format.
-#' The legend file gets the "legend_" prefix.
+#'   "svg","png",and "pdf" file extensions are accepted. If no file extension is
+#'   specified, the pathway and legend image will be generated in .svg format.
+#'   The legend file gets the "legend_" prefix.
 #' @param featureIDs (optional) \code{character} vector of gene IDs.
 #' @param colorVar (optional) \code{vector} or \code{data.frame} for
-#' coloring the nodes in the pathway. This can be for instance a
-#' \code{data.frame} with the log2FCs and significance in the columns.
-#' The (row) order should match \code{featureIDs}. The color rules and palettes
-#' for the supplied values can be set in the colorList parameter.
+#'   coloring the nodes in the pathway. This can be for instance a
+#'   \code{data.frame} with the log2FCs and significance in the columns.
+#'   The (row) order should match \code{featureIDs}. The color rules and
+#'   palettes for the supplied values can be set in the colorList parameter.
 #' @param annGenes (optional) \code{character} string of the Bioconductor
-#' annotation package (e.g., org.Hs.eg.db).
+#'   annotation package (e.g., org.Hs.eg.db).
 #' @param annMetabolites (optional) \code{tibble} or \code{data.frame} with
-#' metabolite mapping information (see metaboliteIDmapping package).
+#'   metabolite mapping information (see metaboliteIDmapping package).
 #' @param inputDB (optional) Input gene ID type
-#' (SYMBOL, ENTREZID, ENSEMBL, UNIPROT).
-#' This can be a \code{character} vector of \code{length = 1}
-#' (if all gene IDs are of the same type) or of
-#' \code{length = nrow(featureIDs)}
-#' (if you want to specify the type per gene ID).
+#'   (SYMBOL, ENTREZID, ENSEMBL, UNIPROT).
+#'   This can be a \code{character} vector of \code{length = 1}
+#'   (if all gene IDs are of the same type) or of
+#'   \code{length = nrow(featureIDs)}
+#'   (if you want to specify the type per gene ID).
 #' @param colorNames (optional) \code{character} vector with names of the
-#' color variables. If \code{colorNames} is NULL, the column names of the
+#'   color variables. If \code{colorNames} is NULL, the column names of the
 #' \code{colorVar} \code{data.frame} will be used.
 #' @param colorList (optional) A list with information about the coloring of
-#' the nodes. An example can be generated using the \link{defaultColorList}
-#' function.
+#'   the nodes. An example can be generated using the \link{defaultColorList}
+#'   function.
 #' @param NAvalue (optional) Node color for \code{NA} values.
 #' @param layout (optional) Network layout from igraph.
 #' @param unconnectedNodes (optional) Logical (TRUE or FALSE).
-#' Should unconnected (isolated) nodes be shown in the network?
+#'   Should unconnected (isolated) nodes be shown in the network?
 #' @param alpha (optional) Transparency of the nodes.
 #' @param nodeSize (optional) Size of the nodes.
 #' @param legend (optional) Logical (TRUE or FALSE).
-#' Should the legend be plotted?
+#'   Should the legend be plotted?
 #' @param nodeTable (optional) Logical (TRUE or FALSE).
-#' Should a node table be returned?
+#'   Should a node table be returned?
 #' @param pathInfo (optional) Logical (TRUE or FALSE).
-#' Should pathway information be returned?
+#'   Should pathway information be returned?
 #' @param openFile (optional) Logical (TRUE or FALSE).
-#' Should the pathway file be opened after it has been saved?
-#' This option only works for Windows users.
+#'   Should the pathway file be opened after it has been saved?
+#'   This option only works for Windows users.
 #' @return A \code{list} with the node table and the file location of the
-#' pathway and legend image.
+#'   pathway and legend image.
 #' @importFrom rlang .data
 #' @examples
 #'
-#'  # Load example data
-#'  lung_expr <- read.csv(system.file(
-#'      "extdata","data-lung-cancer.csv", package="PinPath"),
-#'      stringsAsFactors = FALSE)
+#' # Load example data
+#' lung_expr <- read.csv(system.file(
+#'     "extdata","data-lung-cancer.csv", package="PinPath"),
+#'     stringsAsFactors = FALSE)
 #'
-#'  # Select pathway
-#'  infile <- rWikiPathways::getPathway("WP4255")
+#' # Select pathway
+#' infile <- rWikiPathways::getPathway("WP4255")
 #'
-#'  # Draw pathway
-#'  pathVis <- PinPath::GPML2Network(
-#'      infile = infile,
-#'      outdir = tempdir(),
-#'      annGenes = "org.Hs.eg.db",
-#'      inputDB = "ENSEMBL",
-#'      featureIDs = lung_expr$GeneID,
-#'      colorVar = lung_expr[,"log2FC"],
-#'      nodeTable = TRUE,
-#'      legend = TRUE,
-#'      openFile = FALSE) # <-- set to TRUE to open the image automatically
+#' # Draw pathway
+#' pathVis <- PinPath::GPML2Network(
+#'     infile = infile,
+#'     outdir = tempdir(),
+#'     annGenes = "org.Hs.eg.db",
+#'     inputDB = "ENSEMBL",
+#'     featureIDs = lung_expr$GeneID,
+#'     colorVar = lung_expr[,"log2FC"],
+#'     nodeTable = TRUE,
+#'     legend = TRUE,
+#'     openFile = FALSE) # <-- set to TRUE to open the image automatically
 #'
 #' @export
 
 
 GPML2Network <- function(
-        infile,outdir = getwd(),outname = NULL,featureIDs = NULL,
-        colorVar = NULL,annGenes = NULL,annMetabolites = NULL,inputDB = NULL,
-        colorNames = NULL,colorList = NULL,NAvalue = "#F0F0F0",
-        layout = "nicely",unconnectedNodes = FALSE,alpha = 0.9,nodeSize = 1,
-        legend = FALSE,nodeTable = FALSE,pathInfo = FALSE,openFile = FALSE){
+        infile,outdir=getwd(),outname=NULL,featureIDs=NULL,
+        colorVar=NULL,annGenes=NULL,annMetabolites=NULL,inputDB=NULL,
+        colorNames=NULL,colorList=NULL,NAvalue="#F0F0F0",layout="nicely",
+        unconnectedNodes=FALSE,alpha=0.9,nodeSize=1,legend=FALSE,
+        nodeTable=FALSE,pathInfo=FALSE,openFile=FALSE){
     # Read and prepare GPML file
     gpml <- XML::xmlToList(XML::xmlParse(xml2::read_xml(infile)))
     gpml_fil <- .prepareGPML(gpml)
@@ -230,7 +230,7 @@ GPML2Network <- function(
 
     # Make network
     g_plot <- .makeNetwork(
-        edges_df, nodes_df_split, unconnectedNodes, layout, nodeSize, alpha)
+        edges_df,nodes_df_split,unconnectedNodes,layout,nodeSize,alpha)
     outfile <- .exportNetwork(g_plot, outdir, outname, nodeSize)
     outputList <- list()
     outputList[["Pathway"]] <- outfile
@@ -290,7 +290,7 @@ GPML2Network <- function(
 }
 
 .makeNetwork <- function(
-        edges_df, nodes_df_split, unconnectedNodes, layout, nodeSize, alpha){
+        edges_df,nodes_df_split,unconnectedNodes,layout,nodeSize,alpha){
     # Make graph
     graph_full <- igraph::graph_from_data_frame(
         edges_df,
@@ -356,6 +356,8 @@ GPML2Network <- function(
             nodes_df_temp, colors_df[, c("GraphId1", "ColorValue","Scale")],
             by = c("GraphId1" = "GraphId1"))
     } else{
+        colors_df <- NULL
+        nodes_df <- nodes_df_temp
         nodes_df$ColorValue <- "white"
         nodes_df$Scale <- 1}
     # Change name
@@ -366,7 +368,6 @@ GPML2Network <- function(
     node2group <- nodes_df[, c("GraphId", "name", "GroupRef")]
     node2group <- node2group[!is.na(node2group$GroupRef),]
     node2group <- node2group[!duplicated(node2group),]
-
     # Give groups unique names
     group_ids <- unique(node2group$GroupRef)
     group_names <- rep(NA, length(group_ids))
@@ -375,8 +376,7 @@ GPML2Network <- function(
         group_names[g] <- paste(
             sort(node2group$name[node2group$GroupRef == group_ids[g]]),
             collapse = "_")
-        graph_ids[g] <- groups_df$GraphId[groups_df$GroupId == group_ids[g]][1]
-    }
+        graph_ids[g] <- groups_df$GraphId[groups_df$GroupId == group_ids[g]][1]}
     # Combine groups with node information
     if (length(group_names) > 0){
         nodes_df <- rbind.data.frame(

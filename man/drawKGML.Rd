@@ -51,8 +51,8 @@ gene ID).}
 \item{colorVar}{(optional) \code{vector} or \code{data.frame} for
 coloring the nodes in the pathway. This can be for instance a
 \code{data.frame} with the log2FCs and significance in the columns.
-The (row) order should match \code{featureIDs}. The color rules and palettes
-for the supplied values can be set in the colorList parameter.}
+The (row) order should match \code{featureIDs}. The color rules and
+palettes for the supplied values can be set in the colorList parameter.}
 
 \item{colorNames}{(optional) \code{character} vector with names of the
 color variables. If \code{colorNames} is NULL, the column names of the
@@ -79,35 +79,35 @@ This option only works for Windows users.}
 }
 \value{
 A \code{list} with the node table and the file location of the
-pathway and legend image.
+  pathway and legend image.
 }
 \description{
 This function draws a pathway from a KGML file with the option
-to map, e.g., expression data onto the pathway diagram.
+  to map, e.g., expression data onto the pathway diagram.
 }
 \examples{
 
- # Load example data
- lung_expr <- read.csv(system.file(
-     "extdata","data-lung-cancer.csv", package="PinPath"),
-     stringsAsFactors = FALSE)
+# Load example data
+lung_expr <- read.csv(system.file(
+    "extdata","data-lung-cancer.csv", package="PinPath"),
+    stringsAsFactors = FALSE)
 
- # Select pathway
- pathway_id <- "hsa05223"
- bfc <- BiocFileCache::BiocFileCache()
- infile <- BiocFileCache::bfcrpath(bfc,
- paste0("https://rest.kegg.jp/get/",pathway_id,"/kgml"))
+# Select pathway
+pathway_id <- "hsa05223"
+bfc <- BiocFileCache::BiocFileCache()
+infile <- BiocFileCache::bfcrpath(bfc,
+paste0("https://rest.kegg.jp/get/",pathway_id,"/kgml"))
 
- # Draw pathway
- pathVis <- PinPath::drawKGML(
-     infile = infile,
-     outdir = tempdir(),
-     annGenes = "org.Hs.eg.db",
-     inputDB = "ENSEMBL",
-     featureIDs = lung_expr$GeneID,
-     colorVar = lung_expr[,"log2FC"],
-     nodeTable = TRUE,
-     legend = TRUE,
-     openFile = FALSE) # <-- set to TRUE to open the image automatically
+# Draw pathway
+pathVis <- PinPath::drawKGML(
+    infile = infile,
+    outdir = tempdir(),
+    annGenes = "org.Hs.eg.db",
+    inputDB = "ENSEMBL",
+    featureIDs = lung_expr$GeneID,
+    colorVar = lung_expr[,"log2FC"],
+    nodeTable = TRUE,
+    legend = TRUE,
+    openFile = FALSE) # <-- set to TRUE to open the image automatically
 
 }

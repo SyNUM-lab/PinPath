@@ -1,3 +1,7 @@
+Changes in version 0.99.4
++ If no visualization variables are provided, GPML2Network() and KGML2Network() functions will generate plain network diagram
++ Package description updated
+
 Changes in version 0.99.3
 + docs folder removed and website moved to https://synum-lab.github.io/PinPath-web/
 + DESCRIPTON file updated: R dependency version (>= 4.6.0) and lazyLoad field
@@ -6,7 +10,7 @@ Changes in version 0.99.3
 
 Changes in version 0.99.2
 + Typos fixed in website
-+ Documentation updated: indicate that usage of openFile is only available for Windows.
++ Documentation updated: indicate that usage of openFile is only available for Windows
 
 Changes in version 0.99.1
 + Default value of openFile set to FALSE

@@ -43,8 +43,8 @@ The legend file gets the "legend_" prefix.}
 \item{colorVar}{(optional) \code{vector} or \code{data.frame} for coloring
 the nodes in the pathway. This can be for instance a \code{data.frame} with
 the log2FCs and significance in the columns. The (row) order should match
-\code{featureIDs}.  The color rules and palettes for the supplied values can
-be set in the colorList parameter.}
+\code{featureIDs}.  The color rules and palettes for the supplied values
+can be set in the colorList parameter.}
 
 \item{annGenes}{(optional) \code{character} string of the Bioconductor
 annotation package (e.g., org.Hs.eg.db).}
@@ -53,13 +53,13 @@ annotation package (e.g., org.Hs.eg.db).}
 metabolite mapping information (see metaboliteIDmapping package).}
 
 \item{inputDB}{(optional) Input gene ID type
-(SYMBOL, ENTREZID, ENSEMBL, UNIPROT). This can be a \code{character}
-vector of \code{length = 1} (if all gene IDs are of the same type) or of
+  (SYMBOL, ENTREZID, ENSEMBL, UNIPROT). This can be a \code{character}
+  vector of \code{length = 1} (if all gene IDs are of the same type) or of
 \code{length = nrow(featureIDs)} (if you want to specify the type
-per gene ID).}
+  per gene ID).}
 
 \item{colorNames}{(optional) \code{character} vector with names of the
-color variables. If \code{colorNames} is NULL, the column names of the
+  color variables. If \code{colorNames} is NULL, the column names of the
 \code{colorVar} \code{data.frame} will be used.}
 
 \item{colorList}{(optional) A list with information about the coloring of
@@ -92,35 +92,35 @@ This option only works for Windows users.}
 }
 \value{
 A \code{list} with the node table and the file location of the
-pathway and legend image.
+  pathway and legend image.
 }
 \description{
 This function draws a pathway from a KGML file with the option
-to map, e.g., expression data onto the pathway diagram.
+  to map, e.g., expression data onto the pathway diagram.
 }
 \examples{
 
- # Load example data
- lung_expr <- read.csv(system.file(
-     "extdata","data-lung-cancer.csv", package="PinPath"),
-     stringsAsFactors = FALSE)
+# Load example data
+lung_expr <- read.csv(system.file(
+    "extdata","data-lung-cancer.csv", package="PinPath"),
+    stringsAsFactors = FALSE)
 
- # Select pathway
- pathway_id <- "hsa05223"
- bfc <- BiocFileCache::BiocFileCache()
- infile <- BiocFileCache::bfcrpath(bfc,
- paste0("https://rest.kegg.jp/get/",pathway_id,"/kgml"))
+# Select pathway
+pathway_id <- "hsa05223"
+bfc <- BiocFileCache::BiocFileCache()
+infile <- BiocFileCache::bfcrpath(bfc,
+paste0("https://rest.kegg.jp/get/",pathway_id,"/kgml"))
 
- # Draw pathway
- pathVis <- PinPath::KGML2Network(
-     infile = infile,
-     outdir = tempdir(),
-     annGenes = "org.Hs.eg.db",
-     inputDB = "ENSEMBL",
-     featureIDs = lung_expr$GeneID,
-     colorVar = lung_expr[,"log2FC"],
-     nodeTable = TRUE,
-     legend = TRUE,
-     openFile = FALSE) # <-- set to TRUE to open the image automatically
+# Draw pathway
+pathVis <- PinPath::KGML2Network(
+    infile = infile,
+    outdir = tempdir(),
+    annGenes = "org.Hs.eg.db",
+    inputDB = "ENSEMBL",
+    featureIDs = lung_expr$GeneID,
+    colorVar = lung_expr[,"log2FC"],
+    nodeTable = TRUE,
+    legend = TRUE,
+    openFile = FALSE) # <-- set to TRUE to open the image automatically
 
 }

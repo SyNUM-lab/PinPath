@@ -12,30 +12,30 @@ in the pathway. This can be for instance a \code{data.frame} with the
 log2FCs and significance in the columns.}
 
 \item{ColorNames}{(optional) \code{character} vector with names of the
-color variables. These will be used to set the names in the legend.
-If \code{colorNames} is NULL, the column names of the \code{colorVar}
+  color variables. These will be used to set the names in the legend.
+  If \code{colorNames} is NULL, the column names of the \code{colorVar}
 \code{data.frame} will be used.}
 }
 \value{
 A list that can be provided to \link{drawGPML} to set the node
-colors in the pathway diagram.
+  colors in the pathway diagram.
 }
 \description{
 This function makes default list that can be used to set the
-node colors in the pathway diagram.
+  node colors in the pathway diagram.
 }
 \details{
 For both divergent and sequential color scales,
-values outside the specified range (\code{minVal} to \code{maxVal})
-are clipped and mapped to the colors corresponding to the
-minimum (\code{minCol}) or maximum (\code{maxCol}).
+  values outside the specified range (\code{minVal} to \code{maxVal})
+  are clipped and mapped to the colors corresponding to the
+  minimum (\code{minCol}) or maximum (\code{maxCol}).
 }
 \examples{
 
 # Load example data
- lung_expr <- read.csv(system.file(
-     "extdata","data-lung-cancer.csv", package="PinPath"),
-     stringsAsFactors = FALSE)
+lung_expr <- read.csv(system.file(
+    "extdata","data-lung-cancer.csv", package="PinPath"),
+    stringsAsFactors = FALSE)
 
 # Set significance as a binary variable
 lung_expr$Significant <- ifelse(lung_expr$adj.P.Value < 0.05, "Yes", "No")

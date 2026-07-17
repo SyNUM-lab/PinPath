@@ -1,7 +1,7 @@
 Package: PinPath
 Type: Package
-Title: Visualization of Omics Data on Pathway Diagrams
-Version: 0.99.3
+Title: Visualization of Omics Data onto Pathway Diagrams
+Version: 0.99.4
 Date: 2026-03-12
 Authors@R: c(
     person("Jarno", "Koetsier", role = c("aut","cre"), email = "jarno.koetsier@gmail.com", comment = c(ORCID = "0000-0002-7981-1345")),
@@ -41,12 +41,13 @@ Suggests:
 Depends:
     R (>= 4.6.0)
 Encoding: UTF-8
-Description: With PinPath, you can visualize omics data onto pathways diagrams from WikiPathways and KEGG.
+Description: PinPath enables flexible visualization of (omics) data onto pathways diagrams, allowing users to pinpoint where the relevant changes occur.
+    It supports pathway diagrams from WikiPathways and KEGG, as well as custom GPML and KGML files. Data can be displayed on both native pathway layouts and network representations.
 License: MIT + file LICENSE
 URL: https://github.com/SyNUM-lab/PinPath
 BugReports: https://github.com/SyNUM-lab/PinPath/issues
-biocViews: Pathways, Visualization, GraphAndNetwork, KEGG
+biocViews: Pathways, Visualization, GraphAndNetwork, KEGG, Metabolomics, Proteomics, Transcriptomics, Network
 NeedsCompilation: no
 VignetteBuilder: knitr
-RoxygenNote: 7.3.3
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.0.0
