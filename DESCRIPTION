@@ -1,8 +1,8 @@
 Package: PinPath
 Type: Package
 Title: Visualization of Omics Data onto Pathway Diagrams
-Version: 0.99.6
-Date: 2026-10-15
+Version: 0.99.7
+Date: 2026-11-02
 Authors@R: c(
     person("Jarno", "Koetsier", role = c("aut","cre"), email = "jarno.koetsier@gmail.com", comment = c(ORCID = "0000-0002-7981-1345")),
     person("Lars", "Eijssen", role = "aut", comment = c(ORCID = "0000-0002-6473-2839")),

@@ -1,3 +1,6 @@
+Changes in version 0.99.7
++ Bug fix in legend generation for qualitative and sequential color scales.
+
 Changes in version 0.99.6
 + Improved ID mapping for KEGG pathways.
 + Darker color palette for the default qualitative color scale.

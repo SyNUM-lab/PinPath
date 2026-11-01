@@ -501,7 +501,7 @@
     # Add color scales
     for (s in seq_len(nScales)){
         ScaleType <- colorList[[s]]$ScaleType
-        if (same){.legendName(colorList, s)}else{
+        if (same & (ScaleType == "Divergent")){.legendName(colorList, s)}else{
             if (ScaleType == "Divergent"){.legendDivergent(colorList, s)}
             if (ScaleType == "Sequential"){.legendSequential(colorList, s)}
             if (ScaleType == "Qualitative"){.legendQualitative(colorList, s)}
